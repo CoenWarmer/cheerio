@@ -236,6 +236,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                 left: '20px',
                 right: '420px',
                 pointerEvents: 'none',
+                zIndex: 500,
               }}
             >
               <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
