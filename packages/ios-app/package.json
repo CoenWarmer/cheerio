@@ -1,0 +1,6 @@
+{
+  "name": "@cheerio/ios-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cheerio iOS app built with Swift/SwiftUI. This is an Xcode project and does not use npm/yarn for dependency management. Open CheerioApp.xcodeproj in Xcode to work on this project."
+}

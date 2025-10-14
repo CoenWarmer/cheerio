@@ -1,0 +1,18 @@
+{
+  "name": "cheerio-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "yarn workspace @cheerio/web-app dev",
+    "build:web": "yarn workspace @cheerio/web-app build",
+    "start:web": "yarn workspace @cheerio/web-app start",
+    "lint:web": "yarn workspace @cheerio/web-app lint"
+  },
+  "packageManager": "yarn@4.0.0",
+  "dependencies": {
+    "prettier": "^3.6.2"
+  }
+}
