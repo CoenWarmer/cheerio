@@ -3,6 +3,22 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  Box,
+  Center,
+  Stack,
+  Title,
+  Text,
+  Anchor,
+  Group,
+  Button,
+  Burger,
+  Container,
+  Popover,
+  List,
+  ThemeIcon,
+} from '@mantine/core';
+import { IconCheck } from '@tabler/icons-react';
 import ChatSidebar from '@/components/ChatSidebar';
 import ActivityTracker from '@/components/ActivityTracker';
 import UserActivityFeed from '@/components/UserActivityFeed';
@@ -12,23 +28,18 @@ import { useActivity } from '@/hooks/useActivity';
 import { useEmojiMarkers } from '@/hooks/useEmojiMarkers';
 import { useUser } from '@/hooks/useUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
+import { MicrophoneIcon } from './icons/MicrophoneIcon';
+import { ChatIcon } from './icons/ChatIcon';
 
 // Dynamically import the map component to avoid SSR issues
 const RoomMap = dynamic(() => import('@/components/RoomMap'), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f3f4f6',
-      }}
-    >
-      <p style={{ color: '#6b7280' }}>Loading map...</p>
-    </div>
+    <Center w="100%" h="100%" bg="gray.1">
+      <Text c="gray.6">Loading map...</Text>
+    </Center>
   ),
 });
 
@@ -60,6 +71,19 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
   );
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [cheerPopoverOpened, setCheerPopoverOpened] = useState(false);
+
+  // Audio recording hook for cheer popover
+  const {
+    isRecording: isCheerRecording,
+    isSending: isCheerSending,
+    toggleRecording: toggleCheerRecording,
+  } = useAudioRecorder({
+    roomSlug,
+    onRecordingComplete: () => {
+      setCheerPopoverOpened(false);
+    },
+  });
 
   // Redirect to sign-in if no user
   useEffect(() => {
@@ -81,71 +105,41 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          background: '#f9fafb',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              marginBottom: '1rem',
-              fontSize: '2rem',
-            }}
-          >
-            ⏳
-          </div>
-          <p style={{ color: '#6b7280' }}>Loading room...</p>
-        </div>
-      </div>
+      <Center h="100vh" bg="gray.0">
+        <Stack align="center" gap="md">
+          <Text fz={32}>⏳</Text>
+          <Text c="gray.6">Loading room...</Text>
+        </Stack>
+      </Center>
     );
   }
 
   if (roomError || !room) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          background: '#f9fafb',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <h1
-            style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              marginBottom: '1rem',
-            }}
-          >
-            Room not found
-          </h1>
-          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+      <Center h="100vh" bg="gray.0">
+        <Stack align="center" gap="xl">
+          <Title order={1}>Room not found</Title>
+          <Text c="gray.6" ta="center" maw={500}>
             {roomError?.message ||
               'The room you are looking for does not exist'}
-          </p>
-          <Link
+          </Text>
+          <Anchor
+            component={Link}
             href="/rooms"
+            px="xl"
+            py="md"
+            bg="blue.6"
+            c="white"
             style={{
-              display: 'inline-block',
-              padding: '0.75rem 1.5rem',
-              background: '#3b82f6',
-              color: 'white',
               borderRadius: '0.5rem',
               textDecoration: 'none',
-              fontWeight: '500',
+              fontWeight: 500,
             }}
           >
             ← Back to Rooms
-          </Link>
-        </div>
-      </div>
+          </Anchor>
+        </Stack>
+      </Center>
     );
   }
 
@@ -156,29 +150,6 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
           __html: `
         .chat-sidebar.collapsed {
           right: -400px !important;
-        }
-        
-        .chat-toggle-btn {
-          position: absolute;
-          left: -40px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 40px;
-          height: 80px;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-right: none;
-          border-radius: 8px 0 0 8px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10;
-          transition: all 0.3s ease;
-        }
-        
-        .chat-toggle-btn:hover {
-          background: #f9fafb;
         }
         
         .map-overlay-bottom.sidebar-collapsed {
@@ -202,17 +173,6 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
             bottom: -50vh !important;
           }
           
-          .chat-toggle-btn {
-            left: 50%;
-            top: -40px;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 40px;
-            border: 1px solid #e5e7eb;
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-          }
-          
           .map-overlay-bottom {
             right: 20px !important;
             bottom: calc(50vh + 20px) !important;
@@ -225,7 +185,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
       `,
         }}
       />
-      <div
+      <Box
         style={{
           height: '100vh',
           overflow: 'hidden',
@@ -235,64 +195,200 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
         }}
       >
         {/* Header */}
-        {/* <header
+        <Box
+          component="header"
           style={{
             background: 'white',
             borderBottom: '1px solid #e5e7eb',
-            padding: '1rem 2rem',
             flexShrink: 0,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div>
-              <Link
-                href="/rooms"
-                style={{
-                  color: '#6b7280',
-                  textDecoration: 'none',
-                  fontSize: '0.875rem',
-                  marginBottom: '0.25rem',
-                  display: 'block',
-                }}
-              >
-                ← Back to Rooms
-              </Link>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
-                {room.name}
-              </h1>
-            </div>
-            <Link
-              href="/profile"
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#f3f4f6',
-                color: '#374151',
-                borderRadius: '0.375rem',
-                textDecoration: 'none',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-              }}
-            >
-              Profile
-            </Link>
-          </div>
-        </header> */}
+          <Container size="fluid" px="lg" py="md" style={{ maxWidth: '100%' }}>
+            <Group justify="space-between" align="center">
+              {/* Left: Brand/Logo and Room Name */}
+              <Group gap="md">
+                <Anchor
+                  component={Link}
+                  href="/rooms"
+                  c="gray.7"
+                  fw={700}
+                  size="lg"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Cheerio <SpeakerphoneIcon fill="#228be6" />
+                </Anchor>
+                <Text c="gray.4" fw={300} size="lg">
+                  /
+                </Text>
+                <Title order={3} size="h4" c="gray.9">
+                  {room.name}
+                </Title>
+
+                <Popover
+                  width={500}
+                  position="bottom"
+                  withArrow
+                  shadow="xl"
+                  opened={cheerPopoverOpened}
+                  onChange={setCheerPopoverOpened}
+                >
+                  <Popover.Target>
+                    <Button
+                      variant="light"
+                      leftSection={<SpeakerphoneIcon />}
+                      radius="xl"
+                      size="md"
+                      pr={14}
+                      h={48}
+                      onClick={() => setCheerPopoverOpened(o => !o)}
+                    >
+                      Moedig je atleet aan!
+                    </Button>
+                  </Popover.Target>
+                  <Popover.Dropdown p="xl">
+                    <Stack gap="xl">
+                      <Box>
+                        <Title
+                          order={2}
+                          size="h2"
+                          fw={700}
+                          mb="md"
+                          style={{ lineHeight: 1.2 }}
+                        >
+                          Moedig je{' '}
+                          <Text
+                            component="span"
+                            fw={700}
+                            style={{
+                              backgroundColor: '#E7F5FF',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                            }}
+                          >
+                            atleet
+                          </Text>{' '}
+                          aan! 💪
+                        </Title>
+                        <Text size="md" c="dimmed" style={{ lineHeight: 1.6 }}>
+                          Klik op opnemen en neem een boodschap op. Jouw sporter
+                          hoort het direct.
+                        </Text>
+                      </Box>
+
+                      <List
+                        spacing="md"
+                        size="sm"
+                        center
+                        icon={
+                          <ThemeIcon color="blue" size={20} radius="xl">
+                            <IconCheck size={12} />
+                          </ThemeIcon>
+                        }
+                      >
+                        <List.Item>
+                          <Text size="sm">
+                            <strong>Direct hoorbaar</strong> – je boodschap
+                            wordt meteen afgespeeld bij de atleet
+                          </Text>
+                        </List.Item>
+                        <List.Item>
+                          <Text size="sm">
+                            <strong>Eenvoudig opnemen</strong> – één klik en je
+                            bent klaar om te spreken
+                          </Text>
+                        </List.Item>
+                        <List.Item>
+                          <Text size="sm">
+                            <strong>Extra motivatie</strong> – geef die extra
+                            push op het juiste moment
+                          </Text>
+                        </List.Item>
+                      </List>
+
+                      <Group gap="md">
+                        <Button
+                          variant={isCheerRecording ? 'filled' : 'filled'}
+                          color={isCheerRecording ? 'red' : 'blue'}
+                          leftSection={<MicrophoneIcon />}
+                          radius="xl"
+                          size="md"
+                          pr={14}
+                          h={48}
+                          onClick={toggleCheerRecording}
+                          loading={isCheerSending}
+                          disabled={isCheerSending}
+                        >
+                          {isCheerRecording ? 'Stop Opname' : 'Start Opname'}
+                        </Button>
+                      </Group>
+                    </Stack>
+                  </Popover.Dropdown>
+                </Popover>
+              </Group>
+
+              {/* Right: Navigation Links */}
+              <Group gap="md" visibleFrom="sm">
+                <Button
+                  variant="light"
+                  leftSection={<ChatIcon size={20} />}
+                  radius="xl"
+                  size="s"
+                  pr={14}
+                  pl={4}
+                  h={30}
+                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                >
+                  Chat
+                </Button>
+                <Anchor
+                  component={Link}
+                  href="/rooms"
+                  c="gray.6"
+                  size="sm"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Events
+                </Anchor>
+                <Anchor
+                  component={Link}
+                  href="/dashboard"
+                  c="gray.6"
+                  size="sm"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Dashboard
+                </Anchor>
+                <Button
+                  component={Link}
+                  href="/profile"
+                  variant="default"
+                  size="sm"
+                >
+                  Profile
+                </Button>
+              </Group>
+
+              {/* Mobile burger menu */}
+              <Burger
+                opened={false}
+                hiddenFrom="sm"
+                size="sm"
+                aria-label="Toggle navigation"
+              />
+            </Group>
+          </Container>
+        </Box>
 
         {/* Main Content */}
-        <div
+        <Box
           style={{
             flex: 1,
             position: 'relative',
             overflow: 'hidden',
           }}
         >
-          <main
+          <Box
+            component="main"
             style={{
               position: 'absolute',
               top: 0,
@@ -304,7 +400,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
               zIndex: 0,
             }}
           >
-            <div style={{ flex: 1, position: 'relative' }}>
+            <Box style={{ flex: 1, position: 'relative' }}>
               <RoomMap
                 roomName={room.name}
                 location={room.location}
@@ -313,7 +409,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                 trackingPaths={trackingPaths}
               />
 
-              <div
+              <Box
                 className={`map-overlay-bottom ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}
                 style={{
                   position: 'absolute',
@@ -325,22 +421,22 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                   transition: 'right 0.3s ease, bottom 0.3s ease',
                 }}
               >
-                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                  <div style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
+                <Box style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                  <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
                     {user && room && <ActivityTracker roomSlug={room.slug} />}
-                  </div>
-                  <div style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
+                  </Box>
+                  <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
                     {room && (
                       <UserActivityFeed roomId={room.id} roomSlug={room.slug} />
                     )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
           {/* Chat Sidebar Container */}
-          <div
+          <Box
             className={`chat-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}
             style={{
               position: 'absolute',
@@ -353,7 +449,8 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
             }}
           >
             {/* Chat Sidebar */}
-            <aside
+            <Box
+              component="aside"
               style={{
                 width: '100%',
                 height: '100%',
@@ -368,7 +465,6 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                 <ChatSidebar
                   roomId={room.id}
                   roomSlug={room.slug}
-                  roomName={room.name}
                   currentUser={user}
                   currentUserLocation={
                     userLocations.find(loc => loc.userId === user.id)
@@ -379,95 +475,10 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                   }
                 />
               )}
-            </aside>
-          </div>
-
-          <div
-            style={{
-              position: 'absolute',
-              right: '30px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column',
-              gap: '12px',
-              zIndex: 500,
-            }}
-          >
-            {/* Toggle Button */}
-            <button
-              aria-label={isSidebarCollapsed ? 'Show chat' : 'Hide chat'}
-              title={isSidebarCollapsed ? 'Show chat' : 'Hide chat'}
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              style={{
-                display: 'flex',
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'white',
-                border: '2px solid #e5e7eb',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                cursor: 'pointer',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: '5px',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <span style={{ fontSize: '35px' }}>
-                {isSidebarCollapsed ? '💬' : '✕'}
-              </span>
-              <span
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  color: '#666',
-                }}
-              >
-                Chat
-              </span>
-            </button>
-
-            {/* Megaphone Button */}
-            <button
-              style={{
-                display: 'flex',
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'white',
-                border: '2px solid #e5e7eb',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                cursor: 'pointer',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: '5px',
-                transition: 'all 0.2s ease',
-              }}
-              onClick={() => {
-                console.log('Megaphone button clicked');
-              }}
-              aria-label="Broadcast"
-              title="Broadcast"
-            >
-              <span style={{ fontSize: '35px' }}>📣</span>
-              <span
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  color: '#666',
-                }}
-              >
-                Cheer
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }

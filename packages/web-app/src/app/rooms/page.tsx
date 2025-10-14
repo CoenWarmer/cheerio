@@ -1,243 +1,206 @@
 'use client';
 
 import Link from 'next/link';
+import {
+  Box,
+  Container,
+  Title,
+  Text,
+  SimpleGrid,
+  Card,
+  Badge,
+  Group,
+  Stack,
+  Alert,
+  Anchor,
+  Center,
+  Progress,
+  Paper,
+} from '@mantine/core';
 import { useRooms } from '@/hooks/useRooms';
 
 export default function RoomsListPage() {
   const { rooms, isLoading: loading, error } = useRooms();
 
+  // Helper function to get status color
+  const getStatusColor = (status: string | null) => {
+    switch (status) {
+      case 'in_progress':
+        return 'blue';
+      case 'finished':
+        return 'green';
+      case 'awaiting':
+      default:
+        return 'gray';
+    }
+  };
+
+  // Helper function to get progress percentage based on status
+  const getStatusProgress = (status: string | null) => {
+    switch (status) {
+      case 'finished':
+        return 100;
+      case 'in_progress':
+        return 50;
+      case 'awaiting':
+      default:
+        return 10;
+    }
+  };
+
+  // Helper function to format status text
+  const getStatusText = (status: string | null) => {
+    switch (status) {
+      case 'in_progress':
+        return 'In Progress';
+      case 'finished':
+        return 'Finished';
+      case 'awaiting':
+      default:
+        return 'Awaiting';
+    }
+  };
+
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-        <nav
-          style={{
-            background: 'white',
-            borderBottom: '1px solid #e5e7eb',
-            padding: '1rem 2rem',
-          }}
-        >
-          <div
-            style={{
-              maxWidth: '1200px',
-              margin: '0 auto',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Rooms</h1>
-            <Link
-              href="/dashboard"
-              style={{
-                color: '#6b7280',
-                textDecoration: 'none',
-                fontSize: '0.875rem',
-              }}
-            >
-              ← Dashboard
-            </Link>
-          </div>
-        </nav>
-        <main
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '2rem',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#6b7280' }}>Loading rooms...</p>
-        </main>
-      </div>
+      <Box mih="100vh" bg="gray.0">
+        <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
+          <Container size="xl">
+            <Group justify="space-between" align="center">
+              <Title order={1}>Rooms</Title>
+              <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
+                ← Dashboard
+              </Anchor>
+            </Group>
+          </Container>
+        </Box>
+        <Container size="xl" py="xl">
+          <Center>
+            <Text c="gray.6">Loading rooms...</Text>
+          </Center>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <nav
-        style={{
-          background: 'white',
-          borderBottom: '1px solid #e5e7eb',
-          padding: '1rem 2rem',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Rooms</h1>
-          <Link
-            href="/dashboard"
-            style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-            }}
-          >
-            ← Dashboard
-          </Link>
-        </div>
-      </nav>
+    <Box mih="100vh" bg="gray.0">
+      <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
+        <Container size="xl">
+          <Group justify="space-between" align="center">
+            <Title order={1}>Rooms</Title>
+            <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
+              ← Dashboard
+            </Anchor>
+          </Group>
+        </Container>
+      </Box>
 
-      <main
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '2rem',
-        }}
-      >
+      <Container size="xl" py="xl">
         {error && (
-          <div
-            style={{
-              padding: '1rem',
-              background: '#fee',
-              color: '#dc2626',
-              borderRadius: '0.5rem',
-              marginBottom: '2rem',
-            }}
-          >
+          <Alert color="red" variant="light" mb="xl">
             {error.message || 'Failed to load rooms'}
-          </div>
+          </Alert>
         )}
 
         {rooms.length === 0 ? (
-          <div
-            style={{
-              background: 'white',
-              padding: '3rem 2rem',
-              borderRadius: '0.5rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏠</div>
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                marginBottom: '0.5rem',
-              }}
-            >
-              No rooms yet
-            </h2>
-            <p style={{ color: '#6b7280' }}>
-              Create your first room to get started!
-            </p>
-          </div>
+          <Card shadow="sm" padding="xl" radius="md" withBorder>
+            <Stack align="center" gap="md">
+              <Text fz={48}>🏠</Text>
+              <Title order={2}>No rooms yet</Title>
+              <Text c="gray.6">Create your first room to get started!</Text>
+            </Stack>
+          </Card>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: '1.5rem',
-            }}
-          >
+          <Stack gap="md">
             {rooms.map(room => (
-              <Link
+              <Paper
                 key={room.id}
+                component={Link}
                 href={`/room/${room.slug}`}
-                style={{ textDecoration: 'none' }}
+                shadow="xs"
+                p="xl"
+                radius="md"
+                withBorder
+                style={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: 'white',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.boxShadow =
+                    '0 2px 8px rgba(0,0,0,0.08)';
+                  e.currentTarget.style.borderColor = '#228be6';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.boxShadow =
+                    '0 1px 3px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = '#dee2e6';
+                }}
               >
-                <div
-                  style={{
-                    background: 'white',
-                    padding: '1.5rem',
-                    borderRadius: '0.5rem',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    transition: 'all 0.2s',
-                    cursor: 'pointer',
-                    height: '100%',
-                    border: '1px solid transparent',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.boxShadow =
-                      '0 4px 6px rgba(0,0,0,0.1)';
-                    e.currentTarget.style.borderColor = '#3b82f6';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.boxShadow =
-                      '0 1px 3px rgba(0,0,0,0.1)';
-                    e.currentTarget.style.borderColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      marginBottom: '0.75rem',
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold',
-                        color: '#111827',
-                      }}
-                    >
-                      {room.name}
-                    </h3>
-                    {room.is_private && (
-                      <span
-                        style={{
-                          padding: '0.25rem 0.5rem',
-                          background: '#fef3c7',
-                          color: '#92400e',
-                          borderRadius: '0.25rem',
-                          fontSize: '0.75rem',
-                          fontWeight: '500',
-                        }}
-                      >
-                        🔒
-                      </span>
+                <Group justify="space-between" align="flex-start" mb="md">
+                  <Box style={{ flex: 1 }}>
+                    <Group gap="sm" mb="xs">
+                      <Title order={3} size="h3" fw={600} c="gray.9">
+                        {room.name}
+                      </Title>
+                      {room.is_private && (
+                        <Badge color="yellow" variant="light" size="sm">
+                          🔒 Private
+                        </Badge>
+                      )}
+                    </Group>
+                    {room.description && (
+                      <Text size="sm" c="gray.6" lineClamp={2} mb="md">
+                        {room.description}
+                      </Text>
                     )}
-                  </div>
-
-                  {room.description && (
-                    <p
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '0.875rem',
-                        marginBottom: '1rem',
-                        lineHeight: '1.5',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {room.description}
-                    </p>
-                  )}
-
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: '#9ca3af',
-                      paddingTop: '0.75rem',
-                      borderTop: '1px solid #e5e7eb',
-                    }}
+                  </Box>
+                  <Badge
+                    color={getStatusColor(room.status)}
+                    variant="light"
+                    size="lg"
+                    radius="sm"
                   >
+                    {getStatusText(room.status)}
+                  </Badge>
+                </Group>
+
+                <Progress
+                  value={getStatusProgress(room.status)}
+                  color={getStatusColor(room.status)}
+                  size="sm"
+                  radius="xl"
+                  mb="sm"
+                />
+
+                <Group justify="space-between">
+                  <Text size="xs" c="gray.5">
                     Created{' '}
                     {new Date(room.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
                     })}
-                  </div>
-                </div>
-              </Link>
+                  </Text>
+                  {room.start_time && (
+                    <Text size="xs" c="gray.5">
+                      Starts{' '}
+                      {new Date(room.start_time).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </Text>
+                  )}
+                </Group>
+              </Paper>
             ))}
-          </div>
+          </Stack>
         )}
-      </main>
-    </div>
+      </Container>
+    </Box>
   );
 }

@@ -2,6 +2,24 @@
 
 import { useRef } from 'react';
 import Link from 'next/link';
+import {
+  Box,
+  Container,
+  Title,
+  Text,
+  TextInput,
+  Button,
+  Group,
+  Stack,
+  Alert,
+  Paper,
+  Anchor,
+  Avatar,
+  FileButton,
+  Badge,
+  Loader,
+  Center,
+} from '@mantine/core';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { getPermissionLabel } from '@/types/permissions';
 
@@ -39,371 +57,167 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f9fafb',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              border: '4px solid #e5e7eb',
-              borderTopColor: '#3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 16px',
-            }}
-          />
-          <p style={{ color: '#6b7280' }}>Loading profile...</p>
-        </div>
-        <style jsx>{`
-          @keyframes spin {
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
-      </div>
+      <Center mih="100vh" bg="gray.0">
+        <Stack align="center" gap="md">
+          <Loader size="lg" />
+          <Text c="gray.6">Loading profile...</Text>
+        </Stack>
+      </Center>
     );
   }
 
+  const getPermissionBadgeColor = (perm: string) => {
+    if (perm === 'admin') return 'yellow';
+    if (perm === 'tracker') return 'blue';
+    return 'gray';
+  };
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#f9fafb',
-        padding: '2rem 1rem',
-      }}
-    >
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <Link
-            href="/dashboard"
-            style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-              display: 'inline-block',
-              marginBottom: '1rem',
-            }}
-          >
-            ← Back to Dashboard
-          </Link>
-          <h1
-            style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              marginBottom: '0.5rem',
-            }}
-          >
-            Edit Profile
-          </h1>
-          <p style={{ color: '#6b7280' }}>
-            Manage your display name and avatar
-          </p>
-        </div>
-
-        {/* Success Message */}
-        {success && (
-          <div
-            style={{
-              padding: '1rem',
-              background: '#d1fae5',
-              border: '1px solid #10b981',
-              borderRadius: '0.5rem',
-              marginBottom: '1.5rem',
-              color: '#065f46',
-            }}
-          >
-            ✓ Profile updated successfully!
-          </div>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div
-            style={{
-              padding: '1rem',
-              background: '#fee2e2',
-              border: '1px solid #ef4444',
-              borderRadius: '0.5rem',
-              marginBottom: '1.5rem',
-              color: '#991b1b',
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form
-          onSubmit={onSubmit}
-          style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '0.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          {/* Avatar Section */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '0.5rem',
-              }}
+    <Box mih="100vh" bg="gray.0" p="xl">
+      <Container size="sm">
+        <Stack gap="xl">
+          {/* Header */}
+          <Box>
+            <Anchor
+              component={Link}
+              href="/dashboard"
+              c="gray.6"
+              size="sm"
+              mb="md"
+              display="block"
             >
-              Avatar
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              {/* Avatar Preview */}
-              <div
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  background: '#e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {previewUrl || avatarUrl ? (
-                  <img
-                    src={previewUrl || avatarUrl || ''}
-                    alt="Avatar"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : (
-                  <span style={{ fontSize: '2rem', color: '#9ca3af' }}>
-                    {displayName?.[0]?.toUpperCase() ||
-                      user?.email?.[0]?.toUpperCase() ||
-                      '?'}
-                  </span>
-                )}
-              </div>
+              ← Back to Dashboard
+            </Anchor>
+            <Title order={1} mb="xs">
+              Edit Profile
+            </Title>
+            <Text c="gray.6">Manage your display name and avatar</Text>
+          </Box>
 
-              {/* Upload Buttons */}
-              <div style={{ flex: 1 }}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
-                  onChange={onFileSelect}
-                  style={{ display: 'none' }}
-                />
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: uploading ? '#d1d5db' : '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.375rem',
-                      fontWeight: '500',
-                      cursor: uploading ? 'not-allowed' : 'pointer',
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {uploading ? 'Uploading...' : 'Upload'}
-                  </button>
-                  {avatarUrl && (
-                    <button
-                      type="button"
-                      onClick={handleRemoveAvatar}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        background: 'white',
-                        color: '#ef4444',
-                        border: '1px solid #ef4444',
-                        borderRadius: '0.375rem',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                      }}
+          {/* Success Message */}
+          {success && (
+            <Alert color="green" variant="light">
+              ✓ Profile updated successfully!
+            </Alert>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <Alert color="red" variant="light">
+              {error}
+            </Alert>
+          )}
+
+          {/* Form */}
+          <Paper shadow="sm" p="xl" radius="md" withBorder>
+            <form onSubmit={onSubmit}>
+              <Stack gap="lg">
+                {/* Avatar Section */}
+                <Box>
+                  <Text size="sm" fw={500} mb="sm">
+                    Avatar
+                  </Text>
+                  <Group align="center">
+                    <Avatar
+                      src={previewUrl || avatarUrl || undefined}
+                      size={80}
+                      radius="xl"
+                      color="gray"
                     >
-                      Remove
-                    </button>
-                  )}
-                </div>
-                <p
-                  style={{
-                    fontSize: '0.75rem',
-                    color: '#6b7280',
-                    marginTop: '0.5rem',
+                      {!previewUrl &&
+                        !avatarUrl &&
+                        (displayName?.[0]?.toUpperCase() ||
+                          user?.email?.[0]?.toUpperCase() ||
+                          '?')}
+                    </Avatar>
+
+                    <Stack gap="xs" style={{ flex: 1 }}>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        onChange={onFileSelect}
+                        style={{ display: 'none' }}
+                      />
+                      <Group gap="xs">
+                        <Button
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                          loading={uploading}
+                        >
+                          {uploading ? 'Uploading...' : 'Upload'}
+                        </Button>
+                        {avatarUrl && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            color="red"
+                            onClick={handleRemoveAvatar}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </Group>
+                      <Text size="xs" c="gray.6">
+                        JPEG, PNG or WebP. Max 5MB.
+                      </Text>
+                    </Stack>
+                  </Group>
+                </Box>
+
+                {/* Display Name */}
+                <TextInput
+                  label="Display Name"
+                  placeholder="Enter your display name"
+                  value={displayName}
+                  onChange={e => setDisplayName(e.target.value)}
+                  description="This is how other users will see you in rooms and chats."
+                />
+
+                {/* Email (read-only) */}
+                <TextInput
+                  label="Email"
+                  value={user?.email || ''}
+                  disabled
+                  styles={{
+                    input: { backgroundColor: '#f9fafb', color: '#6b7280' },
                   }}
-                >
-                  JPEG, PNG or WebP. Max 5MB.
-                </p>
-              </div>
-            </div>
-          </div>
+                />
 
-          {/* Display Name */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label
-              htmlFor="displayName"
-              style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '0.5rem',
-              }}
-            >
-              Display Name
-            </label>
-            <input
-              id="displayName"
-              type="text"
-              value={displayName}
-              onChange={e => setDisplayName(e.target.value)}
-              placeholder="Enter your display name"
-              style={{
-                width: '100%',
-                padding: '0.625rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                fontSize: '1rem',
-              }}
-            />
-            <p
-              style={{
-                fontSize: '0.75rem',
-                color: '#6b7280',
-                marginTop: '0.5rem',
-              }}
-            >
-              This is how other users will see you in rooms and chats.
-            </p>
-          </div>
+                {/* Permission (read-only) */}
+                <Box>
+                  <Text size="sm" fw={500} mb="xs">
+                    Permission Level
+                  </Text>
+                  <Paper p="xs" withBorder bg="gray.0">
+                    <Group gap="sm">
+                      <Badge
+                        color={getPermissionBadgeColor(permissions)}
+                        variant="light"
+                        tt="uppercase"
+                        size="sm"
+                      >
+                        {permissions}
+                      </Badge>
+                      <Text size="sm" c="gray.6">
+                        {getPermissionLabel(permissions)}
+                      </Text>
+                    </Group>
+                  </Paper>
+                  <Text size="xs" c="gray.6" mt="xs">
+                    Contact an administrator to change your permission level.
+                  </Text>
+                </Box>
 
-          {/* Email (read-only) */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '0.5rem',
-              }}
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              value={user?.email || ''}
-              disabled
-              style={{
-                width: '100%',
-                padding: '0.625rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#6b7280',
-              }}
-            />
-          </div>
-
-          {/* Permission (read-only) */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '0.5rem',
-              }}
-            >
-              Permission Level
-            </label>
-            <div
-              style={{
-                width: '100%',
-                padding: '0.625rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#6b7280',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              <span
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  background:
-                    permissions === 'admin'
-                      ? '#fef3c7'
-                      : permissions === 'tracker'
-                        ? '#dbeafe'
-                        : '#f3f4f6',
-                  color:
-                    permissions === 'admin'
-                      ? '#92400e'
-                      : permissions === 'tracker'
-                        ? '#1e40af'
-                        : '#374151',
-                }}
-              >
-                {permissions}
-              </span>
-              <span>{getPermissionLabel(permissions)}</span>
-            </div>
-            <p
-              style={{
-                fontSize: '0.75rem',
-                color: '#6b7280',
-                marginTop: '0.5rem',
-              }}
-            >
-              Contact an administrator to change your permission level.
-            </p>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={saving}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: saving ? '#d1d5db' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.375rem',
-              fontSize: '1rem',
-              fontWeight: '500',
-              cursor: saving ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </form>
-      </div>
-    </div>
+                {/* Submit Button */}
+                <Button type="submit" loading={saving} fullWidth>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </Stack>
+            </form>
+          </Paper>
+        </Stack>
+      </Container>
+    </Box>
   );
 }

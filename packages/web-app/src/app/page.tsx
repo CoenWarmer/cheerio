@@ -1,11 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Box, Title, Text, Button, Group, Stack, Anchor } from '@mantine/core';
 import styles from './page.module.css';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <Box className={styles.page}>
+      <Box component="main" className={styles.main}>
         <Image
           className={styles.logo}
           src="/next.svg"
@@ -14,47 +15,43 @@ export default function Home() {
           height={38}
           priority
         />
-        <h1
-          style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}
-        >
+        <Title order={1} ta="center" mb="md">
           Welcome to Cheerio
-        </h1>
-        <p style={{ color: '#666', marginBottom: '2rem', textAlign: 'center' }}>
+        </Title>
+        <Text c="gray.6" ta="center" mb="xl">
           A modern web app with authentication powered by Supabase
-        </p>
+        </Text>
 
-        <div className={styles.ctas}>
-          <Link className={styles.primary} href="/register">
+        <Group className={styles.ctas} gap="md" justify="center">
+          <Button
+            component={Link}
+            href="/register"
+            size="lg"
+            className={styles.primary}
+          >
             Get Started
-          </Link>
-          <Link href="/sign-in" className={styles.secondary}>
+          </Button>
+          <Button
+            component={Link}
+            href="/sign-in"
+            size="lg"
+            variant="default"
+            className={styles.secondary}
+          >
             Sign In
-          </Link>
-        </div>
+          </Button>
+        </Group>
 
-        <div style={{ marginTop: '3rem', textAlign: 'center' }}>
-          <p
-            style={{
-              fontSize: '0.875rem',
-              color: '#999',
-              marginBottom: '0.5rem',
-            }}
-          >
+        <Stack mt="xl" align="center" gap="xs">
+          <Text size="sm" c="gray.5">
             Already set up?
-          </p>
-          <Link
-            href="/dashboard"
-            style={{
-              color: '#0070f3',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-            }}
-          >
+          </Text>
+          <Anchor component={Link} href="/dashboard" size="sm">
             Go to Dashboard →
-          </Link>
-        </div>
-      </main>
-      <footer className={styles.footer}>
+          </Anchor>
+        </Stack>
+      </Box>
+      <Box component="footer" className={styles.footer}>
         <a
           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
           target="_blank"
@@ -97,7 +94,7 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
-      </footer>
-    </div>
+      </Box>
+    </Box>
   );
 }

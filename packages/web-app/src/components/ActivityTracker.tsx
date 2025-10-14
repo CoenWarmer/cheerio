@@ -1,6 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import {
+  Box,
+  Card,
+  SimpleGrid,
+  Text,
+  Button,
+  Alert,
+  Stack,
+} from '@mantine/core';
 import { useProfile } from '@/hooks/useProfile';
 import { useCreateActivity } from '@/hooks/useActivity';
 import { canTrack } from '@/types/permissions';
@@ -191,17 +200,11 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
 
   if (loading) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          background: 'white',
-          borderRadius: '0.5rem',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          border: '1px solid #e5e7eb',
-        }}
-      >
-        <div style={{ textAlign: 'center', color: '#6b7280' }}>Loading...</div>
-      </div>
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Text ta="center" c="gray.6">
+          Loading...
+        </Text>
+      </Card>
     );
   }
 
@@ -211,128 +214,61 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
   }
 
   return (
-    <div
-      style={{
-        padding: '1rem',
-        background: 'white',
-        borderRadius: '0.5rem',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        border: '1px solid #e5e7eb',
-      }}
-    >
-      {/* Stats */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <div
-          style={{
-            padding: '0.75rem',
-            background: '#eff6ff',
-            borderRadius: '0.375rem',
-          }}
-        >
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Distance</div>
-          <div
-            style={{
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#2563eb',
-            }}
-          >
-            {totalDistance.toFixed(2)} km
-          </div>
-        </div>
-        <div
-          style={{
-            padding: '0.75rem',
-            background: '#f0fdf4',
-            borderRadius: '0.375rem',
-          }}
-        >
-          <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Speed</div>
-          <div
-            style={{
-              fontSize: '1.25rem',
-              fontWeight: 'bold',
-              color: '#16a34a',
-            }}
-          >
-            {currentSpeed.toFixed(1)} km/h
-          </div>
-        </div>
-      </div>
+    <Card shadow="sm" padding="md" radius="md" withBorder>
+      <Stack gap="md">
+        {/* Stats */}
+        <SimpleGrid cols={2} spacing="md">
+          <Box p="sm" bg="blue.0" style={{ borderRadius: '0.375rem' }}>
+            <Text size="sm" c="gray.6">
+              Distance
+            </Text>
+            <Text size="xl" fw={700} c="blue.6">
+              {totalDistance.toFixed(2)} km
+            </Text>
+          </Box>
+          <Box p="sm" bg="green.0" style={{ borderRadius: '0.375rem' }}>
+            <Text size="sm" c="gray.6">
+              Speed
+            </Text>
+            <Text size="xl" fw={700} c="green.6">
+              {currentSpeed.toFixed(1)} km/h
+            </Text>
+          </Box>
+        </SimpleGrid>
 
-      {/* Status */}
-      {status && (
-        <div
-          style={{
-            marginBottom: '1rem',
-            fontSize: '0.875rem',
-            color: '#6b7280',
-          }}
-        >
-          Status: <span style={{ fontWeight: '500' }}>{status}</span>
-        </div>
-      )}
+        {/* Status */}
+        {status && (
+          <Text size="sm" c="gray.6">
+            Status:{' '}
+            <Text component="span" fw={500}>
+              {status}
+            </Text>
+          </Text>
+        )}
 
-      {/* Error */}
-      {error && (
-        <div
-          style={{
-            marginBottom: '1rem',
-            padding: '0.5rem',
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '0.375rem',
-            fontSize: '0.875rem',
-            color: '#dc2626',
-          }}
-        >
-          {error}
-        </div>
-      )}
+        {/* Error */}
+        {error && (
+          <Alert color="red" variant="light" title="Error">
+            {error}
+          </Alert>
+        )}
 
-      {/* Controls */}
-      <button
-        onClick={isTracking ? stopTracking : startTracking}
-        style={{
-          width: '100%',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.375rem',
-          fontWeight: '500',
-          transition: 'background-color 0.2s',
-          background: isTracking ? '#ef4444' : '#3b82f6',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.background = isTracking ? '#dc2626' : '#2563eb';
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.background = isTracking ? '#ef4444' : '#3b82f6';
-        }}
-      >
-        {isTracking ? 'Stop Tracking' : 'Start Tracking'}
-      </button>
-
-      {isTracking ? (
-        <p
-          style={{
-            marginTop: '0.5rem',
-            fontSize: '0.75rem',
-            color: '#6b7280',
-          }}
+        {/* Controls */}
+        <Button
+          onClick={isTracking ? stopTracking : startTracking}
+          color={isTracking ? 'red' : 'blue'}
+          fullWidth
         >
-          Your location, speed, and distance are being shared with others in the
-          room.
-        </p>
-      ) : null}
-    </div>
+          {isTracking ? 'Stop Tracking' : 'Start Tracking'}
+        </Button>
+
+        {isTracking && (
+          <Text size="xs" c="gray.6">
+            Your location, speed, and distance are being shared with others in
+            the room.
+          </Text>
+        )}
+      </Stack>
+    </Card>
   );
 }

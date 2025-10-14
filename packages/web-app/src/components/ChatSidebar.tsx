@@ -1,7 +1,19 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { attachmentsApi, ApiError } from '@/lib/api-client';
+import {
+  Box,
+  Stack,
+  Group,
+  Text,
+  TextInput,
+  Button,
+  Badge,
+  ActionIcon,
+  Center,
+  Paper,
+} from '@mantine/core';
+import { ApiError } from '@/lib/api-client';
 import type { User } from '@supabase/supabase-js';
 import {
   useMessages,
@@ -13,20 +25,75 @@ import {
   useUpdatePresence,
   useRemovePresence,
 } from '@/hooks/usePresence';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { ChatIcon } from './icons/ChatIcon';
+import { MicrophoneIcon } from './icons/MicrophoneIcon';
 
 interface ChatSidebarProps {
   roomId: string; // Room UUID for realtime subscriptions
   roomSlug: string; // Room slug for API calls
-  roomName: string;
   currentUser: User;
   currentUserLocation?: { lat: number; long: number } | null;
   onToggleSidebar: () => void;
 }
 
+// Constants to prevent object recreation
+const MESSAGE_BUBBLE_STYLE_CURRENT = {
+  wordWrap: 'break-word' as const,
+  borderBottomRightRadius: '0.25rem',
+};
+
+const MESSAGE_BUBBLE_STYLE_OTHER = {
+  wordWrap: 'break-word' as const,
+  borderBottomLeftRadius: '0.25rem',
+};
+
+const RECORD_BUTTON_STYLE = {
+  fontSize: '1.5rem',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.375rem',
+};
+
+const PULSE_DOT_STYLE = {
+  width: '8px',
+  height: '8px',
+  borderRadius: '50%',
+  background: 'white',
+  animation: 'pulse 1.5s infinite',
+};
+
+const AUDIO_STYLE = {
+  width: '100%',
+  maxWidth: '300px',
+  height: '32px',
+};
+
+const CONTAINER_STYLE = {
+  position: 'relative' as const,
+  display: 'flex',
+  flexDirection: 'column' as const,
+};
+
+const HEADER_STYLE = {
+  borderBottom: '1px solid #e5e7eb',
+  flexShrink: 0,
+};
+
+const MESSAGES_WRAPPER_STYLE = {
+  flex: 1,
+  overflowY: 'auto' as const,
+  padding: '1rem',
+};
+
+const INPUT_STYLE = {
+  borderTop: '1px solid #e5e7eb',
+  flexShrink: 0,
+};
+
 export default function ChatSidebar({
   roomId,
   roomSlug,
-  roomName,
   currentUser,
   currentUserLocation,
   onToggleSidebar,
@@ -44,21 +111,31 @@ export default function ChatSidebar({
   const [messages, setMessages] = useState<EnrichedMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const presenceIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Sync messages from hook to local state (for real-time updates)
-  useEffect(() => {
-    setMessages(messagesData);
-    scrollToBottom();
-  }, [messagesData]);
+  // Audio recording hook
+  const {
+    isRecording,
+    isSending: isRecordingSending,
+    toggleRecording,
+  } = useAudioRecorder({
+    roomSlug,
+    onRecordingComplete: () => {
+      scrollToBottom();
+    },
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Sync messages from hook to local state (for real-time updates)
+  useEffect(() => {
+    setMessages(messagesData);
+    // Use setTimeout to ensure DOM has updated before scrolling
+    setTimeout(scrollToBottom, 0);
+  }, [messagesData]);
 
   // Presence management
   useEffect(() => {
@@ -79,12 +156,6 @@ export default function ChatSidebar({
       removePresence(roomSlug);
     };
   }, [roomSlug, updatePresence, removePresence]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Real-time subscriptions are now handled by useMessages and usePresence hooks
 
   // Helper to check if a string is a single emoji
   const isEmoji = (str: string): boolean => {
@@ -128,98 +199,6 @@ export default function ChatSidebar({
     }
   }
 
-  async function toggleRecording() {
-    if (isRecording) {
-      // Stop recording
-      if (
-        mediaRecorderRef.current &&
-        mediaRecorderRef.current.state !== 'inactive'
-      ) {
-        mediaRecorderRef.current.stop();
-        setIsRecording(false);
-      }
-    } else {
-      // Start recording
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-
-        // Try to use MP4/M4A format (compatible with iOS), fall back to WebM
-        let mimeType = 'audio/webm';
-
-        if (MediaRecorder.isTypeSupported('audio/mp4')) {
-          mimeType = 'audio/mp4';
-        } else if (
-          MediaRecorder.isTypeSupported('audio/mp4; codecs="mp4a.40.2"')
-        ) {
-          mimeType = 'audio/mp4; codecs="mp4a.40.2"'; // AAC-LC
-        } else if (MediaRecorder.isTypeSupported('audio/webm; codecs=opus')) {
-          mimeType = 'audio/webm; codecs=opus';
-        }
-
-        console.log('Using audio format:', mimeType);
-
-        const mediaRecorder = new MediaRecorder(stream, { mimeType });
-        mediaRecorderRef.current = mediaRecorder;
-        audioChunksRef.current = [];
-
-        mediaRecorder.ondataavailable = event => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
-          }
-        };
-
-        mediaRecorder.onstop = async () => {
-          // Stop all tracks to release microphone
-          stream.getTracks().forEach(track => track.stop());
-
-          // Create audio blob with the correct MIME type
-          const audioBlob = new Blob(audioChunksRef.current, {
-            type: mimeType,
-          });
-
-          setSending(true);
-          try {
-            // Upload via API route (uses slug for folder naming)
-            const { attachment } = await attachmentsApi.upload(
-              audioBlob,
-              roomSlug,
-              'audio'
-            );
-
-            // Send message with attachment URL
-            const messageData = {
-              content: '🎤 Voice message',
-              attachment,
-            };
-
-            sendMessage({ roomId: roomSlug, messageData });
-          } catch (err) {
-            console.error('Failed to send voice message:', err);
-            if (err instanceof ApiError) {
-              alert(`Failed to send voice message: ${err.message}`);
-            } else if (err instanceof Error) {
-              alert(`Failed to send voice message: ${err.message}`);
-            } else {
-              alert('Failed to send voice message');
-            }
-          } finally {
-            setSending(false);
-          }
-        };
-
-        mediaRecorder.start();
-        setIsRecording(true);
-      } catch (err) {
-        console.error('Failed to access microphone:', err);
-        alert(
-          'Failed to access microphone. Please grant permission and try again.'
-        );
-      }
-    }
-  }
-
   function formatTime(timestamp: string) {
     const date = new Date(timestamp);
     const now = new Date();
@@ -242,333 +221,163 @@ export default function ChatSidebar({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        position: 'relative',
-      }}
-    >
+    <Box h="100%" style={CONTAINER_STYLE}>
       {/* Chat Header */}
-      <div
-        style={{
-          padding: '1rem',
-          borderBottom: '1px solid #e5e7eb',
-          background: 'white',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '0.5rem',
-            justifyItems: 'stretch',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: '1.125rem',
-              fontWeight: 'bold',
-              margin: 0,
-              color: '#3b82f6',
-            }}
-          >
-            💬 {roomName}
-          </h3>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginTop: '0.25rem',
-              justifyContent: 'flex-end',
-              flexGrow: 1,
-            }}
-          >
-            <p
-              style={{
-                fontSize: '0.75rem',
-                color: '#6b7280',
-                margin: 0,
-              }}
-            >
-              {messages.length} message{messages.length !== 1 ? 's' : ''}
-            </p>
-            <span style={{ color: '#e5e7eb' }}>•</span>
-            <p
-              style={{
-                fontSize: '0.75rem',
-                color: '#10b981',
-                margin: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-              }}
-            >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#10b981',
-                  display: 'inline-block',
-                }}
-              />
-              {activeUsers} active
-            </p>
-          </div>
-          <button
-            style={{
-              width: '20px',
-              height: '20px',
-            }}
+      <Group p="md" justify="space-between" bg="white" style={HEADER_STYLE}>
+        <Group gap="10px">
+          <Text size="lg" fw={700}>
+            Chat
+          </Text>
+          <ChatIcon fill="#228be6" />
+        </Group>
+        <Group gap="xs">
+          <Text size="xs" c="gray.6">
+            {messages.length} message{messages.length !== 1 ? 's' : ''}
+          </Text>
+          <Text c="gray.3">•</Text>
+          <Badge color="green" variant="dot" size="sm">
+            {activeUsers} active
+          </Badge>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="sm"
             onClick={onToggleSidebar}
+            aria-label="Close chat"
           >
             ✕
-          </button>
-        </div>
-      </div>
+          </ActionIcon>
+        </Group>
+      </Group>
 
       {/* Messages Area */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '1rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-        }}
-      >
-        {loading ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              color: '#6b7280',
-            }}
-          >
-            Loading messages...
-          </div>
-        ) : messages.length === 0 ? (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              color: '#6b7280',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
-            <p style={{ fontSize: '0.875rem' }}>
-              No messages yet. Start the conversation!
-            </p>
-          </div>
-        ) : (
-          messages.map(message => {
-            const isCurrentUser = message.user_id === currentUser.id;
-            const userName = isCurrentUser
-              ? 'You'
-              : message.userName || 'Unknown User';
+      <Box style={MESSAGES_WRAPPER_STYLE}>
+        <Stack gap="md">
+          {loading ? (
+            <Center h="100%">
+              <Text c="gray.6">Loading messages...</Text>
+            </Center>
+          ) : messages.length === 0 ? (
+            <Center h="100%">
+              <Stack align="center" gap="xs">
+                <Text fz={32}>💬</Text>
+                <Text size="sm" c="gray.6" ta="center">
+                  No messages yet. Start the conversation!
+                </Text>
+              </Stack>
+            </Center>
+          ) : (
+            messages.map(message => {
+              const isCurrentUser = message.user_id === currentUser.id;
+              const userName = isCurrentUser
+                ? 'You'
+                : message.userName || 'Unknown User';
 
-            return (
-              <div
-                key={message.id}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: isCurrentUser ? 'flex-end' : 'flex-start',
-                }}
-              >
-                {/* User name label */}
-                {!isCurrentUser && (
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                      marginBottom: '0.25rem',
-                      marginLeft: '0.5rem',
-                      fontWeight: '500',
-                    }}
+              return (
+                <Stack
+                  key={message.id}
+                  gap="xs"
+                  align={isCurrentUser ? 'flex-end' : 'flex-start'}
+                >
+                  {/* User name label */}
+                  {!isCurrentUser && (
+                    <Text size="xs" c="gray.6" fw={500} pl="xs">
+                      {userName}
+                    </Text>
+                  )}
+
+                  <Paper
+                    p="sm"
+                    radius="lg"
+                    bg={isCurrentUser ? 'blue.6' : 'white'}
+                    c={isCurrentUser ? 'white' : 'dark'}
+                    shadow="xs"
+                    maw="75%"
+                    style={
+                      isCurrentUser
+                        ? MESSAGE_BUBBLE_STYLE_CURRENT
+                        : MESSAGE_BUBBLE_STYLE_OTHER
+                    }
                   >
-                    {userName}
-                  </div>
-                )}
-
-                <div
-                  style={{
-                    maxWidth: '75%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '1rem',
-                    background: isCurrentUser ? '#3b82f6' : 'white',
-                    color: isCurrentUser ? 'white' : '#111827',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                    wordWrap: 'break-word',
-                    borderBottomRightRadius: isCurrentUser ? '0.25rem' : '1rem',
-                    borderBottomLeftRadius: isCurrentUser ? '1rem' : '0.25rem',
-                  }}
-                >
-                  {message.content}
-                  {message.attachment &&
-                    message.attachment.type === 'audio' && (
-                      <div style={{ marginTop: '0.5rem' }}>
-                        <audio
-                          controls
-                          src={
-                            message.attachment.url || message.attachment.data
-                          }
-                          style={{
-                            width: '100%',
-                            maxWidth: '300px',
-                            height: '32px',
-                          }}
-                        />
-                      </div>
-                    )}
-                </div>
-                <div
-                  style={{
-                    fontSize: '0.6875rem',
-                    color: '#9ca3af',
-                    marginTop: '0.25rem',
-                    paddingLeft: isCurrentUser ? '0' : '0.5rem',
-                    paddingRight: isCurrentUser ? '0.5rem' : '0',
-                  }}
-                >
-                  {formatTime(message.created_at)}
-                  {message.edited_at && ' (edited)'}
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+                    {message.content}
+                    {message.attachment &&
+                      message.attachment.type === 'audio' && (
+                        <Box mt="xs">
+                          <audio
+                            controls
+                            src={
+                              message.attachment.url || message.attachment.data
+                            }
+                            style={AUDIO_STYLE}
+                          />
+                        </Box>
+                      )}
+                  </Paper>
+                  <Text
+                    size="xs"
+                    c="gray.5"
+                    pl={isCurrentUser ? 0 : 'xs'}
+                    pr={isCurrentUser ? 'xs' : 0}
+                  >
+                    {formatTime(message.created_at)}
+                    {message.edited_at && ' (edited)'}
+                  </Text>
+                </Stack>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </Stack>
+      </Box>
 
       {/* Message Input */}
-      <div
-        style={{
-          padding: '1rem',
-          borderTop: '1px solid #e5e7eb',
-          background: 'white',
-        }}
-      >
-        <form
-          onSubmit={handleSendMessage}
-          style={{ display: 'flex', gap: '0.5rem' }}
-        >
-          <input
-            type="text"
-            value={newMessage}
-            onChange={e => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            disabled={sending || isRecording}
-            style={{
-              flex: 1,
-              padding: '0.625rem 0.875rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '1.5rem',
-              fontSize: '0.875rem',
-              outline: 'none',
-              transition: 'border-color 0.2s',
-            }}
-            onFocus={e => {
-              e.target.style.borderColor = '#3b82f6';
-            }}
-            onBlur={e => {
-              e.target.style.borderColor = '#d1d5db';
-            }}
-          />
-          <button
-            type="button"
-            onClick={toggleRecording}
-            disabled={sending}
-            style={{
-              padding: '0.625rem 1.25rem',
-              background: isRecording ? '#ef4444' : '#10b981',
-              color: 'white',
-              border: 'none',
-              borderRadius: '1.5rem',
-              fontSize: '1.5rem',
-              fontWeight: '500',
-              cursor: sending ? 'not-allowed' : 'pointer',
-              transition: 'background 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-            }}
-            onMouseEnter={e => {
-              if (!sending) {
-                e.currentTarget.style.background = isRecording
-                  ? '#dc2626'
-                  : '#059669';
+      <Box p="md" bg="white" style={INPUT_STYLE}>
+        <form onSubmit={handleSendMessage}>
+          <Group gap="xs" align="flex-end">
+            <TextInput
+              flex={1}
+              value={newMessage}
+              onChange={e => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              disabled={sending || isRecording || isRecordingSending}
+              radius="xl"
+              size="sm"
+            />
+            <Button
+              type="button"
+              onClick={toggleRecording}
+              disabled={sending || isRecordingSending}
+              color={isRecording ? 'red' : 'green'}
+              radius="xl"
+              size="sm"
+              style={RECORD_BUTTON_STYLE}
+            >
+              {isRecording ? (
+                <>
+                  <Box style={PULSE_DOT_STYLE} />
+                  Stop
+                </>
+              ) : (
+                <>
+                  <MicrophoneIcon />
+                </>
+              )}
+            </Button>
+            <Button
+              type="submit"
+              disabled={
+                !newMessage.trim() ||
+                sending ||
+                isRecording ||
+                isRecordingSending
               }
-            }}
-            onMouseLeave={e => {
-              if (!sending) {
-                e.currentTarget.style.background = isRecording
-                  ? '#ef4444'
-                  : '#10b981';
-              }
-            }}
-          >
-            {isRecording ? (
-              <>
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'white',
-                    animation: 'pulse 1.5s infinite',
-                  }}
-                />
-                Stop
-              </>
-            ) : (
-              <>📣</>
-            )}
-          </button>
-          <button
-            type="submit"
-            disabled={!newMessage.trim() || sending || isRecording}
-            style={{
-              padding: '0.625rem 1.25rem',
-              background:
-                !newMessage.trim() || sending || isRecording
-                  ? '#9ca3af'
-                  : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '1.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              cursor:
-                !newMessage.trim() || sending || isRecording
-                  ? 'not-allowed'
-                  : 'pointer',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={e => {
-              if (!sending && newMessage.trim() && !isRecording) {
-                e.currentTarget.style.background = '#2563eb';
-              }
-            }}
-            onMouseLeave={e => {
-              if (!sending && newMessage.trim() && !isRecording) {
-                e.currentTarget.style.background = '#3b82f6';
-              }
-            }}
-          >
-            {sending ? 'Sending...' : 'Send'}
-          </button>
+              color="blue"
+              radius="xl"
+              size="sm"
+            >
+              {sending ? 'Sending...' : 'Send'}
+            </Button>
+          </Group>
         </form>
         <style jsx>{`
           @keyframes pulse {
@@ -581,7 +390,7 @@ export default function ChatSidebar({
             }
           }
         `}</style>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

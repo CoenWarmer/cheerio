@@ -1,6 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Stack,
+  Card,
+  Text,
+  Alert,
+  Group,
+  Avatar,
+  Select,
+  Box,
+  SimpleGrid,
+} from '@mantine/core';
 import { useActivitySummary } from '@/hooks/useActivitySummary';
 
 interface UserActivityFeedProps {
@@ -32,17 +43,9 @@ export default function UserActivityFeed({
 
   if (error) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '0.375rem',
-          color: '#dc2626',
-        }}
-      >
+      <Alert color="red" variant="light" title="Error">
         {error.message || 'Failed to load activity'}
-      </div>
+      </Alert>
     );
   }
 
@@ -51,33 +54,21 @@ export default function UserActivityFeed({
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          background: '#f9fafb',
-          borderRadius: '0.5rem',
-          color: '#6b7280',
-          fontSize: '0.875rem',
-        }}
-      >
-        Loading activity...
-      </div>
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Text size="sm" c="gray.6">
+          Loading activity...
+        </Text>
+      </Card>
     );
   }
 
   if (otherUsers.length === 0) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          background: '#f9fafb',
-          borderRadius: '0.5rem',
-          color: '#4b5563',
-          fontSize: '0.875rem',
-        }}
-      >
-        No other users are currently sharing their activity.
-      </div>
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Text size="sm" c="gray.7">
+          No other users are currently sharing their activity.
+        </Text>
+      </Card>
     );
   }
 
@@ -88,49 +79,28 @@ export default function UserActivityFeed({
       : otherUsers;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+    <Stack gap={0}>
       {/* Dropdown selector when multiple users */}
       {otherUsers.length > 1 && (
-        <div style={{ padding: '0 1rem 1rem 1rem' }}>
-          <select
+        <Box px="md" pb="md">
+          <Select
             value={selectedUserId || 'all'}
-            onChange={e =>
-              setSelectedUserId(
-                e.target.value === 'all' ? null : e.target.value
-              )
+            onChange={value =>
+              setSelectedUserId(value === 'all' ? null : value)
             }
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '0.375rem',
-              fontSize: '0.875rem',
-              background: 'white',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="all">All Users ({otherUsers.length})</option>
-            {otherUsers.map(summary => {
-              const displayName =
-                summary.userName || `User ${summary.userId.substring(0, 8)}`;
-              return (
-                <option key={summary.userId} value={summary.userId}>
-                  {displayName}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+            data={[
+              { value: 'all', label: `All Users (${otherUsers.length})` },
+              ...otherUsers.map(summary => ({
+                value: summary.userId,
+                label:
+                  summary.userName || `User ${summary.userId.substring(0, 8)}`,
+              })),
+            ]}
+          />
+        </Box>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-          padding: '0 1rem 1rem 1rem',
-        }}
-      >
+      <Stack gap="sm" px="md" pb="md">
         {usersToDisplay.map(summary => {
           const displayName =
             summary.userName || `User ${summary.userId.substring(0, 8)}`;
@@ -143,200 +113,95 @@ export default function UserActivityFeed({
               .substring(0, 2) || summary.userId.substring(0, 2).toUpperCase();
 
           return (
-            <div
+            <Card
               key={summary.userId}
-              style={{
-                padding: '1rem',
-                background: 'white',
-                borderRadius: '0.5rem',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                border: '1px solid #e5e7eb',
-              }}
+              shadow="sm"
+              padding="md"
+              radius="md"
+              withBorder
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '0.75rem',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '2rem',
-                      height: '2rem',
-                      background: '#3b82f6',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontWeight: '500',
-                      fontSize: '0.875rem',
-                    }}
-                  >
-                    {initials}
-                  </div>
-                  <span style={{ fontWeight: '500', color: '#1f2937' }}>
-                    {displayName}
-                  </span>
-                </div>
-              </div>
+              <Group mb="sm">
+                <Avatar color="blue" radius="xl">
+                  {initials}
+                </Avatar>
+                <Text fw={500}>{displayName}</Text>
+              </Group>
 
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '0.5rem',
-                  fontSize: '0.875rem',
-                }}
-              >
+              <SimpleGrid cols={2} spacing="xs">
                 {summary.lastLocation && (
-                  <div
-                    style={{
-                      padding: '0.5rem',
-                      background: '#eff6ff',
-                      borderRadius: '0.375rem',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#4b5563',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
+                  <Box p="xs" bg="blue.0" style={{ borderRadius: '0.375rem' }}>
+                    <Text size="xs" c="gray.7" mb={4}>
                       Location
-                    </div>
-                    <div style={{ fontWeight: '500', color: '#1d4ed8' }}>
+                    </Text>
+                    <Text fw={500} c="blue.8">
                       {summary.lastLocation.lat.toFixed(5)},{' '}
                       {summary.lastLocation.long.toFixed(5)}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '0.25rem',
-                      }}
-                    >
+                    </Text>
+                    <Text size="xs" c="gray.6" mt={4}>
                       {formatTime(summary.lastLocation.timestamp)}
-                    </div>
-                  </div>
+                    </Text>
+                  </Box>
                 )}
 
                 {summary.lastSpeed && (
-                  <div
-                    style={{
-                      padding: '0.5rem',
-                      background: '#f0fdf4',
-                      borderRadius: '0.375rem',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#4b5563',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
+                  <Box p="xs" bg="green.0" style={{ borderRadius: '0.375rem' }}>
+                    <Text size="xs" c="gray.7" mb={4}>
                       Speed
-                    </div>
-                    <div style={{ fontWeight: '500', color: '#15803d' }}>
+                    </Text>
+                    <Text fw={500} c="green.8">
                       {summary.lastSpeed.speed.toFixed(1)}{' '}
                       {summary.lastSpeed.unit}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '0.25rem',
-                      }}
-                    >
+                    </Text>
+                    <Text size="xs" c="gray.6" mt={4}>
                       {formatTime(summary.lastSpeed.timestamp)}
-                    </div>
-                  </div>
+                    </Text>
+                  </Box>
                 )}
 
                 {summary.lastDistance && (
-                  <div
-                    style={{
-                      padding: '0.5rem',
-                      background: '#faf5ff',
-                      borderRadius: '0.375rem',
-                    }}
+                  <Box
+                    p="xs"
+                    bg="violet.0"
+                    style={{ borderRadius: '0.375rem' }}
                   >
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#4b5563',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
+                    <Text size="xs" c="gray.7" mb={4}>
                       Distance
-                    </div>
-                    <div style={{ fontWeight: '500', color: '#7e22ce' }}>
+                    </Text>
+                    <Text fw={500} c="violet.8">
                       {summary.lastDistance.distance.toFixed(2)}{' '}
                       {summary.lastDistance.unit}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '0.25rem',
-                      }}
-                    >
+                    </Text>
+                    <Text size="xs" c="gray.6" mt={4}>
                       {formatTime(summary.lastDistance.timestamp)}
-                    </div>
-                  </div>
+                    </Text>
+                  </Box>
                 )}
 
                 {summary.lastMusic && (
-                  <div
-                    style={{
-                      padding: '0.5rem',
-                      background: '#fdf2f8',
-                      borderRadius: '0.375rem',
-                      gridColumn: 'span 2',
-                    }}
+                  <Box
+                    p="xs"
+                    bg="pink.0"
+                    style={{ borderRadius: '0.375rem', gridColumn: 'span 2' }}
                   >
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#4b5563',
-                        marginBottom: '0.25rem',
-                      }}
-                    >
+                    <Text size="xs" c="gray.7" mb={4}>
                       🎵 Listening to
-                    </div>
-                    <div style={{ fontWeight: '500', color: '#be185d' }}>
+                    </Text>
+                    <Text fw={500} c="pink.8">
                       {summary.lastMusic.title}
-                    </div>
-                    <div style={{ fontSize: '0.875rem', color: '#db2777' }}>
+                    </Text>
+                    <Text size="sm" c="pink.7">
                       {summary.lastMusic.artist}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginTop: '0.25rem',
-                      }}
-                    >
+                    </Text>
+                    <Text size="xs" c="gray.6" mt={4}>
                       {formatTime(summary.lastMusic.timestamp)}
-                    </div>
-                  </div>
+                    </Text>
+                  </Box>
                 )}
-              </div>
-            </div>
+              </SimpleGrid>
+            </Card>
           );
         })}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

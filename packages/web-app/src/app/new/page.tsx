@@ -3,6 +3,23 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  Box,
+  Container,
+  Title,
+  Text,
+  TextInput,
+  Textarea,
+  Select,
+  NumberInput,
+  Checkbox,
+  Button,
+  Group,
+  Stack,
+  Alert,
+  Paper,
+  Anchor,
+} from '@mantine/core';
 import { supabase } from '@/lib/supabase';
 import { useCreateRoom } from '@/hooks/useRooms';
 import { ApiError } from '@/lib/api-client';
@@ -114,458 +131,147 @@ export default function NewRoomPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <nav
-        style={{
-          background: 'white',
-          borderBottom: '1px solid #e5e7eb',
-          padding: '1rem 2rem',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
-            Create New Room
-          </h1>
-          <Link
-            href="/dashboard"
-            style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '0.875rem',
-            }}
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </nav>
+    <Box mih="100vh" bg="gray.0">
+      <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
+        <Container size="xl">
+          <Group justify="space-between" align="center">
+            <Title order={1}>Create New Room</Title>
+            <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
+              ← Back to Dashboard
+            </Anchor>
+          </Group>
+        </Container>
+      </Box>
 
-      <main
-        style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '2rem',
-        }}
-      >
-        <div
-          style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '0.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
+      <Container size="md" py="xl">
+        <Paper shadow="sm" p="xl" radius="md" withBorder>
           <form onSubmit={handleSubmit}>
-            {/* Title */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="title"
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                }}
-              >
-                Room Title *
-              </label>
-              <input
-                id="title"
-                type="text"
+            <Stack gap="md">
+              <TextInput
+                label="Room Title"
+                placeholder="Enter room title"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 required
-                placeholder="Enter room title"
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '1rem',
-                }}
+                withAsterisk
               />
-            </div>
 
-            {/* Description */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="description"
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                }}
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
+              <Textarea
+                label="Description"
+                placeholder="Describe your room..."
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                placeholder="Describe your room..."
                 rows={4}
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '1rem',
-                  resize: 'vertical',
-                }}
               />
-            </div>
 
-            {/* Donation Link */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="donationLink"
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                }}
-              >
-                Donation Link
-              </label>
-              <input
-                id="donationLink"
+              <TextInput
+                label="Donation Link"
                 type="url"
+                placeholder="https://example.com/donate"
                 value={donationLink}
                 onChange={e => setDonationLink(e.target.value)}
-                placeholder="https://example.com/donate"
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '1rem',
-                }}
+                description="Optional: Add a link where people can donate"
               />
-              <p
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  marginTop: '0.25rem',
-                }}
-              >
-                Optional: Add a link where people can donate
-              </p>
-            </div>
 
-            {/* Start Time */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="startTime"
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                }}
-              >
-                Start Time
-              </label>
-              <input
-                id="startTime"
+              <TextInput
+                label="Start Time"
                 type="datetime-local"
                 value={startTime}
                 onChange={e => setStartTime(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '1rem',
-                }}
+                description="Optional: When does this room start?"
               />
-              <p
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  marginTop: '0.25rem',
-                }}
-              >
-                Optional: When does this room start?
-              </p>
-            </div>
 
-            {/* Status */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="status"
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                }}
-              >
-                Status
-              </label>
-              <select
-                id="status"
+              <Select
+                label="Status"
                 value={status}
-                onChange={e => setStatus(e.target.value as RoomStatus)}
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '1rem',
-                  background: 'white',
-                }}
-              >
-                <option value="awaiting">Awaiting</option>
-                <option value="in_progress">In Progress</option>
-                <option value="finished">Finished</option>
-              </select>
-            </div>
+                onChange={value => setStatus(value as RoomStatus)}
+                data={[
+                  { value: 'awaiting', label: 'Awaiting' },
+                  { value: 'in_progress', label: 'In Progress' },
+                  { value: 'finished', label: 'Finished' },
+                ]}
+              />
 
-            {/* Location Section */}
-            <div
-              style={{
-                marginBottom: '1.5rem',
-                padding: '1rem',
-                background: '#f9fafb',
-                borderRadius: '0.5rem',
-                border: '1px solid #e5e7eb',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '1rem',
-                }}
-              >
-                <label
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                  }}
+              <Paper p="md" withBorder bg="gray.0">
+                <Stack gap="md">
+                  <Group justify="space-between" align="center">
+                    <Text size="sm" fw={500}>
+                      📍 Location (Optional)
+                    </Text>
+                    <Button
+                      size="xs"
+                      onClick={handleGetCurrentLocation}
+                      loading={loadingLocation}
+                    >
+                      {loadingLocation
+                        ? 'Getting location...'
+                        : '📍 Use My Location'}
+                    </Button>
+                  </Group>
+
+                  <Group grow>
+                    <NumberInput
+                      label="Latitude"
+                      placeholder="37.7749"
+                      value={latitude}
+                      onChange={value => setLatitude(String(value))}
+                      decimalScale={6}
+                      hideControls
+                    />
+                    <NumberInput
+                      label="Longitude"
+                      placeholder="-122.4194"
+                      value={longitude}
+                      onChange={value => setLongitude(String(value))}
+                      decimalScale={6}
+                      hideControls
+                    />
+                  </Group>
+
+                  <Text size="xs" c="gray.6">
+                    Set the location for your room. Click Use My Location or
+                    enter coordinates manually.
+                  </Text>
+                </Stack>
+              </Paper>
+
+              <Checkbox
+                label="🔒 Make this room private"
+                description="Private rooms are only visible to invited members"
+                checked={isPrivate}
+                onChange={e => setIsPrivate(e.currentTarget.checked)}
+              />
+
+              {error && (
+                <Alert color="red" variant="light">
+                  {error}
+                </Alert>
+              )}
+
+              <Group justify="flex-end" gap="md">
+                <Button
+                  component={Link}
+                  href="/dashboard"
+                  variant="default"
+                  size="sm"
                 >
-                  📍 Location (Optional)
-                </label>
-                <button
-                  type="button"
-                  onClick={handleGetCurrentLocation}
-                  disabled={loadingLocation}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    background: loadingLocation ? '#9ca3af' : '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                    cursor: loadingLocation ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {loadingLocation
-                    ? 'Getting location...'
-                    : '📍 Use My Location'}
-                </button>
-              </div>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '1rem',
-                }}
-              >
-                <div>
-                  <label
-                    htmlFor="latitude"
-                    style={{
-                      display: 'block',
-                      marginBottom: '0.5rem',
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                    }}
-                  >
-                    Latitude
-                  </label>
-                  <input
-                    id="latitude"
-                    type="number"
-                    step="any"
-                    value={latitude}
-                    onChange={e => setLatitude(e.target.value)}
-                    placeholder="37.7749"
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.875rem',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="longitude"
-                    style={{
-                      display: 'block',
-                      marginBottom: '0.5rem',
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                    }}
-                  >
-                    Longitude
-                  </label>
-                  <input
-                    id="longitude"
-                    type="number"
-                    step="any"
-                    value={longitude}
-                    onChange={e => setLongitude(e.target.value)}
-                    placeholder="-122.4194"
-                    style={{
-                      width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.875rem',
-                    }}
-                  />
-                </div>
-              </div>
-
-              <p
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  marginTop: '0.5rem',
-                }}
-              >
-                Set the location for your room. Click Use My Location or enter
-                coordinates manually.
-              </p>
-            </div>
-
-            {/* Is Private */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={isPrivate}
-                  onChange={e => setIsPrivate(e.target.checked)}
-                  style={{
-                    width: '1rem',
-                    height: '1rem',
-                    marginRight: '0.5rem',
-                    cursor: 'pointer',
-                  }}
-                />
-                <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>
-                  🔒 Make this room private
-                </span>
-              </label>
-              <p
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  marginTop: '0.25rem',
-                  marginLeft: '1.5rem',
-                }}
-              >
-                Private rooms are only visible to invited members
-              </p>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div
-                style={{
-                  padding: '0.75rem',
-                  background: '#fee',
-                  color: '#dc2626',
-                  borderRadius: '0.375rem',
-                  marginBottom: '1rem',
-                  fontSize: '0.875rem',
-                }}
-              >
-                {error}
-              </div>
-            )}
-
-            {/* Buttons */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Link
-                href="/dashboard"
-                style={{
-                  padding: '0.625rem 1.25rem',
-                  background: '#f3f4f6',
-                  color: '#374151',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                }}
-              >
-                Cancel
-              </Link>
-              <button
-                type="submit"
-                disabled={isCreating}
-                style={{
-                  padding: '0.625rem 1.25rem',
-                  background: isCreating ? '#9ca3af' : '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  cursor: isCreating ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isCreating ? 'Creating...' : 'Create Room'}
-              </button>
-            </div>
+                  Cancel
+                </Button>
+                <Button type="submit" loading={isCreating} size="sm">
+                  {isCreating ? 'Creating...' : 'Create Room'}
+                </Button>
+              </Group>
+            </Stack>
           </form>
-        </div>
+        </Paper>
 
-        {/* Help Text */}
-        <div
-          style={{
-            marginTop: '1.5rem',
-            padding: '1rem',
-            background: '#eff6ff',
-            borderRadius: '0.375rem',
-            fontSize: '0.875rem',
-            color: '#1e40af',
-          }}
-        >
-          <strong>💡 Tip:</strong> After creating your room, you can share the
-          link with others to join. Use the chat to communicate in real-time!
-        </div>
-      </main>
-    </div>
+        <Alert color="blue" variant="light" mt="xl">
+          <Text size="sm">
+            <strong>💡 Tip:</strong> After creating your room, you can share the
+            link with others to join. Use the chat to communicate in real-time!
+          </Text>
+        </Alert>
+      </Container>
+    </Box>
   );
 }
