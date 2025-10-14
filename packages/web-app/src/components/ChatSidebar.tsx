@@ -17,15 +17,19 @@ import {
 interface ChatSidebarProps {
   roomId: string; // Room UUID for realtime subscriptions
   roomSlug: string; // Room slug for API calls
+  roomName: string;
   currentUser: User;
   currentUserLocation?: { lat: number; long: number } | null;
+  onToggleSidebar: () => void;
 }
 
 export default function ChatSidebar({
   roomId,
   roomSlug,
+  roomName,
   currentUser,
   currentUserLocation,
+  onToggleSidebar,
 }: ChatSidebarProps) {
   // Use hooks for data fetching
   const { messages: messagesData, isLoading: loading } = useMessages(
@@ -243,6 +247,7 @@ export default function ChatSidebar({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        position: 'relative',
       }}
     >
       {/* Chat Header */}
@@ -257,6 +262,7 @@ export default function ChatSidebar({
           style={{
             display: 'flex',
             flexDirection: 'row',
+            alignItems: 'center',
             gap: '0.5rem',
             justifyItems: 'stretch',
           }}
@@ -266,9 +272,10 @@ export default function ChatSidebar({
               fontSize: '1.125rem',
               fontWeight: 'bold',
               margin: 0,
+              color: '#3b82f6',
             }}
           >
-            💬 Chat
+            💬 {roomName}
           </h3>
           <div
             style={{
@@ -312,6 +319,15 @@ export default function ChatSidebar({
               {activeUsers} active
             </p>
           </div>
+          <button
+            style={{
+              width: '20px',
+              height: '20px',
+            }}
+            onClick={onToggleSidebar}
+          >
+            ✕
+          </button>
         </div>
       </div>
 
@@ -480,7 +496,7 @@ export default function ChatSidebar({
               color: 'white',
               border: 'none',
               borderRadius: '1.5rem',
-              fontSize: '0.875rem',
+              fontSize: '1.5rem',
               fontWeight: '500',
               cursor: sending ? 'not-allowed' : 'pointer',
               transition: 'background 0.2s',
@@ -517,7 +533,7 @@ export default function ChatSidebar({
                 Stop
               </>
             ) : (
-              <>🎤 Record</>
+              <>📣</>
             )}
           </button>
           <button

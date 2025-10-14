@@ -1,18 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
   Tooltip,
+  Polyline,
   useMap,
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Room } from '@/types/types';
 import type { LocationActivity } from '@/types/activity';
+import type { TrackingPath } from '@/hooks/useTrackingPaths';
 
 // Fix for default marker icon in webpack
 const roomIcon = L.icon({
@@ -136,6 +138,7 @@ interface RoomMapProps {
   location?: Room['location'];
   userLocations?: UserLocationMarker[];
   emojiMarkers?: EmojiMarker[];
+  trackingPaths?: TrackingPath[];
 }
 
 function MapResizer() {
@@ -161,8 +164,12 @@ function MapBoundsUpdater({
   userLocations: UserLocationMarker[];
 }) {
   const map = useMap();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
+    // Only auto-adjust bounds on initial load
+    if (hasInitialized.current) return;
+
     // Collect all positions
     const allPositions: [number, number][] = [roomPosition];
 
@@ -173,6 +180,7 @@ function MapBoundsUpdater({
     // If we only have the room position, just center on it
     if (allPositions.length === 1) {
       map.setView(roomPosition, 15);
+      hasInitialized.current = true;
       return;
     }
 
@@ -186,6 +194,8 @@ function MapBoundsUpdater({
       paddingBottomRight: [450, 50], // Right padding (400px sidebar + 50px buffer) and bottom
       maxZoom: 16, // Don't zoom in too much
     });
+
+    hasInitialized.current = true;
   }, [roomPosition, userLocations, map]);
 
   return null;
@@ -196,6 +206,7 @@ export default function RoomMap({
   location,
   userLocations = [],
   emojiMarkers = [],
+  trackingPaths = [],
 }: RoomMapProps) {
   const [mounted, setMounted] = useState(false);
   const [userColorMap, setUserColorMap] = useState<Map<string, string>>(
@@ -281,7 +292,7 @@ export default function RoomMap({
         />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url={`https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`}
         />
 
         {/* Room location marker */}
@@ -442,6 +453,36 @@ export default function RoomMap({
                 </div>
               </Popup>
             </Marker>
+          );
+        })}
+
+        {/* Tracking path polylines */}
+        {trackingPaths.map(path => {
+          if (path.coordinates.length < 2) return null;
+
+          const positions: [number, number][] = path.coordinates.map(coord => [
+            coord.lat,
+            coord.lng,
+          ]);
+
+          return (
+            <Polyline
+              key={path.userId}
+              positions={positions}
+              color={path.color}
+              weight={3}
+              opacity={0.7}
+            >
+              <Tooltip direction="top" opacity={0.9} sticky>
+                <strong>
+                  {path.userName || `User ${path.userId.substring(0, 8)}`}
+                </strong>
+                <br />
+                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                  {path.coordinates.length} points tracked
+                </span>
+              </Tooltip>
+            </Polyline>
           );
         })}
       </MapContainer>

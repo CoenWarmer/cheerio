@@ -200,15 +200,6 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
           border: '1px solid #e5e7eb',
         }}
       >
-        <h3
-          style={{
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            marginBottom: '1rem',
-          }}
-        >
-          Activity Tracker
-        </h3>
         <div style={{ textAlign: 'center', color: '#6b7280' }}>Loading...</div>
       </div>
     );
@@ -229,16 +220,6 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
         border: '1px solid #e5e7eb',
       }}
     >
-      <h3
-        style={{
-          fontSize: '1.125rem',
-          fontWeight: '600',
-          marginBottom: '1rem',
-        }}
-      >
-        Activity Tracker
-      </h3>
-
       {/* Stats */}
       <div
         style={{
