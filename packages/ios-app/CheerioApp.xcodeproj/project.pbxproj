@@ -7,16 +7,60 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CheerioAppApp /* CheerioAppApp.swift in Sources */ = {isa = PBXBuildFile; };
-		ContentView /* ContentView.swift in Sources */ = {isa = PBXBuildFile; };
-		Assets /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; };
+		361F30CD2E9E61110091FDDE /* RoomDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C82E9E61110091FDDE /* RoomDetailView.swift */; };
+		361F30CE2E9E61110091FDDE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B92E9E61110091FDDE /* Message.swift */; };
+		361F30CF2E9E61110091FDDE /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BF2E9E61110091FDDE /* LocationService.swift */; };
+		361F30D02E9E61110091FDDE /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BC2E9E61110091FDDE /* AudioService.swift */; };
+		361F30D12E9E61110091FDDE /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B62E9E61110091FDDE /* Config.swift */; };
+		361F30D22E9E61110091FDDE /* TrackingStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C62E9E61110091FDDE /* TrackingStatsView.swift */; };
+		361F30D32E9E61110091FDDE /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BA2E9E61110091FDDE /* Room.swift */; };
+		361F30D42E9E61110091FDDE /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BD2E9E61110091FDDE /* AuthService.swift */; };
+		361F30D52E9E61110091FDDE /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C32E9E61110091FDDE /* RegisterView.swift */; };
+		361F30D62E9E61110091FDDE /* RoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C02E9E61110091FDDE /* RoomService.swift */; };
+		361F30D72E9E61110091FDDE /* RoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C92E9E61110091FDDE /* RoomListView.swift */; };
+		361F30D82E9E61110091FDDE /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C22E9E61110091FDDE /* LoginView.swift */; };
+		361F30D92E9E61110091FDDE /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B52E9E61110091FDDE /* AppState.swift */; };
+		361F30DA2E9E61110091FDDE /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BE2E9E61110091FDDE /* ChatService.swift */; };
+		361F30DB2E9E61110091FDDE /* ChatMessageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C52E9E61110091FDDE /* ChatMessageRow.swift */; };
+		361F30DC2E9E61110091FDDE /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B82E9E61110091FDDE /* Activity.swift */; };
+		365B04812E9E731F00BD6EB8 /* VLCKitSPM in Frameworks */ = {isa = PBXBuildFile; productRef = 365B04802E9E731F00BD6EB8 /* VLCKitSPM */; };
+		365B04832E9E7A9600BD6EB8 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365B04822E9E7A9600BD6EB8 /* ProfileService.swift */; };
+		3686B9AB2E9E64CD008E208C /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9AA2E9E64CD008E208C /* Auth */; };
+		3686B9AD2E9E64CD008E208C /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9AC2E9E64CD008E208C /* Functions */; };
+		3686B9AF2E9E64CD008E208C /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9AE2E9E64CD008E208C /* PostgREST */; };
+		3686B9B12E9E64CD008E208C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B02E9E64CD008E208C /* Realtime */; };
+		3686B9B32E9E64CD008E208C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B22E9E64CD008E208C /* Storage */; };
+		3686B9B52E9E64CD008E208C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B42E9E64CD008E208C /* Supabase */; };
+		3686B9B62E9E66B4008E208C /* CheerioAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CheerioAppAppFile /* CheerioAppApp.swift */; };
+		3688C2222E9E71F5003E8EFC /* VLCKitSPM in Frameworks */ = {isa = PBXBuildFile; productRef = 3688C2212E9E71F5003E8EFC /* VLCKitSPM */; };
+		Assets /* (null) in Resources */ = {isa = PBXBuildFile; };
+		CheerioAppApp /* (null) in Sources */ = {isa = PBXBuildFile; };
+		ContentView /* (null) in Sources */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		361F30B52E9E61110091FDDE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		361F30B62E9E61110091FDDE /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		361F30B82E9E61110091FDDE /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		361F30B92E9E61110091FDDE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		361F30BA2E9E61110091FDDE /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
+		361F30BC2E9E61110091FDDE /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		361F30BD2E9E61110091FDDE /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		361F30BE2E9E61110091FDDE /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
+		361F30BF2E9E61110091FDDE /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		361F30C02E9E61110091FDDE /* RoomService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomService.swift; sourceTree = "<group>"; };
+		361F30C22E9E61110091FDDE /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		361F30C32E9E61110091FDDE /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		361F30C52E9E61110091FDDE /* ChatMessageRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageRow.swift; sourceTree = "<group>"; };
+		361F30C62E9E61110091FDDE /* TrackingStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingStatsView.swift; sourceTree = "<group>"; };
+		361F30C82E9E61110091FDDE /* RoomDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailView.swift; sourceTree = "<group>"; };
+		361F30C92E9E61110091FDDE /* RoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListView.swift; sourceTree = "<group>"; };
+		361F30DD2E9E62A90091FDDE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		365B04822E9E7A9600BD6EB8 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileService.swift; path = CheerioApp/Services/ProfileService.swift; sourceTree = "<group>"; };
+		AssetsFile /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CheerioApp /* CheerioApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheerioApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CheerioAppAppFile /* CheerioAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheerioAppApp.swift; sourceTree = "<group>"; };
 		ContentViewFile /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AssetsFile /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -24,18 +68,100 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3686B9AF2E9E64CD008E208C /* PostgREST in Frameworks */,
+				3686B9AD2E9E64CD008E208C /* Functions in Frameworks */,
+				3686B9B52E9E64CD008E208C /* Supabase in Frameworks */,
+				3686B9AB2E9E64CD008E208C /* Auth in Frameworks */,
+				3686B9B32E9E64CD008E208C /* Storage in Frameworks */,
+				3688C2222E9E71F5003E8EFC /* VLCKitSPM in Frameworks */,
+				365B04812E9E731F00BD6EB8 /* VLCKitSPM in Frameworks */,
+				3686B9B12E9E64CD008E208C /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		Root = {
+		361F30BB2E9E61110091FDDE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				CheerioAppGroup /* CheerioApp */,
-				Products /* Products */,
+				361F30B82E9E61110091FDDE /* Activity.swift */,
+				361F30B92E9E61110091FDDE /* Message.swift */,
+				361F30BA2E9E61110091FDDE /* Room.swift */,
 			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		361F30C12E9E61110091FDDE /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				361F30BC2E9E61110091FDDE /* AudioService.swift */,
+				361F30BD2E9E61110091FDDE /* AuthService.swift */,
+				361F30BE2E9E61110091FDDE /* ChatService.swift */,
+				361F30BF2E9E61110091FDDE /* LocationService.swift */,
+				361F30C02E9E61110091FDDE /* RoomService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		361F30C42E9E61110091FDDE /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				361F30C22E9E61110091FDDE /* LoginView.swift */,
+				361F30C32E9E61110091FDDE /* RegisterView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		361F30C72E9E61110091FDDE /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				361F30C52E9E61110091FDDE /* ChatMessageRow.swift */,
+				361F30C62E9E61110091FDDE /* TrackingStatsView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		361F30CA2E9E61110091FDDE /* Rooms */ = {
+			isa = PBXGroup;
+			children = (
+				361F30C82E9E61110091FDDE /* RoomDetailView.swift */,
+				361F30C92E9E61110091FDDE /* RoomListView.swift */,
+			);
+			path = Rooms;
+			sourceTree = "<group>";
+		};
+		361F30CB2E9E61110091FDDE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				361F30C42E9E61110091FDDE /* Auth */,
+				361F30C72E9E61110091FDDE /* Components */,
+				361F30CA2E9E61110091FDDE /* Rooms */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		3686B9A92E9E64CD008E208C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CheerioAppGroup /* CheerioApp */ = {
+			isa = PBXGroup;
+			children = (
+				361F30DD2E9E62A90091FDDE /* Info.plist */,
+				361F30B52E9E61110091FDDE /* AppState.swift */,
+				361F30B62E9E61110091FDDE /* Config.swift */,
+				361F30BB2E9E61110091FDDE /* Models */,
+				361F30C12E9E61110091FDDE /* Services */,
+				361F30CB2E9E61110091FDDE /* Views */,
+				CheerioAppAppFile /* CheerioAppApp.swift */,
+				ContentViewFile /* ContentView.swift */,
+				AssetsFile /* Assets.xcassets */,
+			);
+			path = CheerioApp;
 			sourceTree = "<group>";
 		};
 		Products /* Products */ = {
@@ -46,14 +172,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		CheerioAppGroup /* CheerioApp */ = {
+		Root = {
 			isa = PBXGroup;
 			children = (
-				CheerioAppAppFile /* CheerioAppApp.swift */,
-				ContentViewFile /* ContentView.swift */,
-				AssetsFile /* Assets.xcassets */,
+				365B04822E9E7A9600BD6EB8 /* ProfileService.swift */,
+				CheerioAppGroup /* CheerioApp */,
+				3686B9A92E9E64CD008E208C /* Frameworks */,
+				Products /* Products */,
 			);
-			path = CheerioApp;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,6 +221,10 @@
 				Base,
 			);
 			mainGroup = Root;
+			packageReferences = (
+				361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				3688C2202E9E71F5003E8EFC /* XCRemoteSwiftPackageReference "vlckit-spm" */,
+			);
 			productRefGroup = Products /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -109,7 +239,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				Assets /* Assets.xcassets in Resources */,
+				Assets /* (null) in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,8 +250,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CheerioAppApp /* CheerioAppApp.swift in Sources */,
-				ContentView /* ContentView.swift in Sources */,
+				3686B9B62E9E66B4008E208C /* CheerioAppApp.swift in Sources */,
+				361F30CD2E9E61110091FDDE /* RoomDetailView.swift in Sources */,
+				361F30CE2E9E61110091FDDE /* Message.swift in Sources */,
+				361F30CF2E9E61110091FDDE /* LocationService.swift in Sources */,
+				361F30D02E9E61110091FDDE /* AudioService.swift in Sources */,
+				361F30D12E9E61110091FDDE /* Config.swift in Sources */,
+				361F30D22E9E61110091FDDE /* TrackingStatsView.swift in Sources */,
+				361F30D32E9E61110091FDDE /* Room.swift in Sources */,
+				361F30D42E9E61110091FDDE /* AuthService.swift in Sources */,
+				365B04832E9E7A9600BD6EB8 /* ProfileService.swift in Sources */,
+				361F30D52E9E61110091FDDE /* RegisterView.swift in Sources */,
+				361F30D62E9E61110091FDDE /* RoomService.swift in Sources */,
+				361F30D72E9E61110091FDDE /* RoomListView.swift in Sources */,
+				361F30D82E9E61110091FDDE /* LoginView.swift in Sources */,
+				361F30D92E9E61110091FDDE /* AppState.swift in Sources */,
+				361F30DA2E9E61110091FDDE /* ChatService.swift in Sources */,
+				361F30DB2E9E61110091FDDE /* ChatMessageRow.swift in Sources */,
+				361F30DC2E9E61110091FDDE /* Activity.swift in Sources */,
+				CheerioAppApp /* (null) in Sources */,
+				ContentView /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +333,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CheerioApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerio needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -261,6 +414,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CheerioApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerio needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -308,7 +466,68 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+		3688C2202E9E71F5003E8EFC /* XCRemoteSwiftPackageReference "vlckit-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tylerjonesio/vlckit-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		365B04802E9E731F00BD6EB8 /* VLCKitSPM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3688C2202E9E71F5003E8EFC /* XCRemoteSwiftPackageReference "vlckit-spm" */;
+			productName = VLCKitSPM;
+		};
+		3686B9AA2E9E64CD008E208C /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		3686B9AC2E9E64CD008E208C /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		3686B9AE2E9E64CD008E208C /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		3686B9B02E9E64CD008E208C /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		3686B9B22E9E64CD008E208C /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		3686B9B42E9E64CD008E208C /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 361F30B42E9E5F120091FDDE /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		3688C2212E9E71F5003E8EFC /* VLCKitSPM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3688C2202E9E71F5003E8EFC /* XCRemoteSwiftPackageReference "vlckit-spm" */;
+			productName = VLCKitSPM;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = Project /* Project object */;
 }
-

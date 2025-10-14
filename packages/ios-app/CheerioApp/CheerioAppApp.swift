@@ -2,9 +2,20 @@ import SwiftUI
 
 @main
 struct CheerioAppApp: App {
+    @StateObject private var appState = AppState()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if appState.isLoading {
+                    ProgressView("Loading...")
+                } else if appState.isAuthenticated {
+                    RoomListView()
+                } else {
+                    LoginView()
+                }
+            }
+            .environmentObject(appState)
         }
     }
 }
