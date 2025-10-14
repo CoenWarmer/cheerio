@@ -89,6 +89,32 @@ const userColors = [
   '#f97316', // orange
 ];
 
+// Create emoji marker icons
+const createEmojiIcon = (emoji: string) => {
+  return L.divIcon({
+    html: `
+      <div style="
+        background: white;
+        border: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      ">
+        ${emoji}
+      </div>
+    `,
+    className: 'custom-emoji-marker',
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50],
+  });
+};
+
 interface UserLocationMarker {
   userId: string;
   userName?: string;
@@ -97,10 +123,19 @@ interface UserLocationMarker {
   timestamp: string;
 }
 
+interface EmojiMarker {
+  id: string;
+  emoji: string;
+  userName: string;
+  location: LocationActivity;
+  timestamp: string;
+}
+
 interface RoomMapProps {
   roomName: string;
   location?: Room['location'];
   userLocations?: UserLocationMarker[];
+  emojiMarkers?: EmojiMarker[];
 }
 
 function MapResizer() {
@@ -160,6 +195,7 @@ export default function RoomMap({
   roomName,
   location,
   userLocations = [],
+  emojiMarkers = [],
 }: RoomMapProps) {
   const [mounted, setMounted] = useState(false);
   const [userColorMap, setUserColorMap] = useState<Map<string, string>>(
@@ -365,6 +401,49 @@ export default function RoomMap({
             );
           }
         )}
+
+        {/* Emoji markers */}
+        {emojiMarkers.map(({ id, emoji, userName, location, timestamp }) => {
+          const emojiPosition: [number, number] = [location.lat, location.long];
+          const emojiIcon = createEmojiIcon(emoji);
+
+          const timeSince = currentTime - new Date(timestamp).getTime();
+          const minutesAgo = Math.floor(timeSince / 1000 / 60);
+          const timeText =
+            minutesAgo < 1
+              ? 'just now'
+              : minutesAgo < 60
+                ? `${minutesAgo}m ago`
+                : `${Math.floor(minutesAgo / 60)}h ago`;
+
+          return (
+            <Marker key={id} position={emojiPosition} icon={emojiIcon}>
+              <Tooltip direction="top" offset={[0, -50]} opacity={0.9}>
+                <strong>{userName}</strong>
+              </Tooltip>
+              <Popup>
+                <div>
+                  <div
+                    style={{
+                      fontSize: '32px',
+                      textAlign: 'center',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {emoji}
+                  </div>
+                  <strong>{userName}</strong>
+                  <br />
+                  📍 {location.lat.toFixed(6)}, {location.long.toFixed(6)}
+                  <br />
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                    {timeText}
+                  </span>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );

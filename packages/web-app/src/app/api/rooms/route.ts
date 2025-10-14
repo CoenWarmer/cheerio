@@ -7,12 +7,14 @@ export async function GET() {
   try {
     const supabase = await createServerClient();
 
-    // Note: PostGIS geography fields are returned in a binary format
-    // We'll parse them on the client side, but ideally use ST_AsText in a view
+    console.log('Getting all rooms');
+
     const { data, error } = await supabase
       .from('rooms')
       .select('*')
       .order('created_at', { ascending: false });
+
+    console.log('data', data);
 
     if (error) {
       console.error('Supabase error:', error);

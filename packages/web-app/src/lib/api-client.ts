@@ -110,8 +110,8 @@ export const messagesApi = {
     roomId: string,
     messageData: {
       content: string;
-      user_id: string;
       attachment?: Attachment;
+      location?: { lat: number; long: number };
     }
   ) {
     return fetchApi<{ data: Message }>(`/api/rooms/${roomId}/messages`, {

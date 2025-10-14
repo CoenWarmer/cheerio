@@ -22,6 +22,7 @@ export type Database = {
           deleted: boolean | null
           edited_at: string | null
           id: string
+          location: Json | null
           room_id: string
           user_id: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           deleted?: boolean | null
           edited_at?: string | null
           id?: string
+          location?: Json | null
           room_id: string
           user_id: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           deleted?: boolean | null
           edited_at?: string | null
           id?: string
+          location?: Json | null
           room_id?: string
           user_id?: string
         }

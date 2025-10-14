@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { roomsApi, ApiError } from '@/lib/api-client';
+import { useCreateRoom } from '@/hooks/useRooms';
+import { ApiError } from '@/lib/api-client';
 import { getCurrentLocation, isValidCoordinates } from '@/utils/location';
 
 type RoomStatus = 'awaiting' | 'in_progress' | 'finished';
 
 export default function NewRoomPage() {
   const router = useRouter();
+  const { createRoomAsync, isCreating } = useCreateRoom();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [donationLink, setDonationLink] = useState('');
@@ -21,7 +23,6 @@ export default function NewRoomPage() {
   const [longitude, setLongitude] = useState('');
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleGetCurrentLocation = async () => {
     setLoadingLocation(true);
@@ -43,12 +44,10 @@ export default function NewRoomPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     // Validate required fields
     if (!title.trim()) {
       setError('Title is required');
-      setLoading(false);
       return;
     }
 
@@ -60,7 +59,6 @@ export default function NewRoomPage() {
 
       if (isNaN(lat) || isNaN(long)) {
         setError('Invalid coordinates. Please enter valid numbers.');
-        setLoading(false);
         return;
       }
 
@@ -68,7 +66,6 @@ export default function NewRoomPage() {
         setError(
           'Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.'
         );
-        setLoading(false);
         return;
       }
 
@@ -84,7 +81,6 @@ export default function NewRoomPage() {
 
       if (!user) {
         setError('You must be logged in to create a room');
-        setLoading(false);
         return;
       }
 
@@ -100,8 +96,8 @@ export default function NewRoomPage() {
         location: locationJson,
       };
 
-      // Call API route to create room
-      const result = await roomsApi.create(roomData);
+      // Call API route to create room using Tanstack Query mutation
+      const result = await createRoomAsync(roomData);
 
       if (result.data) {
         // Redirect to the newly created room
@@ -114,8 +110,6 @@ export default function NewRoomPage() {
         setError('Failed to create room. Please try again.');
       }
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -539,19 +533,19 @@ export default function NewRoomPage() {
               </Link>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isCreating}
                 style={{
                   padding: '0.625rem 1.25rem',
-                  background: loading ? '#9ca3af' : '#3b82f6',
+                  background: isCreating ? '#9ca3af' : '#3b82f6',
                   color: 'white',
                   border: 'none',
                   borderRadius: '0.375rem',
                   fontSize: '0.875rem',
                   fontWeight: '500',
-                  cursor: loading ? 'not-allowed' : 'pointer',
+                  cursor: isCreating ? 'not-allowed' : 'pointer',
                 }}
               >
-                {loading ? 'Creating...' : 'Create Room'}
+                {isCreating ? 'Creating...' : 'Create Room'}
               </button>
             </div>
           </form>

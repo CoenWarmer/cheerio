@@ -53,7 +53,17 @@ export async function POST(
     const { slug } = await params;
     const body = await request.json();
 
-    const { content, user_id, attachment } = body;
+    const { content, attachment, location } = body;
+
+    // Get authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Get room by slug to get the room ID
     const { data: room, error: roomError } = await supabase
@@ -67,9 +77,9 @@ export async function POST(
     }
 
     // Validate required fields
-    if (!content || !user_id) {
+    if (!content) {
       return NextResponse.json(
-        { error: 'Content and user_id are required' },
+        { error: 'Content is required' },
         { status: 400 }
       );
     }
@@ -79,8 +89,9 @@ export async function POST(
       .insert({
         content,
         room_id: room.id,
-        user_id,
+        user_id: user.id,
         attachment: attachment || null,
+        location: location || null,
       })
       .select()
       .single();

@@ -58,11 +58,13 @@ export async function GET(
       location_points: locations.length,
       total_distance:
         distances.length > 0
-          ? (distances[distances.length - 1].data as any).distance
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (distances[distances.length - 1].data as any).distance
           : 0,
       max_speed:
         speeds.length > 0
-          ? Math.max(...speeds.map(s => (s.data as any).speed))
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Math.max(...speeds.map(s => (s.data as any).speed))
           : 0,
       songs_played: music.length,
       start_time: activities.length > 0 ? activities[0].created_at : null,

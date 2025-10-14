@@ -1,31 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { roomsApi } from '@/lib/api-client';
-
-type Room = any; // Will be typed from API response
+import { useRooms } from '@/hooks/useRooms';
 
 export default function RoomsListPage() {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchRooms() {
-      try {
-        const result = await roomsApi.getAll();
-        setRooms(result.data);
-      } catch (err) {
-        setError('Failed to load rooms');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchRooms();
-  }, []);
+  const { rooms, isLoading: loading, error } = useRooms();
 
   if (loading) {
     return (
@@ -122,7 +101,7 @@ export default function RoomsListPage() {
               marginBottom: '2rem',
             }}
           >
-            {error}
+            {error.message || 'Failed to load rooms'}
           </div>
         )}
 

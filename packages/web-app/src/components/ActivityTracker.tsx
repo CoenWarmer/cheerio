@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { activityApi } from '@/lib/activity-client';
 import { useProfile } from '@/hooks/useProfile';
+import { useCreateActivity } from '@/hooks/useActivity';
 import { canTrack } from '@/types/permissions';
 import type {
   LocationActivity,
@@ -16,6 +16,7 @@ interface ActivityTrackerProps {
 
 export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
   const { permissions, loading } = useProfile();
+  const { createActivity } = useCreateActivity();
 
   const [isTracking, setIsTracking] = useState(false);
   const [status, setStatus] = useState<string>('');
@@ -68,9 +69,12 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
         timestamp: position.timestamp,
       };
 
-      await activityApi.createActivity(roomSlug, {
-        activity_type: 'location',
-        data: locationData,
+      createActivity({
+        roomSlug,
+        activity: {
+          activity_type: 'location',
+          data: locationData,
+        },
       });
 
       // Calculate distance and speed if we have a previous position
@@ -100,9 +104,12 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
             unit: 'km',
           };
 
-          await activityApi.createActivity(roomSlug, {
-            activity_type: 'distance',
-            data: distanceData,
+          createActivity({
+            roomSlug,
+            activity: {
+              activity_type: 'distance',
+              data: distanceData,
+            },
           });
 
           // Send speed activity (if speed is > 1 km/h to filter out noise)
@@ -112,9 +119,12 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
               unit: 'kmh',
             };
 
-            await activityApi.createActivity(roomSlug, {
-              activity_type: 'speed',
-              data: speedData,
+            createActivity({
+              roomSlug,
+              activity: {
+                activity_type: 'speed',
+                data: speedData,
+              },
             });
           }
         }

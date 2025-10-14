@@ -1,98 +1,69 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
-import {
-  messagesApi,
-  attachmentsApi,
-  presenceApi,
-  profilesApi,
-  ApiError,
-} from '@/lib/api-client';
+import { attachmentsApi, ApiError } from '@/lib/api-client';
 import type { User } from '@supabase/supabase-js';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Message = any; // Will be typed from API response
+import {
+  useMessages,
+  useSendMessage,
+  type EnrichedMessage,
+} from '@/hooks/useMessages';
+import {
+  usePresence,
+  useUpdatePresence,
+  useRemovePresence,
+} from '@/hooks/usePresence';
 
 interface ChatSidebarProps {
   roomId: string; // Room UUID for realtime subscriptions
   roomSlug: string; // Room slug for API calls
   currentUser: User;
+  currentUserLocation?: { lat: number; long: number } | null;
 }
 
 export default function ChatSidebar({
   roomId,
   roomSlug,
   currentUser,
+  currentUserLocation,
 }: ChatSidebarProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  // Use hooks for data fetching
+  const { messages: messagesData, isLoading: loading } = useMessages(
+    roomId,
+    roomSlug
+  );
+  const { sendMessage } = useSendMessage();
+  const { count: activeUsers } = usePresence(roomId, roomSlug);
+  const { updatePresence } = useUpdatePresence();
+  const { removePresence } = useRemovePresence();
+
+  const [messages, setMessages] = useState<EnrichedMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [activeUsers, setActiveUsers] = useState(0);
-  const [userNames, setUserNames] = useState<Map<string, string>>(new Map());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const presenceIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Sync messages from hook to local state (for real-time updates)
+  useEffect(() => {
+    setMessages(messagesData);
+    scrollToBottom();
+  }, [messagesData]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    async function fetchMessages() {
-      try {
-        const result = await messagesApi.getByRoomId(roomSlug);
-        setMessages(result.data);
-
-        // Fetch user names for message senders
-        const uniqueUserIds = Array.from(
-          new Set(result.data.map((msg: Message) => msg.user_id))
-        );
-
-        if (uniqueUserIds.length > 0) {
-          const names = await profilesApi.getUserNamesMap(uniqueUserIds);
-          setUserNames(names);
-        }
-      } catch (err) {
-        console.error('Failed to fetch messages:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMessages();
-    scrollToBottom();
-  }, [roomSlug]);
-
   // Presence management
   useEffect(() => {
-    async function updatePresence() {
-      try {
-        await presenceApi.update(roomSlug, 'online');
-      } catch (err) {
-        console.error('Failed to update presence:', err);
-      }
-    }
-
-    async function fetchActiveUsers() {
-      try {
-        const result = await presenceApi.getActive(roomSlug);
-        setActiveUsers(result.count);
-      } catch (err) {
-        console.error('Failed to fetch active users:', err);
-      }
-    }
-
     // Initial presence update
-    updatePresence();
-    fetchActiveUsers();
+    updatePresence({ roomId: roomSlug, status: 'online' });
 
     // Update presence every 20 seconds
     presenceIntervalRef.current = setInterval(() => {
-      updatePresence();
-      fetchActiveUsers();
+      updatePresence({ roomId: roomSlug, status: 'online' });
     }, 20000);
 
     // Cleanup on unmount
@@ -101,112 +72,22 @@ export default function ChatSidebar({
         clearInterval(presenceIntervalRef.current);
       }
       // Remove presence when leaving
-      presenceApi.remove(roomSlug).catch(err => {
-        console.error('Failed to remove presence:', err);
-      });
+      removePresence(roomSlug);
     };
-  }, [roomSlug]);
+  }, [roomSlug, updatePresence, removePresence]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Set up real-time subscription for messages and presence
-  useEffect(() => {
-    const channel = supabase
-      .channel(`room-${roomId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `room_id=eq.${roomId}`,
-        },
-        async payload => {
-          const newMsg = payload.new as Message;
-          setMessages(prev => {
-            // Prevent duplicates
-            if (prev.some(m => m.id === newMsg.id)) {
-              return prev;
-            }
-            return [...prev, newMsg];
-          });
+  // Real-time subscriptions are now handled by useMessages and usePresence hooks
 
-          // Fetch user profile for new message sender if we don't have it
-          setUserNames(prev => {
-            // Check if we already have this user
-            if (prev.has(newMsg.user_id)) {
-              return prev;
-            }
-
-            // Fetch profile asynchronously
-            profilesApi.getUserNamesMap([newMsg.user_id]).then(names => {
-              setUserNames(prevInner => {
-                const newMap = new Map(prevInner);
-                names.forEach((name, id) => {
-                  newMap.set(id, name);
-                });
-                return newMap;
-              });
-            });
-
-            return prev;
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages',
-          filter: `room_id=eq.${roomId}`,
-        },
-        payload => {
-          const updatedMsg = payload.new as Message;
-          setMessages(prev =>
-            prev.map(m => (m.id === updatedMsg.id ? updatedMsg : m))
-          );
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'messages',
-          filter: `room_id=eq.${roomId}`,
-        },
-        payload => {
-          const deletedMsg = payload.old as Message;
-          setMessages(prev => prev.filter(m => m.id !== deletedMsg.id));
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'presence',
-          filter: `room_id=eq.${roomId}`,
-        },
-        async () => {
-          // Refetch active users count when presence changes
-          try {
-            const result = await presenceApi.getActive(roomSlug);
-            setActiveUsers(result.count);
-          } catch (err) {
-            console.error('Failed to fetch active users:', err);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [roomId, roomSlug]);
+  // Helper to check if a string is a single emoji
+  const isEmoji = (str: string): boolean => {
+    const emojiRegex =
+      /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Extended_Pictographic})$/u;
+    return emojiRegex.test(str.trim());
+  };
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -216,12 +97,20 @@ export default function ChatSidebar({
     setSending(true);
 
     try {
-      const messageData = {
-        content: newMessage.trim(),
-        user_id: currentUser.id,
+      const content = newMessage.trim();
+      const messageData: {
+        content: string;
+        location?: { lat: number; long: number };
+      } = {
+        content,
       };
 
-      await messagesApi.create(roomSlug, messageData);
+      // If this is an emoji and the user has a location, include it
+      if (isEmoji(content) && currentUserLocation) {
+        messageData.location = currentUserLocation;
+      }
+
+      sendMessage({ roomId: roomSlug, messageData });
       setNewMessage('');
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -251,7 +140,23 @@ export default function ChatSidebar({
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         });
-        const mediaRecorder = new MediaRecorder(stream);
+
+        // Try to use MP4/M4A format (compatible with iOS), fall back to WebM
+        let mimeType = 'audio/webm';
+
+        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          mimeType = 'audio/mp4';
+        } else if (
+          MediaRecorder.isTypeSupported('audio/mp4; codecs="mp4a.40.2"')
+        ) {
+          mimeType = 'audio/mp4; codecs="mp4a.40.2"'; // AAC-LC
+        } else if (MediaRecorder.isTypeSupported('audio/webm; codecs=opus')) {
+          mimeType = 'audio/webm; codecs=opus';
+        }
+
+        console.log('Using audio format:', mimeType);
+
+        const mediaRecorder = new MediaRecorder(stream, { mimeType });
         mediaRecorderRef.current = mediaRecorder;
         audioChunksRef.current = [];
 
@@ -265,9 +170,9 @@ export default function ChatSidebar({
           // Stop all tracks to release microphone
           stream.getTracks().forEach(track => track.stop());
 
-          // Create audio blob
+          // Create audio blob with the correct MIME type
           const audioBlob = new Blob(audioChunksRef.current, {
-            type: 'audio/webm',
+            type: mimeType,
           });
 
           setSending(true);
@@ -282,11 +187,10 @@ export default function ChatSidebar({
             // Send message with attachment URL
             const messageData = {
               content: '🎤 Voice message',
-              user_id: currentUser.id,
               attachment,
             };
 
-            await messagesApi.create(roomSlug, messageData);
+            sendMessage({ roomId: roomSlug, messageData });
           } catch (err) {
             console.error('Failed to send voice message:', err);
             if (err instanceof ApiError) {
@@ -456,7 +360,7 @@ export default function ChatSidebar({
             const isCurrentUser = message.user_id === currentUser.id;
             const userName = isCurrentUser
               ? 'You'
-              : userNames.get(message.user_id) || 'Unknown User';
+              : message.userName || 'Unknown User';
 
             return (
               <div

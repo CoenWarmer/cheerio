@@ -3,31 +3,27 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useUser } from './useUser';
 import type { User } from '@supabase/supabase-js';
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user: initialUser, isLoading } = useUser();
+  const [user, setUser] = useState<User | null>(initialUser);
   const router = useRouter();
 
+  // Sync initial user from useUser hook
   useEffect(() => {
-    // Get initial user
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
+    if (!isLoading) {
+      setUser(initialUser);
+    }
+  }, [initialUser, isLoading]);
 
-    getUser();
-
-    // Listen for auth changes
+  // Listen for auth state changes
+  useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
-      setLoading(false);
 
       if (event === 'SIGNED_IN') {
         router.refresh();
@@ -44,7 +40,7 @@ export function useAuth() {
 
   return {
     user,
-    loading,
+    loading: isLoading,
     signOut: async () => {
       await supabase.auth.signOut();
       router.push('/sign-in');

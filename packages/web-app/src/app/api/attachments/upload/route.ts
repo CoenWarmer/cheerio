@@ -33,7 +33,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ['audio/webm', 'audio/mpeg', 'audio/wav', 'audio/ogg'];
+    const allowedTypes = [
+      'audio/webm',
+      'audio/mpeg',
+      'audio/mp3',
+      'audio/wav',
+      'audio/ogg',
+      'audio/mp4',
+      'audio/m4a',
+      'audio/x-m4a',
+      'audio/aac',
+    ];
     if (type === 'audio' && !allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { error: `Invalid file type. Allowed: ${allowedTypes.join(', ')}` },

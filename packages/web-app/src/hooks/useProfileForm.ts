@@ -115,9 +115,9 @@ export function useProfileForm(): UseProfileFormResult {
       setAvatarPath(result.path);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error uploading avatar:', err);
-      setError(err.message || 'Failed to upload avatar');
+      setError(err instanceof Error ? err.message : 'Failed to upload avatar');
       setPreviewUrl(null);
     } finally {
       setUploading(false);
@@ -136,9 +136,9 @@ export function useProfileForm(): UseProfileFormResult {
       setPreviewUrl(null);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error removing avatar:', err);
-      setError(err.message || 'Failed to remove avatar');
+      setError(err instanceof Error ? err.message : 'Failed to remove avatar');
     }
   };
 
@@ -154,9 +154,9 @@ export function useProfileForm(): UseProfileFormResult {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error updating profile:', err);
-      setError(err.message || 'Failed to update profile');
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setSaving(false);
     }
