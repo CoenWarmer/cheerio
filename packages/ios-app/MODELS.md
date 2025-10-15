@@ -39,7 +39,7 @@ curl http://localhost:3001/api/rooms | jq '.data[0]' > room-sample.json
 # Generate Swift model
 quicktype --lang swift \
   --src room-sample.json \
-  --out CheerioApp/Models/Room.swift \
+  --out CheeriooApp/Models/Room.swift \
   --struct-or-class struct \
   --protocol Codable
 ```

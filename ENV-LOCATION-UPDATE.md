@@ -7,7 +7,7 @@ The `.env.local` file has been moved to the repo root for easier configuration m
 ## 📁 New Structure
 
 ```
-cheerio/
+cheerioo/
 ├── .env.local              ← Your credentials (gitignored) ✨
 ├── .env.local.example      ← Template for new developers
 ├── packages/
@@ -33,7 +33,7 @@ cheerio/
 Next.js automatically looks for `.env.local` at:
 
 1. Package root (`packages/web-app/.env.local`)
-2. Monorepo root (`/cheerio/.env.local`) ← **Now preferred**
+2. Monorepo root (`/cheerioo/.env.local`) ← **Now preferred**
 
 No changes needed - it just works! ✨
 
@@ -41,7 +41,7 @@ No changes needed - it just works! ✨
 
 The `generate-config.sh` script looks for `.env.local` at:
 
-1. Repo root (`/cheerio/.env.local`) ← **Preferred** ✨
+1. Repo root (`/cheerioo/.env.local`) ← **Preferred** ✨
 2. Web app (`packages/web-app/.env.local`) ← Fallback
 
 You'll see which location is used:
@@ -50,7 +50,7 @@ You'll see which location is used:
 $ yarn generate-config
 📝 Generating Config.swift from .env.local (repo root)...
 ✅ Config.swift generated successfully!
-   Source: /Users/.../cheerio/.env.local
+   Source: /Users/.../cheerioo/.env.local
 ```
 
 ## 📝 Quick Start
@@ -63,7 +63,7 @@ cp .env.local.example .env.local
 # Edit with your Supabase credentials
 
 # Generate iOS config
-yarn workspace @cheerio/ios-app generate-config
+yarn workspace @cheerioo/ios-app generate-config
 ```
 
 ### Existing Setup (Migration)
@@ -125,7 +125,7 @@ cp .env.local.example .env.local
 
 ```bash
 # Check if repo root .env.local exists
-ls /path/to/cheerio/.env.local
+ls /path/to/cheerioo/.env.local
 
 # If it doesn't, create it
 cp packages/web-app/.env.local .env.local

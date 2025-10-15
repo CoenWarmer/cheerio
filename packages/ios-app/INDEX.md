@@ -1,6 +1,6 @@
 # 📱 iOS App Documentation Index
 
-Complete guide to configuring and building the Cheerio iOS app.
+Complete guide to configuring and building the Cheerioo iOS app.
 
 ---
 
@@ -178,7 +178,7 @@ ios-app/scripts/
 ### Config Files
 
 ```
-ios-app/CheerioApp/
+ios-app/CheeriooApp/
 ├── Config.swift                    # Generated config (gitignored)
 └── Config.swift.example           # Template (safe to commit)
 ```

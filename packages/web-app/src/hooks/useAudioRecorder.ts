@@ -67,7 +67,7 @@ export function useAudioRecorder({
 
           // Send message with attachment URL
           const messageData = {
-            content: '📢 Cheerio!',
+            content: '📢 Cheerioo!',
             attachment,
           };
 

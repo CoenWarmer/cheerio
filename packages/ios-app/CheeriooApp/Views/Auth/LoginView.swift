@@ -18,7 +18,7 @@ struct LoginView: View {
                     .font(.system(size: 60))
                     .foregroundColor(.blue)
                 
-                Text("Cheerio")
+                Text("Cheerioo")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 

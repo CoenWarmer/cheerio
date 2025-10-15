@@ -6,7 +6,7 @@ struct ContentView: View {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Welcome to Cheerio")
+            Text("Welcome to Cheerioo")
                 .font(.title)
             Text("iOS App")
                 .font(.subheadline)

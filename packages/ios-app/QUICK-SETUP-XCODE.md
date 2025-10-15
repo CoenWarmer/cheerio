@@ -11,15 +11,15 @@ Make `Config.swift` automatically regenerate from `.env.local` every time you bu
 ### 1. Open Xcode
 
 ```bash
-open packages/ios-app/CheerioApp.xcodeproj
+open packages/ios-app/CheeriooApp.xcodeproj
 ```
 
 ### 2. Navigate to Build Phases
 
 ```
-Click: CheerioApp (in sidebar)
+Click: CheeriooApp (in sidebar)
    ↓
-Click: CheerioApp target (under TARGETS)
+Click: CheeriooApp target (under TARGETS)
    ↓
 Click: Build Phases tab (at top)
 ```
@@ -58,7 +58,7 @@ Add: $(SRCROOT)/../web-app/.env.local
 
 Expand: Output Files
    ↓
-Add: $(SRCROOT)/CheerioApp/Config.swift
+Add: $(SRCROOT)/CheeriooApp/Config.swift
 ```
 
 ### 6. Test

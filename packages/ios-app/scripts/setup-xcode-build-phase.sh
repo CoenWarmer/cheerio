@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 IOS_APP_DIR="$(dirname "$SCRIPT_DIR")"
-PROJECT_FILE="$IOS_APP_DIR/CheerioApp.xcodeproj/project.pbxproj"
+PROJECT_FILE="$IOS_APP_DIR/CheeriooApp.xcodeproj/project.pbxproj"
 
 echo -e "${BLUE}🔧 Setting up Xcode build phase for auto-generating Config.swift${NC}"
 echo ""
@@ -75,7 +75,7 @@ BUILD_PHASE_ENTRY="		${BUILD_PHASE_ID} /* ShellScript */ = {
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				\"\$(SRCROOT)/CheerioApp/Config.swift\",
+				\"\$(SRCROOT)/CheeriooApp/Config.swift\",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -100,7 +100,7 @@ $BUILD_PHASE_ENTRY\\
 fi
 
 # Add the build phase to the target's buildPhases array
-# Find the CheerioApp target and add the script phase before Sources phase
+# Find the CheeriooApp target and add the script phase before Sources phase
 TARGET_SECTION=$(grep -n "isa = PBXNativeTarget" "$PROJECT_FILE" | head -1 | cut -d: -f1)
 BUILD_PHASES_LINE=$(tail -n +$TARGET_SECTION "$PROJECT_FILE" | grep -n "buildPhases = (" | head -1 | cut -d: -f1)
 INSERT_LINE=$((TARGET_SECTION + BUILD_PHASES_LINE))
@@ -115,7 +115,7 @@ echo ""
 echo -e "${GREEN}🎉 Setup complete!${NC}"
 echo ""
 echo -e "${BLUE}Next steps:${NC}"
-echo -e "  1. Open CheerioApp.xcodeproj in Xcode"
+echo -e "  1. Open CheeriooApp.xcodeproj in Xcode"
 echo -e "  2. Go to Target → Build Phases"
 echo -e "  3. You should see 'Generate Config from .env'"
 echo -e "  4. Drag it above 'Compile Sources' if needed"

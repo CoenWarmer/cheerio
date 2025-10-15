@@ -1,6 +1,6 @@
-# Cheerio iOS App
+# Cheerioo iOS App
 
-A native iOS application built with Swift and SwiftUI that connects to the Cheerio backend.
+A native iOS application built with Swift and SwiftUI that connects to the Cheerioo backend.
 
 ## Features
 
@@ -38,7 +38,7 @@ yarn generate-config
 
 The script looks for `.env.local` at:
 
-1. Repo root (`/cheerio/.env.local`) - **Recommended** ✨
+1. Repo root (`/cheerioo/.env.local`) - **Recommended** ✨
 2. Web app (`packages/web-app/.env.local`) - Fallback
 
 This automatically:
@@ -62,7 +62,7 @@ This automatically:
 ## Project Structure
 
 ```
-ios-app/CheerioApp/
+ios-app/CheeriooApp/
 ├── Config.swift                    # API and Supabase configuration
 ├── AppState.swift                  # Global app state management
 ├── Models/                         # Data models (Room, Message, Activity)
@@ -71,7 +71,7 @@ ios-app/CheerioApp/
 │   ├── Auth/                       # Login and registration
 │   ├── Rooms/                      # Room list and detail views
 │   └── Components/                 # Reusable UI components
-└── CheerioAppApp.swift             # App entry point
+└── CheeriooAppApp.swift             # App entry point
 ```
 
 ## Architecture

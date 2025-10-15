@@ -16,6 +16,22 @@
   font-family: var(--font-geist-sans);
 }
 
+.title {
+  font-family: Outfit, var(--mantine-font-family);
+  font-size: 62px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+  margin-bottom: 16px;
+  padding: 0;
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-blue));
+
+  @media (max-width: 700px) {
+    font-size: 42px;
+    line-height: 1.2;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .page {
     --gray-rgb: 255, 255, 255;
@@ -30,7 +46,6 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
   grid-row-start: 2;
 }
 

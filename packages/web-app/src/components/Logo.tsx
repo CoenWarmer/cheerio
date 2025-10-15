@@ -16,7 +16,7 @@ export function Logo({
       size={size}
       style={{ textDecoration: 'none' }}
     >
-      Cheerio <SpeakerphoneIcon fill="#228be6" />
+      Cheerioo <SpeakerphoneIcon fill="#228be6" />
     </Anchor>
   );
 }

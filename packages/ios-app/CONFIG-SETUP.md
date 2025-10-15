@@ -22,7 +22,7 @@ This generates `Config.swift` with:
 
 The script looks for `.env.local` in this order:
 
-1. **`/cheerio/.env.local`** (repo root) - **Recommended** ✨
+1. **`/cheerioo/.env.local`** (repo root) - **Recommended** ✨
 2. **`packages/web-app/.env.local`** (fallback)
 
 **Why repo root?** Makes it easier to share configuration across all packages (web-app, ios-app, etc.)
@@ -32,7 +32,7 @@ The script looks for `.env.local` in this order:
 ### New Files
 
 1. **`scripts/generate-config.sh`** - Bash script that reads `.env.local` and generates Swift
-2. **`CheerioApp/Config.swift.example`** - Template config (safe to commit)
+2. **`CheeriooApp/Config.swift.example`** - Template config (safe to commit)
 3. **`ENV-VARIABLES.md`** - Comprehensive documentation
 4. **`.gitignore`** - Updated to ignore generated `Config.swift`
 
@@ -88,7 +88,7 @@ if let mapKey = Config.thunderforestAPIKey {
 
 ### Optional: Auto-generate on every build
 
-1. Open `CheerioApp.xcodeproj` in Xcode
+1. Open `CheeriooApp.xcodeproj` in Xcode
 2. Target → Build Phases → + → New Run Script Phase
 3. Add script:
    ```bash

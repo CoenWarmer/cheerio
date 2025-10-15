@@ -18,12 +18,12 @@ This guide shows you how to automatically regenerate `Config.swift` from `.env.l
 1. **Open your project in Xcode**
 
    ```bash
-   open packages/ios-app/CheerioApp.xcodeproj
+   open packages/ios-app/CheeriooApp.xcodeproj
    ```
 
 2. **Select your app target**
-   - Click on `CheerioApp` in the Project Navigator (left sidebar)
-   - Make sure the `CheerioApp` target is selected (not the project)
+   - Click on `CheeriooApp` in the Project Navigator (left sidebar)
+   - Make sure the `CheeriooApp` target is selected (not the project)
 
 3. **Go to Build Phases**
    - Click the "Build Phases" tab at the top
@@ -58,7 +58,7 @@ This guide shows you how to automatically regenerate `Config.swift` from `.env.l
    - Click `+` and add: `$(SRCROOT)/../../.env.local` (repo root - recommended)
    - Click `+` and add: `$(SRCROOT)/../web-app/.env.local` (fallback)
    - Expand "Output Files" section
-   - Click `+` and add: `$(SRCROOT)/CheerioApp/Config.swift`
+   - Click `+` and add: `$(SRCROOT)/CheeriooApp/Config.swift`
    - This helps Xcode know when to skip the script (if .env hasn't changed)
 
 9. **Test it!**
@@ -162,7 +162,7 @@ cp .env.local.example .env.local
 
 ```bash
 # In generate-config.sh, verify OUTPUT_FILE path:
-OUTPUT_FILE="$IOS_APP_DIR/CheerioApp/Config.swift"
+OUTPUT_FILE="$IOS_APP_DIR/CheeriooApp/Config.swift"
 ```
 
 ### 🐢 Builds are slower
@@ -228,7 +228,7 @@ To support dev/staging/production configs:
 
 If you want to go back to manual generation:
 
-1. Open Xcode → CheerioApp target → Build Phases
+1. Open Xcode → CheeriooApp target → Build Phases
 2. Find "Generate Config from .env" script phase
 3. Click the `-` button to delete it
 4. Run `yarn generate-config` manually when needed

@@ -1,10 +1,10 @@
-# Cheerio Monorepo
+# Cheerioo Monorepo
 
 A yarn workspaces monorepo containing multiple applications.
 
 ## 📦 Packages
 
-### `@cheerio/web-app`
+### `@cheerioo/web-app`
 
 Next.js web application with TypeScript, ESLint, and Tailwind CSS.
 
@@ -18,7 +18,7 @@ Next.js web application with TypeScript, ESLint, and Tailwind CSS.
 - Tailwind CSS
 - Turbopack
 
-### `@cheerio/ios-app`
+### `@cheerioo/ios-app`
 
 Native iOS application built with Swift and SwiftUI.
 
@@ -90,22 +90,22 @@ The web app will be available at http://localhost:3000
 The iOS app must be opened and run through Xcode:
 
 1. Navigate to `packages/ios-app/`
-2. Open `CheerioApp.xcodeproj` in Xcode
+2. Open `CheeriooApp.xcodeproj` in Xcode
 3. Select a simulator or device
 4. Press `Cmd + R` to build and run
 
 ## 📁 Project Structure
 
 ```
-cheerio-monorepo/
+cheerioo-monorepo/
 ├── packages/
 │   ├── web-app/          # Next.js web application
 │   │   ├── src/
 │   │   ├── public/
 │   │   └── package.json
 │   └── ios-app/          # Native iOS application
-│       ├── CheerioApp/   # Swift source files
-│       ├── CheerioApp.xcodeproj/
+│       ├── CheeriooApp/   # Swift source files
+│       ├── CheeriooApp.xcodeproj/
 │       └── package.json  # (workspace compatibility only)
 ├── package.json          # Root workspace configuration
 └── README.md

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct CheerioAppApp: App {
+struct CheeriooAppApp: App {
     @StateObject private var appState = AppState()
     
     var body: some Scene {

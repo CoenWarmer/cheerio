@@ -30,8 +30,8 @@ You now have a complete environment variable system for your iOS app with:
 
 #### Config Templates
 
-- ✅ `CheerioApp/Config.swift.example` - Safe template
-- ✅ `CheerioApp/Config.swift` - Generated (gitignored)
+- ✅ `CheeriooApp/Config.swift.example` - Safe template
+- ✅ `CheeriooApp/Config.swift` - Generated (gitignored)
 
 #### Package.json
 
@@ -50,7 +50,7 @@ You now have a complete environment variable system for your iOS app with:
 yarn generate-config
 
 # Or from monorepo root
-yarn workspace @cheerio/ios-app generate-config
+yarn workspace @cheerioo/ios-app generate-config
 
 # Setup automated Xcode build phase (optional)
 cd packages/ios-app

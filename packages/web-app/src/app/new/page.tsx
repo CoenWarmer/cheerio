@@ -136,8 +136,8 @@ export default function NewRoomPage() {
         <Container size="xl">
           <Group justify="space-between" align="center">
             <Title order={1}>Create New Room</Title>
-            <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
-              ← Back to Dashboard
+            <Anchor component={Link} href="/rooms" c="gray.6" size="sm">
+              ← Back to Rooms
             </Anchor>
           </Group>
         </Container>
@@ -251,7 +251,7 @@ export default function NewRoomPage() {
               <Group justify="flex-end" gap="md">
                 <Button
                   component={Link}
-                  href="/dashboard"
+                  href="/rooms"
                   variant="default"
                   size="sm"
                 >

@@ -7,8 +7,9 @@ The `Config.swift` file was already committed to the repository, but it shouldn'
 ## Steps Taken
 
 1. **Removed from Git tracking** (file still exists locally):
+
    ```bash
-   git rm --cached packages/ios-app/CheerioApp/Config.swift
+   git rm --cached packages/ios-app/CheeriooApp/Config.swift
    ```
 
 2. **File status**:
@@ -34,12 +35,15 @@ The file will continue to exist locally but won't be tracked by Git.
 ## What Happens Next
 
 ### For You (Current Developer)
+
 - ✅ Your local `Config.swift` remains untouched
 - ✅ It will be ignored by Git from now on
 - ✅ Running `yarn generate-config` will continue to work
 
 ### For Other Developers (After They Pull)
+
 When they pull your changes:
+
 1. Their `Config.swift` will be deleted (since it's removed from Git)
 2. They need to regenerate it:
    ```bash
@@ -71,19 +75,20 @@ Check that it's working correctly:
 
 ```bash
 # File exists locally
-ls packages/ios-app/CheerioApp/Config.swift
+ls packages/ios-app/CheeriooApp/Config.swift
 
 # Not tracked by Git (should show nothing after commit)
-git status packages/ios-app/CheerioApp/Config.swift
+git status packages/ios-app/CheeriooApp/Config.swift
 
 # Ignored by Git
-git check-ignore packages/ios-app/CheerioApp/Config.swift
-# Should output: packages/ios-app/CheerioApp/Config.swift
+git check-ignore packages/ios-app/CheeriooApp/Config.swift
+# Should output: packages/ios-app/CheeriooApp/Config.swift
 ```
 
 ## Template File
 
 The `Config.swift.example` file is committed and serves as:
+
 - ✅ Template for new developers
 - ✅ Shows the structure without exposing credentials
 - ✅ Safe to commit to Git
@@ -94,6 +99,6 @@ The `Config.swift.example` file is committed and serves as:
 ✅ Local file preserved and working  
 ✅ Template file (`Config.swift.example`) committed  
 ✅ `.gitignore` configured  
-✅ Ready to commit this change  
+✅ Ready to commit this change
 
 **Next Step**: Commit the staged deletion when you're ready!

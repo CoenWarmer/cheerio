@@ -31,10 +31,10 @@
 		3686B9B12E9E64CD008E208C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B02E9E64CD008E208C /* Realtime */; };
 		3686B9B32E9E64CD008E208C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B22E9E64CD008E208C /* Storage */; };
 		3686B9B52E9E64CD008E208C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3686B9B42E9E64CD008E208C /* Supabase */; };
-		3686B9B62E9E66B4008E208C /* CheerioAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CheerioAppAppFile /* CheerioAppApp.swift */; };
+		3686B9B62E9E66B4008E208C /* CheeriooAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CheeriooAppAppFile /* CheeriooAppApp.swift */; };
 		3688C2222E9E71F5003E8EFC /* VLCKitSPM in Frameworks */ = {isa = PBXBuildFile; productRef = 3688C2212E9E71F5003E8EFC /* VLCKitSPM */; };
 		Assets /* (null) in Resources */ = {isa = PBXBuildFile; };
-		CheerioAppApp /* (null) in Sources */ = {isa = PBXBuildFile; };
+		CheeriooAppApp /* (null) in Sources */ = {isa = PBXBuildFile; };
 		ContentView /* (null) in Sources */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
@@ -56,10 +56,10 @@
 		361F30C82E9E61110091FDDE /* RoomDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailView.swift; sourceTree = "<group>"; };
 		361F30C92E9E61110091FDDE /* RoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListView.swift; sourceTree = "<group>"; };
 		361F30DD2E9E62A90091FDDE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		365B04822E9E7A9600BD6EB8 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileService.swift; path = CheerioApp/Services/ProfileService.swift; sourceTree = "<group>"; };
+		365B04822E9E7A9600BD6EB8 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileService.swift; path = CheeriooApp/Services/ProfileService.swift; sourceTree = "<group>"; };
 		AssetsFile /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CheerioApp /* CheerioApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheerioApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CheerioAppAppFile /* CheerioAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheerioAppApp.swift; sourceTree = "<group>"; };
+		CheeriooApp /* CheeriooApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheeriooApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CheeriooAppAppFile /* CheeriooAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheeriooAppApp.swift; sourceTree = "<group>"; };
 		ContentViewFile /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -148,7 +148,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		CheerioAppGroup /* CheerioApp */ = {
+		CheeriooAppGroup /* CheeriooApp */ = {
 			isa = PBXGroup;
 			children = (
 				361F30DD2E9E62A90091FDDE /* Info.plist */,
@@ -157,17 +157,17 @@
 				361F30BB2E9E61110091FDDE /* Models */,
 				361F30C12E9E61110091FDDE /* Services */,
 				361F30CB2E9E61110091FDDE /* Views */,
-				CheerioAppAppFile /* CheerioAppApp.swift */,
+				CheeriooAppAppFile /* CheeriooAppApp.swift */,
 				ContentViewFile /* ContentView.swift */,
 				AssetsFile /* Assets.xcassets */,
 			);
-			path = CheerioApp;
+			path = CheeriooApp;
 			sourceTree = "<group>";
 		};
 		Products /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CheerioApp /* CheerioApp.app */,
+				CheeriooApp /* CheeriooApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,7 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				365B04822E9E7A9600BD6EB8 /* ProfileService.swift */,
-				CheerioAppGroup /* CheerioApp */,
+				CheeriooAppGroup /* CheeriooApp */,
 				3686B9A92E9E64CD008E208C /* Frameworks */,
 				Products /* Products */,
 			);
@@ -185,9 +185,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CheerioAppTarget /* CheerioApp */ = {
+		CheeriooAppTarget /* CheeriooApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BuildConfigList /* Build configuration list for PBXNativeTarget "CheerioApp" */;
+			buildConfigurationList = BuildConfigList /* Build configuration list for PBXNativeTarget "CheeriooApp" */;
 			buildPhases = (
 				36F0162A2EA009C400C192C1 /* ShellScript */,
 				Sources /* Sources */,
@@ -198,9 +198,9 @@
 			);
 			dependencies = (
 			);
-			name = CheerioApp;
-			productName = CheerioApp;
-			productReference = CheerioApp /* CheerioApp.app */;
+			name = CheeriooApp;
+			productName = CheeriooApp;
+			productReference = CheeriooApp /* CheeriooApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -213,7 +213,7 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 			};
-			buildConfigurationList = ProjectBuildConfigList /* Build configuration list for PBXProject "CheerioApp" */;
+			buildConfigurationList = ProjectBuildConfigList /* Build configuration list for PBXProject "CheeriooApp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -230,7 +230,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CheerioAppTarget /* CheerioApp */,
+				CheeriooAppTarget /* CheeriooApp */,
 			);
 		};
 /* End PBXProject section */
@@ -271,7 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3686B9B62E9E66B4008E208C /* CheerioAppApp.swift in Sources */,
+				3686B9B62E9E66B4008E208C /* CheeriooAppApp.swift in Sources */,
 				361F30CD2E9E61110091FDDE /* RoomDetailView.swift in Sources */,
 				361F30CE2E9E61110091FDDE /* Message.swift in Sources */,
 				361F30CF2E9E61110091FDDE /* LocationService.swift in Sources */,
@@ -289,7 +289,7 @@
 				361F30DA2E9E61110091FDDE /* ChatService.swift in Sources */,
 				361F30DB2E9E61110091FDDE /* ChatMessageRow.swift in Sources */,
 				361F30DC2E9E61110091FDDE /* Activity.swift in Sources */,
-				CheerioAppApp /* (null) in Sources */,
+				CheeriooAppApp /* (null) in Sources */,
 				ContentView /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -354,11 +354,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CheerioApp/Info.plist;
+				INFOPLIST_FILE = CheeriooApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerio needs access to the microphone to allow you to send voice messages to the chat";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerioo needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -373,7 +373,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cheerio.CheerioApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cheerioo.CheeriooApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -435,11 +435,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CheerioApp/Info.plist;
+				INFOPLIST_FILE = CheeriooApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerio needs access to your location to track your journey and share it with others in the room.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerio needs access to the microphone to allow you to send voice messages to the chat";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerioo needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -453,7 +453,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cheerio.CheerioApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cheerioo.CheeriooApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -468,7 +468,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BuildConfigList /* Build configuration list for PBXNativeTarget "CheerioApp" */ = {
+		BuildConfigList /* Build configuration list for PBXNativeTarget "CheeriooApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				Debug /* Debug */,
@@ -477,7 +477,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ProjectBuildConfigList /* Build configuration list for PBXProject "CheerioApp" */ = {
+		ProjectBuildConfigList /* Build configuration list for PBXProject "CheeriooApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				Debug /* Debug */,

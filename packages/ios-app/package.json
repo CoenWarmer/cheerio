@@ -1,8 +1,8 @@
 {
-  "name": "@cheerio/ios-app",
+  "name": "@cheerioo/ios-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Cheerio iOS app built with Swift/SwiftUI. This is an Xcode project and does not use npm/yarn for dependency management. Open CheerioApp.xcodeproj in Xcode to work on this project.",
+  "description": "Cheerioo iOS app built with Swift/SwiftUI. This is an Xcode project and does not use npm/yarn for dependency management. Open CheeriooApp.xcodeproj in Xcode to work on this project.",
   "scripts": {
     "generate-models": "node scripts/generate-swift-models.mjs",
     "generate-config": "bash scripts/generate-config.sh"

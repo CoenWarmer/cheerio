@@ -1,4 +1,4 @@
-# Cheerio iOS App Setup
+# Cheerioo iOS App Setup
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@
 
 ## Step 1: Install Dependencies
 
-1. Open `CheerioApp.xcodeproj` in Xcode
+1. Open `CheeriooApp.xcodeproj` in Xcode
 2. Go to **File** → **Add Package Dependencies**
 3. Add the following package:
    - **Supabase Swift SDK**: `https://github.com/supabase-community/supabase-swift`
@@ -22,7 +22,7 @@ Xcode will automatically download and integrate the Supabase SDK.
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-2. Open `CheerioApp/Config.swift` in Xcode
+2. Open `CheeriooApp/Config.swift` in Xcode
 3. Replace the placeholder values:
 
    ```swift
@@ -39,10 +39,10 @@ Xcode will automatically download and integrate the Supabase SDK.
 
 ## Step 3: Configure Project Settings
 
-1. In Xcode, select the **CheerioApp** target
+1. In Xcode, select the **CheeriooApp** target
 2. Go to **Signing & Capabilities**:
    - Select your Development Team
-   - Ensure a unique Bundle Identifier (e.g., `com.yourname.cheerio`)
+   - Ensure a unique Bundle Identifier (e.g., `com.yourname.cheerioo`)
 3. Go to **Info** tab:
    - Verify the following keys are present (they should be if Info.plist is properly linked):
      - `NSLocationAlwaysAndWhenInUseUsageDescription`
@@ -113,12 +113,12 @@ Xcode will automatically download and integrate the Supabase SDK.
 ### "Location permission denied"
 
 - Go to iOS Settings → Privacy & Security → Location Services
-- Find Cheerio and set to "Always" or "While Using App"
+- Find Cheerioo and set to "Always" or "While Using App"
 
 ### "Microphone permission denied"
 
 - Go to iOS Settings → Privacy & Security → Microphone
-- Enable access for Cheerio
+- Enable access for Cheerioo
 
 ### Build errors about missing Supabase
 
@@ -133,7 +133,7 @@ Xcode will automatically download and integrate the Supabase SDK.
 ## File Structure
 
 ```
-ios-app/CheerioApp/
+ios-app/CheeriooApp/
 ├── Config.swift                    # API and Supabase configuration
 ├── AppState.swift                  # Global app state management
 ├── Models/
@@ -157,5 +157,5 @@ ios-app/CheerioApp/
 │       ├── ChatMessageRow.swift    # Chat message display
 │       └── TrackingStatsView.swift # Speed/distance/time display
 ├── Info.plist                      # Permissions and capabilities
-└── CheerioAppApp.swift             # App entry point
+└── CheeriooAppApp.swift             # App entry point
 ```

@@ -8,7 +8,7 @@ The iOS app uses a **build-time script** to read environment variables from `pac
 
 1. **Single source of truth**: All credentials live in `packages/web-app/.env.local`
 2. **Build script**: `scripts/generate-config.sh` reads the `.env.local` file
-3. **Generated file**: Creates `CheerioApp/Config.swift` with type-safe Swift code
+3. **Generated file**: Creates `CheeriooApp/Config.swift` with type-safe Swift code
 4. **Auto-detection**: Automatically detects your Mac's IP for device builds
 
 ## Usage
@@ -24,7 +24,7 @@ yarn generate-config
 Or from the monorepo root:
 
 ```bash
-yarn workspace @cheerio/ios-app generate-config
+yarn workspace @cheerioo/ios-app generate-config
 ```
 
 ### What Gets Generated
@@ -83,7 +83,7 @@ struct Config {
 
 To automatically regenerate `Config.swift` on every build:
 
-1. Open `CheerioApp.xcodeproj` in Xcode
+1. Open `CheeriooApp.xcodeproj` in Xcode
 2. Select your app target
 3. Go to **Build Phases** tab
 4. Click **+** → **New Run Script Phase**
@@ -145,7 +145,7 @@ LOCAL_IP="192.168.1.100"
 
 ```bash
 # For production builds
-API_BASE_URL_PRODUCTION=https://api.cheerio.app
+API_BASE_URL_PRODUCTION=https://cheerioo.netlify.app
 ```
 
 Then update the script to use it when building for release.
@@ -178,5 +178,5 @@ To support dev/staging/production:
 
 - **Source**: `packages/web-app/.env.local`
 - **Script**: `packages/ios-app/scripts/generate-config.sh`
-- **Output**: `packages/ios-app/CheerioApp/Config.swift`
+- **Output**: `packages/ios-app/CheeriooApp/Config.swift`
 - **This guide**: `packages/ios-app/ENV-VARIABLES.md`

@@ -291,15 +291,6 @@ export function AppHeader({
                 >
                   Events
                 </Anchor>
-                <Anchor
-                  component={Link}
-                  href="/dashboard"
-                  c="gray.6"
-                  size="sm"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Dashboard
-                </Anchor>
               </>
             )}
             <Button

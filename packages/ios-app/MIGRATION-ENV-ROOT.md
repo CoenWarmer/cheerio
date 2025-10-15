@@ -28,7 +28,7 @@ cp .env.local.example .env.local
 
 The `generate-config.sh` script looks for `.env.local` in this order:
 
-1. **`/cheerio/.env.local`** (repo root) - **Preferred**
+1. **`/cheerioo/.env.local`** (repo root) - **Preferred**
 2. **`packages/web-app/.env.local`** - Fallback
 
 You'll see which location is being used in the script output:

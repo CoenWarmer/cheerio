@@ -56,16 +56,16 @@ export default function RegisterPage() {
         setError(error.message);
       } else if (data.user) {
         setSuccess(true);
-        // If email confirmation is disabled, redirect to dashboard
+        // If email confirmation is disabled, redirect to rooms
         // If email confirmation is enabled, show success message
         if (data.session) {
           setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/rooms');
             router.refresh();
           }, 2000);
         }
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -84,8 +84,8 @@ export default function RegisterPage() {
               </Title>
               <Text c="gray.6" ta="center">
                 Check your email for a confirmation link, or if email
-                confirmation is disabled, you&apos;ll be redirected to the
-                dashboard shortly.
+                confirmation is disabled, you&apos;ll be redirected to rooms
+                shortly.
               </Text>
               <Button component={Link} href="/sign-in" fullWidth>
                 Go to Sign In
@@ -106,7 +106,7 @@ export default function RegisterPage() {
               Create Account
             </Title>
             <Text c="gray.6" ta="center" size="sm">
-              Sign up to get started with Cheerio.
+              Sign up to get started with Cheerioo.
             </Text>
 
             <form onSubmit={handleRegister}>
