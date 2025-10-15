@@ -10,7 +10,7 @@ export function Logo({
   return (
     <Anchor
       component={Link}
-      href="/rooms"
+      href="/events"
       c="gray.7"
       fw={700}
       size={size}

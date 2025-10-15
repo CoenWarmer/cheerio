@@ -39,7 +39,7 @@ export default function SignInPage() {
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        router.push('/rooms');
+        router.push('/events');
         router.refresh();
       }
     } catch {

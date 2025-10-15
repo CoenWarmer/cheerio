@@ -46,10 +46,10 @@ async function fetchApi<T>(
 
 export const activityApi = {
   /**
-   * Get activity history for a room
+   * Get activity history for a event
    */
   async getActivities(
-    roomSlug: string,
+    eventSlug: string,
     filters?: ActivityFilters
   ): Promise<{ data: UserActivity[] }> {
     const params = new URLSearchParams();
@@ -68,7 +68,7 @@ export const activityApi = {
     }
 
     const query = params.toString();
-    const url = `/api/rooms/${roomSlug}/activity${query ? `?${query}` : ''}`;
+    const url = `/api/events/${eventSlug}/activity${query ? `?${query}` : ''}`;
 
     return fetchApi<{ data: UserActivity[] }>(url);
   },
@@ -77,19 +77,19 @@ export const activityApi = {
    * Create a new activity entry
    */
   async createActivity(
-    roomSlug: string,
+    eventSlug: string,
     activity: CreateActivityInput
   ): Promise<{ data: UserActivity }> {
-    return fetchApi<{ data: UserActivity }>(`/api/rooms/${roomSlug}/activity`, {
+    return fetchApi<{ data: UserActivity }>(`/api/events/${eventSlug}/activity`, {
       method: 'POST',
       body: JSON.stringify(activity),
     });
   },
 
   /**
-   * Get current user's journey in a room
+   * Get current user's journey in a event
    */
-  async getMyJourney(roomSlug: string): Promise<{
+  async getMyJourney(eventSlug: string): Promise<{
     data: {
       activities: UserActivity[];
       summary: {
@@ -103,6 +103,6 @@ export const activityApi = {
       };
     };
   }> {
-    return fetchApi(`/api/rooms/${roomSlug}/activity/my-journey`);
+    return fetchApi(`/api/events/${eventSlug}/activity/my-journey`);
   },
 };

@@ -74,11 +74,11 @@ Xcode will automatically download and integrate the Supabase SDK.
 ### Authentication
 
 - Register a new account or sign in with existing credentials
-- The app will show the room list after successful authentication
+- The app will show the event list after successful authentication
 
-### Room Tracking
+### Event Tracking
 
-1. Select a room from the list
+1. Select a event from the list
 2. Tap **"Start Tracking"**
 3. Grant location permission when prompted (select "Allow While Using App" or "Always Allow")
 4. The app will:
@@ -88,7 +88,7 @@ Xcode will automatically download and integrate the Supabase SDK.
 
 ### Chat & Voice Messages
 
-1. Scroll to the chat section in the room detail view
+1. Scroll to the chat section in the event detail view
 2. Type a text message and tap send, or
 3. Tap the microphone button to record a voice message
 4. Grant microphone permission when prompted
@@ -137,12 +137,12 @@ ios-app/CheeriooApp/
 ├── Config.swift                    # API and Supabase configuration
 ├── AppState.swift                  # Global app state management
 ├── Models/
-│   ├── Room.swift                  # Room data model
+│   ├── Event.swift                 # Event data model
 │   ├── Message.swift               # Message data model
 │   └── Activity.swift              # Activity data models
 ├── Services/
 │   ├── AuthService.swift           # Authentication logic
-│   ├── RoomService.swift           # Room API calls
+│   ├── EventService.swift          # Event API calls
 │   ├── LocationService.swift       # Background location tracking
 │   ├── ChatService.swift           # Real-time chat via Supabase
 │   └── AudioService.swift          # Audio recording and playback
@@ -150,9 +150,9 @@ ios-app/CheeriooApp/
 │   ├── Auth/
 │   │   ├── LoginView.swift         # Login screen
 │   │   └── RegisterView.swift      # Registration screen
-│   ├── Rooms/
-│   │   ├── RoomListView.swift      # List of all rooms
-│   │   └── RoomDetailView.swift    # Room details with tracking
+│   ├── Events/
+│   │   ├── EventListView.swift      # List of all events
+│   │   └── EventDetailView.swift    # Event details with tracking
 │   └── Components/
 │       ├── ChatMessageRow.swift    # Chat message display
 │       └── TrackingStatsView.swift # Speed/distance/time display

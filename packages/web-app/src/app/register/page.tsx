@@ -56,11 +56,11 @@ export default function RegisterPage() {
         setError(error.message);
       } else if (data.user) {
         setSuccess(true);
-        // If email confirmation is disabled, redirect to rooms
+        // If email confirmation is disabled, redirect to events
         // If email confirmation is enabled, show success message
         if (data.session) {
           setTimeout(() => {
-            router.push('/rooms');
+            router.push('/events');
             router.refresh();
           }, 2000);
         }
@@ -84,7 +84,7 @@ export default function RegisterPage() {
               </Title>
               <Text c="gray.6" ta="center">
                 Check your email for a confirmation link, or if email
-                confirmation is disabled, you&apos;ll be redirected to rooms
+                confirmation is disabled, you&apos;ll be redirected to events
                 shortly.
               </Text>
               <Button component={Link} href="/sign-in" fullWidth>

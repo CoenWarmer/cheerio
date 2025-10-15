@@ -7,10 +7,10 @@ import {
 
 export type { TrackingPath };
 
-export function useTrackingPaths(roomId: string, roomSlug: string) {
+export function useTrackingPaths(eventId: string, eventSlug: string) {
   const { data, isLoading, error } = useTrackingPathsRealtimeQuery(
-    roomId,
-    roomSlug
+    eventId,
+    eventSlug
   );
 
   return {

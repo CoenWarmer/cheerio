@@ -8,38 +8,38 @@ import { supabase } from '@/lib/supabase';
 export const messageKeys = {
   all: ['messages'] as const,
   lists: () => [...messageKeys.all, 'list'] as const,
-  list: (roomSlug: string) => [...messageKeys.lists(), roomSlug] as const,
+  list: (eventSlug: string) => [...messageKeys.lists(), eventSlug] as const,
 };
 
-export function useMessagesQuery(roomSlug: string) {
+export function useMessagesQuery(eventSlug: string) {
   return useQuery({
-    queryKey: messageKeys.list(roomSlug),
-    queryFn: () => messagesApi.getByRoomId(roomSlug),
-    enabled: !!roomSlug,
+    queryKey: messageKeys.list(eventSlug),
+    queryFn: () => messagesApi.getByEventId(eventSlug),
+    enabled: !!eventSlug,
   });
 }
 
-export function useMessagesRealtimeQuery(roomId: string, roomSlug: string) {
+export function useMessagesRealtimeQuery(eventId: string, eventSlug: string) {
   const queryClient = useQueryClient();
 
-  const query = useMessagesQuery(roomSlug);
+  const query = useMessagesQuery(eventSlug);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!eventId) return;
 
     const channel = supabase
-      .channel(`messages-${roomId}`)
+      .channel(`messages-${eventId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'messages',
-          filter: `room_id=eq.${roomId}`,
+          filter: `event_id=eq.${eventId}`,
         },
         () => {
           queryClient.invalidateQueries({
-            queryKey: messageKeys.list(roomSlug),
+            queryKey: messageKeys.list(eventSlug),
           });
         }
       )
@@ -48,7 +48,7 @@ export function useMessagesRealtimeQuery(roomId: string, roomSlug: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, roomSlug, queryClient]);
+  }, [eventId, eventSlug, queryClient]);
 
   return query;
 }
@@ -57,10 +57,10 @@ export function useSendMessageMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
-      roomId,
+      eventId,
       messageData,
     }: {
-      roomId: string;
+      eventId: string;
       messageData: {
         content: string;
         attachment?: {
@@ -72,9 +72,9 @@ export function useSendMessageMutation() {
         };
         location?: { lat: number; long: number };
       };
-    }) => messagesApi.create(roomId, messageData),
-    onSuccess: (_, { roomId }) => {
-      queryClient.invalidateQueries({ queryKey: messageKeys.list(roomId) });
+    }) => messagesApi.create(eventId, messageData),
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: messageKeys.list(eventId) });
     },
   });
 }

@@ -10,7 +10,7 @@ struct CheeriooAppApp: App {
                 if appState.isLoading {
                     ProgressView("Loading...")
                 } else if appState.isAuthenticated {
-                    RoomListView()
+                    EventListView()
                 } else {
                     LoginView()
                 }

@@ -13,7 +13,7 @@ export default function SupabaseStatus() {
     async function checkConnection() {
       try {
         const { data, error } = await supabase
-          .from('rooms')
+          .from('events')
           .select('*')
           .limit(1);
 

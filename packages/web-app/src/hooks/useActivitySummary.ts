@@ -7,10 +7,10 @@ import {
 
 export type { UserActivitySummary };
 
-export function useActivitySummary(roomId: string, roomSlug: string) {
+export function useActivitySummary(eventId: string, eventSlug: string) {
   const { data, isLoading, error } = useActivitySummaryRealtimeQuery(
-    roomId,
-    roomSlug
+    eventId,
+    eventSlug
   );
 
   return {

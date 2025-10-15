@@ -153,7 +153,7 @@ export default function ProfilePage() {
                   placeholder="Enter your display name"
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
-                  description="This is how other users will see you in rooms and chats."
+                  description="This is how other users will see you in events and chats."
                 />
 
                 {/* Email (read-only) */}

@@ -14,142 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      messages: {
+      event_members: {
         Row: {
-          attachment: Json | null
-          content: string | null
-          created_at: string
-          deleted: boolean | null
-          edited_at: string | null
-          id: string
-          location: Json | null
-          room_id: string
-          user_id: string
-        }
-        Insert: {
-          attachment?: Json | null
-          content?: string | null
-          created_at?: string
-          deleted?: boolean | null
-          edited_at?: string | null
-          id?: string
-          location?: Json | null
-          room_id: string
-          user_id: string
-        }
-        Update: {
-          attachment?: Json | null
-          content?: string | null
-          created_at?: string
-          deleted?: boolean | null
-          edited_at?: string | null
-          id?: string
-          location?: Json | null
-          room_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_room_id_fkey"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      presence: {
-        Row: {
-          id: string
-          metadata: Json | null
-          room_id: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          metadata?: Json | null
-          room_id: string
-          status: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          metadata?: Json | null
-          room_id?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "presence_room_id_fkey"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          display_name: string | null
-          id: string
-          permissions: Database["public"]["Enums"]["user_permission"]
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          id: string
-          permissions?: Database["public"]["Enums"]["user_permission"]
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          id?: string
-          permissions?: Database["public"]["Enums"]["user_permission"]
-        }
-        Relationships: []
-      }
-      room_members: {
-        Row: {
+          event_id: string
           id: string
           joined_at: string
           role: string | null
-          room_id: string
           user_id: string
         }
         Insert: {
+          event_id: string
           id?: string
           joined_at?: string
           role?: string | null
-          room_id: string
           user_id: string
         }
         Update: {
+          event_id?: string
           id?: string
           joined_at?: string
           role?: string | null
-          room_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "room_members_room_id_fkey"
-            columns: ["room_id"]
+            foreignKeyName: "event_members_event_id_fkey"
+            columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "rooms"
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
       }
-      rooms: {
+      events: {
         Row: {
           created_at: string
           created_by: string | null
@@ -191,6 +88,109 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          attachment: Json | null
+          content: string | null
+          created_at: string
+          deleted: boolean | null
+          edited_at: string | null
+          event_id: string
+          id: string
+          location: Json | null
+          user_id: string
+        }
+        Insert: {
+          attachment?: Json | null
+          content?: string | null
+          created_at?: string
+          deleted?: boolean | null
+          edited_at?: string | null
+          event_id: string
+          id?: string
+          location?: Json | null
+          user_id: string
+        }
+        Update: {
+          attachment?: Json | null
+          content?: string | null
+          created_at?: string
+          deleted?: boolean | null
+          edited_at?: string | null
+          event_id?: string
+          id?: string
+          location?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presence: {
+        Row: {
+          event_id: string
+          id: string
+          metadata: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presence_room_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          permissions: Database["public"]["Enums"]["user_permission"]
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id: string
+          permissions?: Database["public"]["Enums"]["user_permission"]
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          permissions?: Database["public"]["Enums"]["user_permission"]
+        }
+        Relationships: []
+      }
       spatial_ref_sys: {
         Row: {
           auth_name: string | null
@@ -220,32 +220,32 @@ export type Database = {
           activity_type: string
           created_at: string | null
           data: Json
+          event_id: string
           id: string
-          room_id: string
           user_id: string
         }
         Insert: {
           activity_type: string
           created_at?: string | null
           data: Json
+          event_id: string
           id?: string
-          room_id: string
           user_id: string
         }
         Update: {
           activity_type?: string
           created_at?: string | null
           data?: Json
+          event_id?: string
           id?: string
-          room_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_activity_room_id_fkey"
-            columns: ["room_id"]
+            foreignKeyName: "user_activity_event_id_fkey"
+            columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "rooms"
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]

@@ -17,20 +17,20 @@ class ChatService: ObservableObject {
         self.profileService = ProfileService(supabase: supabase)
     }
     
-    func subscribeToRoom(roomId: String, roomSlug: String, onAudioMessage: @escaping (String) -> Void) async {
+    func subscribeToEvent(eventId: String, eventSlug: String, onAudioMessage: @escaping (String) -> Void) async {
         self.onAudioMessage = onAudioMessage
         
         // Fetch existing messages first
-        await fetchMessages(roomSlug: roomSlug)
+        await fetchMessages(eventSlug: eventSlug)
         
-        // Subscribe to real-time updates (use roomId UUID for channel and filtering)
-        let channel = supabase.realtimeV2.channel("messages:\(roomId)")
+        // Subscribe to real-time updates (use eventId UUID for channel and filtering)
+        let channel = supabase.realtimeV2.channel("messages:\(eventId)")
         
         let insertions = channel.postgresChange(
             InsertAction.self,
             schema: "public",
             table: "messages",
-            filter: "room_id=eq.\(roomId)"
+            filter: "event_id=eq.\(eventId)"
         )
         
         self.channel = channel
@@ -58,8 +58,8 @@ class ChatService: ObservableObject {
         messages = []
     }
     
-    func sendMessage(roomSlug: String, content: String, location: [String: Double]? = nil) async throws {
-        let url = URL(string: "\(Config.apiBaseURL)/api/rooms/\(roomSlug)/messages")!
+    func sendMessage(eventSlug: String, content: String, location: [String: Double]? = nil) async throws {
+        let url = URL(string: "\(Config.apiBaseURL)/api/events/\(eventSlug)/messages")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -83,9 +83,9 @@ class ChatService: ObservableObject {
         }
     }
     
-    private func fetchMessages(roomSlug: String) async {
+    private func fetchMessages(eventSlug: String) async {
         do {
-            let url = URL(string: "\(Config.apiBaseURL)/api/rooms/\(roomSlug)/messages")!
+            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(eventSlug)/messages")!
             var request = URLRequest(url: url)
             
             // Add auth token
@@ -136,7 +136,7 @@ class ChatService: ObservableObject {
         
         // Extract fields (values come as AnyJSON from Supabase Realtime)
         guard let id = extractString(record["id"]),
-              let roomId = extractString(record["room_id"]),
+              let eventId = extractString(record["event_id"]),
               let userId = extractString(record["user_id"]),
               let content = extractString(record["content"]),
               let createdAt = extractString(record["created_at"]) else {
@@ -161,7 +161,7 @@ class ChatService: ObservableObject {
         // Create JSON structure that matches Message's Codable structure
         var messageDict: [String: Any] = [
             "id": id,
-            "room_id": roomId,
+            "event_id": eventId,
             "user_id": userId,
             "content": content,
             "created_at": createdAt

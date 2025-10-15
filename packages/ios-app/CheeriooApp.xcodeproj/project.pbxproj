@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		361F30CD2E9E61110091FDDE /* RoomDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C82E9E61110091FDDE /* RoomDetailView.swift */; };
+		361F30CD2E9E61110091FDDE /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C82E9E61110091FDDE /* EventDetailView.swift */; };
 		361F30CE2E9E61110091FDDE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B92E9E61110091FDDE /* Message.swift */; };
 		361F30CF2E9E61110091FDDE /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BF2E9E61110091FDDE /* LocationService.swift */; };
 		361F30D02E9E61110091FDDE /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BC2E9E61110091FDDE /* AudioService.swift */; };
 		361F30D12E9E61110091FDDE /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B62E9E61110091FDDE /* Config.swift */; };
 		361F30D22E9E61110091FDDE /* TrackingStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C62E9E61110091FDDE /* TrackingStatsView.swift */; };
-		361F30D32E9E61110091FDDE /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BA2E9E61110091FDDE /* Room.swift */; };
+		361F30D32E9E61110091FDDE /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BA2E9E61110091FDDE /* Event.swift */; };
 		361F30D42E9E61110091FDDE /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BD2E9E61110091FDDE /* AuthService.swift */; };
 		361F30D52E9E61110091FDDE /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C32E9E61110091FDDE /* RegisterView.swift */; };
-		361F30D62E9E61110091FDDE /* RoomService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C02E9E61110091FDDE /* RoomService.swift */; };
-		361F30D72E9E61110091FDDE /* RoomListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C92E9E61110091FDDE /* RoomListView.swift */; };
+		361F30D62E9E61110091FDDE /* EventService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C02E9E61110091FDDE /* EventService.swift */; };
+		361F30D72E9E61110091FDDE /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C92E9E61110091FDDE /* EventListView.swift */; };
 		361F30D82E9E61110091FDDE /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30C22E9E61110091FDDE /* LoginView.swift */; };
 		361F30D92E9E61110091FDDE /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30B52E9E61110091FDDE /* AppState.swift */; };
 		361F30DA2E9E61110091FDDE /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 361F30BE2E9E61110091FDDE /* ChatService.swift */; };
@@ -43,18 +43,18 @@
 		361F30B62E9E61110091FDDE /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		361F30B82E9E61110091FDDE /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		361F30B92E9E61110091FDDE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
-		361F30BA2E9E61110091FDDE /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
+		361F30BA2E9E61110091FDDE /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		361F30BC2E9E61110091FDDE /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		361F30BD2E9E61110091FDDE /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		361F30BE2E9E61110091FDDE /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		361F30BF2E9E61110091FDDE /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
-		361F30C02E9E61110091FDDE /* RoomService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomService.swift; sourceTree = "<group>"; };
+		361F30C02E9E61110091FDDE /* EventService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventService.swift; sourceTree = "<group>"; };
 		361F30C22E9E61110091FDDE /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		361F30C32E9E61110091FDDE /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		361F30C52E9E61110091FDDE /* ChatMessageRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageRow.swift; sourceTree = "<group>"; };
 		361F30C62E9E61110091FDDE /* TrackingStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingStatsView.swift; sourceTree = "<group>"; };
-		361F30C82E9E61110091FDDE /* RoomDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailView.swift; sourceTree = "<group>"; };
-		361F30C92E9E61110091FDDE /* RoomListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListView.swift; sourceTree = "<group>"; };
+		361F30C82E9E61110091FDDE /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		361F30C92E9E61110091FDDE /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		361F30DD2E9E62A90091FDDE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		365B04822E9E7A9600BD6EB8 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileService.swift; path = CheeriooApp/Services/ProfileService.swift; sourceTree = "<group>"; };
 		AssetsFile /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -87,7 +87,7 @@
 			children = (
 				361F30B82E9E61110091FDDE /* Activity.swift */,
 				361F30B92E9E61110091FDDE /* Message.swift */,
-				361F30BA2E9E61110091FDDE /* Room.swift */,
+				361F30BA2E9E61110091FDDE /* Event.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -99,7 +99,7 @@
 				361F30BD2E9E61110091FDDE /* AuthService.swift */,
 				361F30BE2E9E61110091FDDE /* ChatService.swift */,
 				361F30BF2E9E61110091FDDE /* LocationService.swift */,
-				361F30C02E9E61110091FDDE /* RoomService.swift */,
+				361F30C02E9E61110091FDDE /* EventService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -122,13 +122,13 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		361F30CA2E9E61110091FDDE /* Rooms */ = {
+		361F30CA2E9E61110091FDDE /* Events */ = {
 			isa = PBXGroup;
 			children = (
-				361F30C82E9E61110091FDDE /* RoomDetailView.swift */,
-				361F30C92E9E61110091FDDE /* RoomListView.swift */,
+				361F30C82E9E61110091FDDE /* EventDetailView.swift */,
+				361F30C92E9E61110091FDDE /* EventListView.swift */,
 			);
-			path = Rooms;
+			path = Events;
 			sourceTree = "<group>";
 		};
 		361F30CB2E9E61110091FDDE /* Views */ = {
@@ -136,7 +136,7 @@
 			children = (
 				361F30C42E9E61110091FDDE /* Auth */,
 				361F30C72E9E61110091FDDE /* Components */,
-				361F30CA2E9E61110091FDDE /* Rooms */,
+				361F30CA2E9E61110091FDDE /* Events */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -272,18 +272,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				3686B9B62E9E66B4008E208C /* CheeriooAppApp.swift in Sources */,
-				361F30CD2E9E61110091FDDE /* RoomDetailView.swift in Sources */,
+				361F30CD2E9E61110091FDDE /* EventDetailView.swift in Sources */,
 				361F30CE2E9E61110091FDDE /* Message.swift in Sources */,
 				361F30CF2E9E61110091FDDE /* LocationService.swift in Sources */,
 				361F30D02E9E61110091FDDE /* AudioService.swift in Sources */,
 				361F30D12E9E61110091FDDE /* Config.swift in Sources */,
 				361F30D22E9E61110091FDDE /* TrackingStatsView.swift in Sources */,
-				361F30D32E9E61110091FDDE /* Room.swift in Sources */,
+				361F30D32E9E61110091FDDE /* Event.swift in Sources */,
 				361F30D42E9E61110091FDDE /* AuthService.swift in Sources */,
 				365B04832E9E7A9600BD6EB8 /* ProfileService.swift in Sources */,
 				361F30D52E9E61110091FDDE /* RegisterView.swift in Sources */,
-				361F30D62E9E61110091FDDE /* RoomService.swift in Sources */,
-				361F30D72E9E61110091FDDE /* RoomListView.swift in Sources */,
+				361F30D62E9E61110091FDDE /* EventService.swift in Sources */,
+				361F30D72E9E61110091FDDE /* EventListView.swift in Sources */,
 				361F30D82E9E61110091FDDE /* LoginView.swift in Sources */,
 				361F30D92E9E61110091FDDE /* AppState.swift in Sources */,
 				361F30DA2E9E61110091FDDE /* ChatService.swift in Sources */,
@@ -356,8 +356,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CheeriooApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the event, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the event.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerioo needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -437,8 +437,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CheeriooApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room, even when the app is in the background.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the room.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the event, even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cheerioo needs access to your location to track your journey and share it with others in the event.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cheerioo needs access to the microphone to allow you to send voice messages to the chat";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

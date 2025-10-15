@@ -25,7 +25,7 @@ Updated the iOS app to send the user's location with emoji messages when activel
 **Updated `sendMessage` method:**
 
 ```swift
-func sendMessage(roomSlug: String, content: String, location: [String: Double]? = nil) async throws
+func sendMessage(eventSlug: String, content: String, location: [String: Double]? = nil) async throws
 ```
 
 **Changes:**
@@ -34,7 +34,7 @@ func sendMessage(roomSlug: String, content: String, location: [String: Double]? 
 - Includes location in request body if provided
 - Uses `JSONSerialization` instead of `JSONEncoder` to handle mixed types
 
-### 3. RoomDetailView.swift
+### 3. EventDetailView.swift
 
 **Added emoji detection helper:**
 
@@ -88,7 +88,7 @@ private func isEmoji(_ string: String) -> Bool {
 ### Test Case 1: Tracker Sends Emoji
 
 1. Open iOS app, log in as tracker/admin
-2. Join a room
+2. Join a event
 3. Tap "Start Tracking"
 4. Wait for location to be acquired (check tracking stats)
 5. Tap an emoji button or type an emoji
@@ -97,7 +97,7 @@ private func isEmoji(_ string: String) -> Bool {
 ### Test Case 2: Tracker Sends Emoji Without Tracking
 
 1. Open iOS app, log in as tracker/admin
-2. Join a room
+2. Join a event
 3. DON'T start tracking
 4. Tap an emoji button or type an emoji
 5. ✅ Emoji appears in chat, but NO marker on map
@@ -105,7 +105,7 @@ private func isEmoji(_ string: String) -> Bool {
 ### Test Case 3: Supporter Sends Emoji
 
 1. Open iOS app, log in as supporter
-2. Join a room
+2. Join a event
 3. Type an emoji (tracking button should not be visible)
 4. ✅ Emoji appears in chat, but NO marker on map
 

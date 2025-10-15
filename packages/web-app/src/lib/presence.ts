@@ -1,23 +1,23 @@
 import { supabase } from './supabase';
 
-export const setPresence = async (roomId: string, userId: string) => {
+export const setPresence = async (eventId: string, userId: string) => {
   await supabase.from('presence').upsert(
     {
-      room_id: roomId,
+      event_id: eventId,
       user_id: userId,
       status: 'online',
       metadata: { platform: 'web' },
       updated_at: new Date().toISOString(),
     },
-    { onConflict: 'room_id,user_id' }
+    { onConflict: 'event_id,user_id' }
   );
 };
 
-export const getPresence = async (roomId: string) => {
+export const getPresence = async (eventId: string) => {
   const { data, error } = await supabase
     .from('presence')
     .select('*')
-    .eq('room_id', roomId);
+    .eq('event_id', eventId);
   if (error) {
     throw error;
   }

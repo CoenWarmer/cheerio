@@ -6,8 +6,8 @@ import {
   useRemovePresenceMutation,
 } from './queries/usePresenceQueries';
 
-export function usePresence(roomId: string, roomSlug: string) {
-  const { data, isLoading, error } = usePresenceRealtimeQuery(roomId, roomSlug);
+export function usePresence(eventId: string, eventSlug: string) {
+  const { data, isLoading, error } = usePresenceRealtimeQuery(eventId, eventSlug);
 
   return {
     activeUsers: data?.data ?? [],

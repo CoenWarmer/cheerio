@@ -25,7 +25,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Fetch table schemas
 async function generateSwiftModels() {
-  const tables = ['rooms', 'messages', 'profiles', 'user_activity'];
+  const tables = ['events', 'messages', 'profiles', 'user_activity'];
 
   console.log('Fetching database schema...');
 

@@ -3,12 +3,12 @@ import { attachmentsApi, ApiError } from '@/lib/api-client';
 import { useSendMessage } from './useMessages';
 
 interface UseAudioRecorderProps {
-  roomSlug: string;
+  eventSlug: string;
   onRecordingComplete?: () => void;
 }
 
 export function useAudioRecorder({
-  roomSlug,
+  eventSlug,
   onRecordingComplete,
 }: UseAudioRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
@@ -61,7 +61,7 @@ export function useAudioRecorder({
           // Upload via API route (uses slug for folder naming)
           const { attachment } = await attachmentsApi.upload(
             audioBlob,
-            roomSlug,
+            eventSlug,
             'audio'
           );
 
@@ -71,7 +71,7 @@ export function useAudioRecorder({
             attachment,
           };
 
-          sendMessage({ roomId: roomSlug, messageData });
+          sendMessage({ eventId: eventSlug, messageData });
 
           // Callback when complete
           onRecordingComplete?.();
@@ -97,7 +97,7 @@ export function useAudioRecorder({
         'Failed to access microphone. Please grant permission and try again.'
       );
     }
-  }, [roomSlug, sendMessage, onRecordingComplete]);
+  }, [eventSlug, sendMessage, onRecordingComplete]);
 
   const stopRecording = useCallback(() => {
     if (

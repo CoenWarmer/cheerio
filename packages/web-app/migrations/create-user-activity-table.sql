@@ -2,14 +2,14 @@
 CREATE TABLE IF NOT EXISTS user_activity (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  room_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+  event_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
   activity_type TEXT NOT NULL, -- 'location', 'speed', 'distance', 'music', etc.
   data JSONB NOT NULL, -- Flexible JSON for different activity types
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Create indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_user_activity_room_user ON user_activity(room_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_user_activity_room_user ON user_activity(event_id, user_id);
 CREATE INDEX IF NOT EXISTS idx_user_activity_type ON user_activity(activity_type);
 CREATE INDEX IF NOT EXISTS idx_user_activity_created ON user_activity(created_at DESC);
 

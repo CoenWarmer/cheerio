@@ -2,14 +2,20 @@
  * API Client for making requests to Next.js API routes
  */
 
-import { Attachment, Message, Presence, Room, RoomMember } from '@/types/types';
+import {
+  Attachment,
+  Message,
+  Presence,
+  Event,
+  EventMember,
+} from '@/types/types';
 import type { UserPermission } from '@/types/permissions';
 
 export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: Room | Message | Presence | RoomMember | Attachment
+    public data?: Event | Message | Presence | EventMember | Attachment
   ) {
     super(message);
     this.name = 'ApiError';
@@ -42,27 +48,27 @@ async function fetchApi<T>(
 }
 
 /**
- * Rooms API
+ * Events API
  */
-export const roomsApi = {
+export const eventsApi = {
   /**
-   * Get all rooms
+   * Get all events
    */
   async getAll() {
-    return fetchApi<{ data: Room[] }>('/api/rooms');
+    return fetchApi<{ data: Event[] }>('/api/events');
   },
 
   /**
-   * Get a single room by ID
+   * Get a single event by ID
    */
   async getById(id: string) {
-    return fetchApi<{ data: Room }>(`/api/rooms/${id}`);
+    return fetchApi<{ data: Event }>(`/api/events/${id}`);
   },
 
   /**
-   * Create a new room
+   * Create a new event
    */
-  async create(roomData: {
+  async create(eventData: {
     name: string;
     description?: string | null;
     donation_link?: string | null;
@@ -72,21 +78,21 @@ export const roomsApi = {
     created_by: string;
     location?: { lat: number; long: number } | null;
   }) {
-    return fetchApi<{ data: Room }>('/api/rooms', {
+    return fetchApi<{ data: Event }>('/api/events', {
       method: 'POST',
-      body: JSON.stringify(roomData),
+      body: JSON.stringify(eventData),
     });
   },
 
   /**
-   * Join a room (add current user as member)
+   * Join a event (add current user as member)
    */
-  async join(roomId: string) {
+  async join(eventId: string) {
     return fetchApi<{
       success: boolean;
       alreadyMember?: boolean;
-      member?: RoomMember;
-    }>(`/api/rooms/${roomId}/join`, {
+      member?: EventMember;
+    }>(`/api/events/${eventId}/join`, {
       method: 'POST',
     });
   },
@@ -97,24 +103,24 @@ export const roomsApi = {
  */
 export const messagesApi = {
   /**
-   * Get messages for a room
+   * Get messages for a event
    */
-  async getByRoomId(roomId: string) {
-    return fetchApi<{ data: Message[] }>(`/api/rooms/${roomId}/messages`);
+  async getByEventId(eventId: string) {
+    return fetchApi<{ data: Message[] }>(`/api/events/${eventId}/messages`);
   },
 
   /**
-   * Create a new message in a room
+   * Create a new message in a event
    */
   async create(
-    roomId: string,
+    eventId: string,
     messageData: {
       content: string;
       attachment?: Attachment;
       location?: { lat: number; long: number };
     }
   ) {
-    return fetchApi<{ data: Message }>(`/api/rooms/${roomId}/messages`, {
+    return fetchApi<{ data: Message }>(`/api/events/${eventId}/messages`, {
       method: 'POST',
       body: JSON.stringify(messageData),
     });
@@ -130,7 +136,7 @@ export const attachmentsApi = {
    */
   async upload(
     file: Blob,
-    roomId: string,
+    eventId: string,
     type: 'audio' | 'image' | 'video'
   ): Promise<{
     success: boolean;
@@ -144,7 +150,7 @@ export const attachmentsApi = {
   }> {
     const formData = new FormData();
     formData.append('file', file, `recording.webm`);
-    formData.append('roomId', roomId);
+    formData.append('eventId', eventId);
     formData.append('type', type);
 
     const response = await fetch('/api/attachments/upload', {
@@ -167,11 +173,11 @@ export const attachmentsApi = {
  */
 export const presenceApi = {
   /**
-   * Update user presence in a room
+   * Update user presence in a event
    */
-  async update(roomId: string, status: 'online' | 'away' = 'online') {
+  async update(eventId: string, status: 'online' | 'away' = 'online') {
     return fetchApi<{ success: boolean; presence: Presence }>(
-      `/api/rooms/${roomId}/presence`,
+      `/api/events/${eventId}/presence`,
       {
         method: 'POST',
         body: JSON.stringify({ status }),
@@ -180,19 +186,19 @@ export const presenceApi = {
   },
 
   /**
-   * Get active users in a room
+   * Get active users in a event
    */
-  async getActive(roomId: string) {
+  async getActive(eventId: string) {
     return fetchApi<{ data: Presence[]; count: number }>(
-      `/api/rooms/${roomId}/presence`
+      `/api/events/${eventId}/presence`
     );
   },
 
   /**
-   * Remove user presence from a room
+   * Remove user presence from a event
    */
-  async remove(roomId: string) {
-    return fetchApi<{ success: boolean }>(`/api/rooms/${roomId}/presence`, {
+  async remove(eventId: string) {
+    return fetchApi<{ success: boolean }>(`/api/events/${eventId}/presence`, {
       method: 'DELETE',
     });
   },
@@ -392,9 +398,9 @@ export const profilesApi = {
 };
 
 /**
- * Room Members API
+ * Event Members API
  */
-export interface RoomMemberWithProfile {
+export interface EventMemberWithProfile {
   user_id: string;
   joined_at: string;
   display_name: string | null;
@@ -402,15 +408,15 @@ export interface RoomMemberWithProfile {
   permissions: 'admin' | 'tracker' | 'supporter';
 }
 
-export const roomMembersApi = {
+export const eventMembersApi = {
   /**
-   * Get all members of a room with their profiles
+   * Get all members of a event with their profiles
    */
-  async getByRoomSlug(
-    roomSlug: string
-  ): Promise<{ data: RoomMemberWithProfile[] }> {
-    return fetchApi<{ data: RoomMemberWithProfile[] }>(
-      `/api/rooms/${roomSlug}/members`
+  async getByEventSlug(
+    eventSlug: string
+  ): Promise<{ data: EventMemberWithProfile[] }> {
+    return fetchApi<{ data: EventMemberWithProfile[] }>(
+      `/api/events/${eventSlug}/members`
     );
   },
 };

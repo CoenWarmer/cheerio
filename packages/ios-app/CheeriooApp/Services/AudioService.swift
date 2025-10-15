@@ -59,7 +59,7 @@ class AudioService: NSObject, ObservableObject {
         return audioRecorder?.url
     }
     
-    func uploadAudio(fileURL: URL, roomSlug: String) async throws -> [String: Any] {
+    func uploadAudio(fileURL: URL, eventSlug: String) async throws -> [String: Any] {
         let url = URL(string: "\(Config.apiBaseURL)/api/attachments/upload")!
         
         // Create multipart form data
@@ -75,10 +75,10 @@ class AudioService: NSObject, ObservableObject {
         
         var body = Data()
         
-        // Add room_slug field
+        // Add event_slug field
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"room_slug\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(roomSlug)\r\n".data(using: .utf8)!)
+        body.append("\(eventSlug)\r\n".data(using: .utf8)!)
         
         // Add file field
         body.append("--\(boundary)\r\n".data(using: .utf8)!)

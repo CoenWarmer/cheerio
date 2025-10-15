@@ -15,16 +15,16 @@ import {
 import { useActivitySummary } from '@/hooks/useActivitySummary';
 
 interface UserActivityFeedProps {
-  roomSlug: string;
-  roomId: string;
+  eventSlug: string;
+  eventId: string;
 }
 
 export default function UserActivityFeed({
-  roomSlug,
-  roomId,
+  eventSlug,
+  eventId,
 }: UserActivityFeedProps) {
   // Fetch pre-processed summaries from server
-  const { summaries, isLoading, error } = useActivitySummary(roomId, roomSlug);
+  const { summaries, isLoading, error } = useActivitySummary(eventId, eventSlug);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const formatTime = (timestamp: string) => {

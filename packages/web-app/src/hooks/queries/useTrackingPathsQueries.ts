@@ -14,11 +14,12 @@ export interface TrackingPath {
 export const trackingPathKeys = {
   all: ['tracking-paths'] as const,
   lists: () => [...trackingPathKeys.all, 'list'] as const,
-  list: (roomSlug: string) => [...trackingPathKeys.lists(), roomSlug] as const,
+  list: (eventSlug: string) =>
+    [...trackingPathKeys.lists(), eventSlug] as const,
 };
 
-async function fetchTrackingPaths(roomSlug: string): Promise<TrackingPath[]> {
-  const response = await fetch(`/api/rooms/${roomSlug}/tracking-paths`);
+async function fetchTrackingPaths(eventSlug: string): Promise<TrackingPath[]> {
+  const response = await fetch(`/api/events/${eventSlug}/tracking-paths`);
   if (!response.ok) {
     throw new Error('Failed to fetch tracking paths');
   }
@@ -26,33 +27,33 @@ async function fetchTrackingPaths(roomSlug: string): Promise<TrackingPath[]> {
   return result.data;
 }
 
-export function useTrackingPathsQuery(roomSlug: string) {
+export function useTrackingPathsQuery(eventSlug: string) {
   return useQuery({
-    queryKey: trackingPathKeys.list(roomSlug),
-    queryFn: () => fetchTrackingPaths(roomSlug),
-    enabled: !!roomSlug,
+    queryKey: trackingPathKeys.list(eventSlug),
+    queryFn: () => fetchTrackingPaths(eventSlug),
+    enabled: !!eventSlug,
   });
 }
 
 export function useTrackingPathsRealtimeQuery(
-  roomId: string,
-  roomSlug: string
+  eventId: string,
+  eventSlug: string
 ) {
   const queryClient = useQueryClient();
-  const query = useTrackingPathsQuery(roomSlug);
+  const query = useTrackingPathsQuery(eventSlug);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!eventId) return;
 
     const channel = supabase
-      .channel(`tracking-paths-${roomId}`)
+      .channel(`tracking-paths-${eventId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'user_activity',
-          filter: `room_id=eq.${roomId}`,
+          filter: `event_id=eq.${eventId}`,
         },
         payload => {
           // Invalidate if it's a location or tracking activity
@@ -62,7 +63,7 @@ export function useTrackingPathsRealtimeQuery(
             newActivity.activity_type === 'tracking'
           ) {
             queryClient.invalidateQueries({
-              queryKey: trackingPathKeys.list(roomSlug),
+              queryKey: trackingPathKeys.list(eventSlug),
             });
           }
         }
@@ -72,7 +73,7 @@ export function useTrackingPathsRealtimeQuery(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, roomSlug, queryClient]);
+  }, [eventId, eventSlug, queryClient]);
 
   return query;
 }

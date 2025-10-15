@@ -22,13 +22,13 @@ const isEmoji = (str: string): boolean => {
 };
 
 export function useEmojiMarkers(
-  roomId: string,
-  roomSlug: string,
+  eventId: string,
+  eventSlug: string,
   userNames: Map<string, string>,
   activities: UserActivity[]
 ) {
   const { user } = useUser();
-  const { messages, isLoading, error } = useMessages(roomId, roomSlug);
+  const { messages, isLoading, error } = useMessages(eventId, eventSlug);
 
   // Get current user's distance from latest tracking activity
   const currentUserDistance = useMemo(() => {

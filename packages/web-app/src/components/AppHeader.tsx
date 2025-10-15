@@ -23,20 +23,20 @@ import { ChatIcon } from './icons/ChatIcon';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useState, useMemo } from 'react';
 import { usePresence } from '@/hooks/usePresence';
-import { useRoomMembers } from '@/hooks/useRoomMembers';
+import { useEventMembers } from '@/hooks/useEventMembers';
 import { Logo } from './Logo';
 
 interface AppHeaderProps {
-  /** Current page title (e.g., room name, "Dashboard", "Profile") */
+  /** Current page title (e.g., event name, "Dashboard", "Profile") */
   pageTitle?: string;
-  /** Show the cheer button (room page only) */
+  /** Show the cheer button (event page only) */
   showCheerButton?: boolean;
-  /** Show the chat toggle button (room page only) */
+  /** Show the chat toggle button (event page only) */
   showChatButton?: boolean;
-  /** Room slug for audio recording */
-  roomSlug?: string;
-  /** Room id for active users */
-  roomId?: string;
+  /** Event slug for audio recording */
+  eventSlug?: string;
+  /** Event id for active users */
+  eventId?: string;
   /** Chat sidebar collapsed state */
   isChatCollapsed?: boolean;
   /** Callback for chat toggle */
@@ -51,15 +51,15 @@ export function AppHeader({
   pageTitle,
   showCheerButton = false,
   showChatButton = false,
-  roomSlug,
-  roomId,
+  eventSlug,
+  eventId,
   isChatCollapsed,
   onChatToggle,
   selectedUserId,
   onUserSelect,
 }: AppHeaderProps) {
-  const { count: activeUsers } = usePresence(roomId || '', roomSlug || '');
-  const { trackingMembers } = useRoomMembers(roomSlug || '');
+  const { count: activeUsers } = usePresence(eventId || '', eventSlug || '');
+  const { trackingMembers } = useEventMembers(eventSlug || '');
 
   const [cheerPopoverOpened, setCheerPopoverOpened] = useState(false);
 
@@ -69,7 +69,7 @@ export function AppHeader({
     isSending: isCheerSending,
     toggleRecording: toggleCheerRecording,
   } = useAudioRecorder({
-    roomSlug: roomSlug || '',
+    eventSlug: eventSlug || '',
     onRecordingComplete: () => {
       setCheerPopoverOpened(false);
     },
@@ -127,7 +127,7 @@ export function AppHeader({
           </Group>
 
           {/* Center: Cheer Button & User Selector */}
-          {(showCheerButton || showUserSelector) && roomSlug && (
+          {(showCheerButton || showUserSelector) && eventSlug && (
             <Group justify="center" gap="md" style={{ flex: 1 }}>
               {/* User Selector / Selected User Badge */}
               {showUserSelector && (
@@ -284,7 +284,7 @@ export function AppHeader({
               <>
                 <Anchor
                   component={Link}
-                  href="/rooms"
+                  href="/events"
                   c="gray.6"
                   size="sm"
                   style={{ textDecoration: 'none' }}

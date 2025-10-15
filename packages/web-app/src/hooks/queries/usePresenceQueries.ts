@@ -8,39 +8,39 @@ import { supabase } from '@/lib/supabase';
 export const presenceKeys = {
   all: ['presence'] as const,
   lists: () => [...presenceKeys.all, 'list'] as const,
-  list: (roomSlug: string) => [...presenceKeys.lists(), roomSlug] as const,
+  list: (eventSlug: string) => [...presenceKeys.lists(), eventSlug] as const,
 };
 
-export function usePresenceQuery(roomSlug: string) {
+export function usePresenceQuery(eventSlug: string) {
   return useQuery({
-    queryKey: presenceKeys.list(roomSlug),
-    queryFn: () => presenceApi.getActive(roomSlug),
-    enabled: !!roomSlug,
+    queryKey: presenceKeys.list(eventSlug),
+    queryFn: () => presenceApi.getActive(eventSlug),
+    enabled: !!eventSlug,
     refetchInterval: 30000, // Refetch every 30s as fallback
   });
 }
 
-export function usePresenceRealtimeQuery(roomId: string, roomSlug: string) {
+export function usePresenceRealtimeQuery(eventId: string, eventSlug: string) {
   const queryClient = useQueryClient();
 
-  const query = usePresenceQuery(roomSlug);
+  const query = usePresenceQuery(eventSlug);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!eventId) return;
 
     const channel = supabase
-      .channel(`presence-${roomId}`)
+      .channel(`presence-${eventId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'presence',
-          filter: `room_id=eq.${roomId}`,
+          filter: `event_id=eq.${eventId}`,
         },
         () => {
           queryClient.invalidateQueries({
-            queryKey: presenceKeys.list(roomSlug),
+            queryKey: presenceKeys.list(eventSlug),
           });
         }
       )
@@ -49,7 +49,7 @@ export function usePresenceRealtimeQuery(roomId: string, roomSlug: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, roomSlug, queryClient]);
+  }, [eventId, eventSlug, queryClient]);
 
   return query;
 }
@@ -58,14 +58,14 @@ export function useUpdatePresenceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
-      roomId,
+      eventId,
       status,
     }: {
-      roomId: string;
+      eventId: string;
       status?: 'online' | 'away';
-    }) => presenceApi.update(roomId, status),
-    onSuccess: (_, { roomId }) => {
-      queryClient.invalidateQueries({ queryKey: presenceKeys.list(roomId) });
+    }) => presenceApi.update(eventId, status),
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
     },
   });
 }
@@ -73,9 +73,9 @@ export function useUpdatePresenceMutation() {
 export function useRemovePresenceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (roomId: string) => presenceApi.remove(roomId),
-    onSuccess: (_, roomId) => {
-      queryClient.invalidateQueries({ queryKey: presenceKeys.list(roomId) });
+    mutationFn: (eventId: string) => presenceApi.remove(eventId),
+    onSuccess: (_, eventId) => {
+      queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
     },
   });
 }

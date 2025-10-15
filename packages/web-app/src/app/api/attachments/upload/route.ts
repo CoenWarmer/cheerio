@@ -22,12 +22,12 @@ export async function POST(request: NextRequest) {
     // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const roomId = formData.get('roomId') as string;
+    const eventId = formData.get('eventId') as string;
     const type = formData.get('type') as string; // e.g., 'audio', 'image', 'video'
 
-    if (!file || !roomId || !type) {
+    if (!file || !eventId || !type) {
       return NextResponse.json(
-        { error: 'Missing required fields: file, roomId, type' },
+        { error: 'Missing required fields: file, eventId, type' },
         { status: 400 }
       );
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now();
     const extension = file.name.split('.').pop() || 'webm';
     const filename = `${type}-${user.id}-${timestamp}.${extension}`;
-    const filePath = `${type}-messages/${roomId}/${filename}`;
+    const filePath = `${type}-messages/${eventId}/${filename}`;
 
     // Convert File to ArrayBuffer then to Buffer
     const arrayBuffer = await file.arrayBuffer();

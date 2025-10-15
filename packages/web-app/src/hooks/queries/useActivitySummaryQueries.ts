@@ -36,14 +36,14 @@ export interface UserActivitySummary {
 export const activitySummaryKeys = {
   all: ['activity-summary'] as const,
   lists: () => [...activitySummaryKeys.all, 'list'] as const,
-  list: (roomSlug: string) =>
-    [...activitySummaryKeys.lists(), roomSlug] as const,
+  list: (eventSlug: string) =>
+    [...activitySummaryKeys.lists(), eventSlug] as const,
 };
 
 async function fetchActivitySummary(
-  roomSlug: string
+  eventSlug: string
 ): Promise<UserActivitySummary[]> {
-  const response = await fetch(`/api/rooms/${roomSlug}/activity-summary`);
+  const response = await fetch(`/api/events/${eventSlug}/activity-summary`);
   if (!response.ok) {
     throw new Error('Failed to fetch activity summary');
   }
@@ -52,28 +52,28 @@ async function fetchActivitySummary(
 }
 
 export function useActivitySummaryRealtimeQuery(
-  roomId: string,
-  roomSlug: string
+  eventId: string,
+  eventSlug: string
 ) {
   const query = useQuery({
-    queryKey: activitySummaryKeys.list(roomSlug),
-    queryFn: () => fetchActivitySummary(roomSlug),
-    enabled: !!roomSlug,
+    queryKey: activitySummaryKeys.list(eventSlug),
+    queryFn: () => fetchActivitySummary(eventSlug),
+    enabled: !!eventSlug,
   });
 
   // Subscribe to real-time activity updates
   useEffect(() => {
-    if (!roomId) return;
+    if (!eventId) return;
 
     const channel = supabase
-      .channel(`room-activity-summary-${roomId}`)
+      .channel(`room-activity-summary-${eventId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'user_activity',
-          filter: `room_id=eq.${roomId}`,
+          filter: `event_id=eq.${eventId}`,
         },
         () => {
           // Invalidate the query to refetch summaries
@@ -85,7 +85,7 @@ export function useActivitySummaryRealtimeQuery(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, query]);
+  }, [eventId, query]);
 
   return query;
 }

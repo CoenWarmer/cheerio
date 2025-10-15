@@ -71,7 +71,7 @@ let client = SupabaseClient(
 )
 
 // API calls
-let url = "\(Config.apiBaseURL)/api/rooms/\(slug)/activity"
+let url = "\(Config.apiBaseURL)/api/events/\(slug)/activity"
 
 // Check environment
 if Config.isSimulator {

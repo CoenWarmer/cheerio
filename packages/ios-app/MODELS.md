@@ -34,12 +34,12 @@ Generate Swift models from JSON:
 
 ```bash
 # Fetch data from your API
-curl http://localhost:3001/api/rooms | jq '.data[0]' > room-sample.json
+curl http://localhost:3001/api/events | jq '.data[0]' > event-sample.json
 
 # Generate Swift model
 quicktype --lang swift \
-  --src room-sample.json \
-  --out CheeriooApp/Models/Room.swift \
+  --src event-sample.json \
+  --out CheeriooApp/Models/Event.swift \
   --struct-or-class struct \
   --protocol Codable
 ```
@@ -68,7 +68,7 @@ Since the database schema doesn't change frequently:
 
 The following models are maintained manually:
 
-- `Room.swift` - Maps to `rooms` table
+- `Event.swift` - Maps to `events` table
 - `Message.swift` - Maps to `messages` table (with nested attachment handling)
 - `Activity.swift` - Maps to `user_activity` table
 

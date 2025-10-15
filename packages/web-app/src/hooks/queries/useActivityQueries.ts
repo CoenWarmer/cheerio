@@ -9,51 +9,51 @@ import type { ActivityFilters, CreateActivityInput } from '@/types/activity';
 export const activityKeys = {
   all: ['activities'] as const,
   lists: () => [...activityKeys.all, 'list'] as const,
-  list: (roomSlug: string, filters?: ActivityFilters) =>
-    [...activityKeys.lists(), roomSlug, filters] as const,
+  list: (eventSlug: string, filters?: ActivityFilters) =>
+    [...activityKeys.lists(), eventSlug, filters] as const,
 };
 
 export function useActivitiesQuery(
-  roomSlug: string,
+  eventSlug: string,
   filters?: ActivityFilters
 ) {
   return useQuery({
-    queryKey: activityKeys.list(roomSlug, filters),
-    queryFn: () => activityApi.getActivities(roomSlug, filters),
-    enabled: !!roomSlug,
+    queryKey: activityKeys.list(eventSlug, filters),
+    queryFn: () => activityApi.getActivities(eventSlug, filters),
+    enabled: !!eventSlug,
     refetchInterval: 5000, // Poll every 5 seconds
     refetchIntervalInBackground: true,
   });
 }
 
 export function useActivitiesRealtimeQuery(
-  roomId: string,
-  roomSlug: string,
+  eventId: string,
+  eventSlug: string,
   filters?: ActivityFilters
 ) {
   const queryClient = useQueryClient();
 
-  const query = useActivitiesQuery(roomSlug, filters);
+  const query = useActivitiesQuery(eventSlug, filters);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!eventId) return;
 
     const channel = supabase
-      .channel(`activity-${roomId}`)
+      .channel(`activity-${eventId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'user_activity',
-          filter: `room_id=eq.${roomId}`,
+          filter: `event_id=eq.${eventId}`,
         },
         () => {
-          // Invalidate all activity queries for this room
+          // Invalidate all activity queries for this event
           // This will trigger a refetch with the current filters
           queryClient.invalidateQueries({
             queryKey: activityKeys.lists(),
-            predicate: query => query.queryKey.includes(roomSlug),
+            predicate: query => query.queryKey.includes(eventSlug),
           });
         }
       )
@@ -66,9 +66,9 @@ export function useActivitiesRealtimeQuery(
     return () => {
       supabase.removeChannel(channel);
     };
-    // Only depend on roomId and roomSlug - these should be stable
+    // Only depend on eventId and eventSlug - these should be stable
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, roomSlug]);
+  }, [eventId, eventSlug]);
 
   return query;
 }
@@ -77,12 +77,12 @@ export function useCreateActivityMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
-      roomSlug,
+      eventSlug,
       activity,
     }: {
-      roomSlug: string;
+      eventSlug: string;
       activity: CreateActivityInput;
-    }) => activityApi.createActivity(roomSlug, activity),
+    }) => activityApi.createActivity(eventSlug, activity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: activityKeys.lists() });
     },

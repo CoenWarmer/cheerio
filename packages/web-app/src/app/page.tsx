@@ -28,8 +28,8 @@ export default function Home() {
           <Text size="sm" c="gray.5">
             Already set up?
           </Text>
-          <Anchor component={Link} href="/rooms" size="sm">
-            Go to Rooms →
+          <Anchor component={Link} href="/events" size="sm">
+            Go to Events →
           </Anchor>
         </Stack>
       </Box>

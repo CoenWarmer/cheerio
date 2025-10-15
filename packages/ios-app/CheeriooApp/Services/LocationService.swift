@@ -15,7 +15,7 @@ class LocationService: NSObject, ObservableObject {
     private var lastLocation: CLLocation?
     private var startTime: Date?
     private var timer: Timer?
-    private var currentRoomSlug: String?
+    private var currentEventSlug: String?
     
     init(supabase: SupabaseClient) {
         self.supabase = supabase
@@ -32,8 +32,8 @@ class LocationService: NSObject, ObservableObject {
         locationManager.requestAlwaysAuthorization()
     }
     
-    func startTracking(roomSlug: String) async {
-        self.currentRoomSlug = roomSlug
+    func startTracking(eventSlug: String) async {
+        self.currentEventSlug = eventSlug
         self.isTracking = true
         self.startTime = Date()
         self.totalDistance = 0.0
@@ -51,7 +51,7 @@ class LocationService: NSObject, ObservableObject {
     
     func stopTracking() {
         isTracking = false
-        currentRoomSlug = nil
+        currentEventSlug = nil
         locationManager.stopUpdatingLocation()
         timer?.invalidate()
         timer = nil
@@ -66,11 +66,11 @@ class LocationService: NSObject, ObservableObject {
     }
     
     private func sendActivity(type: ActivityType, data: ActivityData) async {
-        guard let roomSlug = currentRoomSlug else {
+        guard let eventSlug = currentEventSlug else {
             return
         }
         
-        let url = URL(string: "\(Config.apiBaseURL)/api/rooms/\(roomSlug)/activity")!
+        let url = URL(string: "\(Config.apiBaseURL)/api/events/\(eventSlug)/activity")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

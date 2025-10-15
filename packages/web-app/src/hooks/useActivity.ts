@@ -17,13 +17,13 @@ export interface UserLocationMarker {
 }
 
 export function useActivity(
-  roomId: string,
-  roomSlug: string,
+  eventId: string,
+  eventSlug: string,
   filters?: ActivityFilters
 ) {
   const { data, isLoading, error } = useActivitiesRealtimeQuery(
-    roomId,
-    roomSlug,
+    eventId,
+    eventSlug,
     filters
   );
 

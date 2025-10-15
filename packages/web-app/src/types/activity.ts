@@ -1,5 +1,5 @@
 /**
- * Types for user activity tracking in rooms
+ * Types for user activity tracking in events
  */
 
 export type ActivityType =
@@ -57,7 +57,7 @@ export type ActivityData =
 export interface UserActivity {
   id: string;
   user_id: string;
-  room_id: string;
+  event_id: string;
   activity_type: ActivityType;
   data: ActivityData;
   created_at: string;

@@ -2,7 +2,7 @@ import Foundation
 
 struct Message: Codable, Identifiable {
     let id: String
-    let roomId: String
+    let eventId: String
     let userId: String
     let content: String
     let attachmentUrl: String?
@@ -11,7 +11,7 @@ struct Message: Codable, Identifiable {
     
     enum CodingKeys: String, CodingKey {
         case id, content, attachment
-        case roomId = "room_id"
+        case eventId = "event_id"
         case userId = "user_id"
         case createdAt = "created_at"
     }
@@ -26,7 +26,7 @@ struct Message: Codable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         id = try container.decode(String.self, forKey: .id)
-        roomId = try container.decode(String.self, forKey: .roomId)
+        eventId = try container.decode(String.self, forKey: .eventId)
         userId = try container.decode(String.self, forKey: .userId)
         content = try container.decode(String.self, forKey: .content)
         createdAt = try container.decode(String.self, forKey: .createdAt)
@@ -45,7 +45,7 @@ struct Message: Codable, Identifiable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encode(id, forKey: .id)
-        try container.encode(roomId, forKey: .roomId)
+        try container.encode(eventId, forKey: .eventId)
         try container.encode(userId, forKey: .userId)
         try container.encode(content, forKey: .content)
         try container.encode(createdAt, forKey: .createdAt)

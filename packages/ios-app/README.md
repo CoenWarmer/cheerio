@@ -65,11 +65,11 @@ This automatically:
 ios-app/CheeriooApp/
 ├── Config.swift                    # API and Supabase configuration
 ├── AppState.swift                  # Global app state management
-├── Models/                         # Data models (Room, Message, Activity)
+├── Models/                         # Data models (Event, Message, Activity)
 ├── Services/                       # Business logic (Auth, Location, Chat, Audio)
 ├── Views/                          # SwiftUI views
 │   ├── Auth/                       # Login and registration
-│   ├── Rooms/                      # Room list and detail views
+│   ├── Events/                      # Event list and detail views
 │   └── Components/                 # Reusable UI components
 └── CheeriooAppApp.swift             # App entry point
 ```

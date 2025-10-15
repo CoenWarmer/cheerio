@@ -22,8 +22,8 @@ export type EnrichedMessage = Omit<Message, 'attachment'> & {
   attachment?: MessageAttachment | null;
 };
 
-export function useMessages(roomId: string, roomSlug: string) {
-  const { data, isLoading, error } = useMessagesRealtimeQuery(roomId, roomSlug);
+export function useMessages(eventId: string, eventSlug: string) {
+  const { data, isLoading, error } = useMessagesRealtimeQuery(eventId, eventSlug);
 
   const messages = useMemo(() => data?.data ?? [], [data]);
 

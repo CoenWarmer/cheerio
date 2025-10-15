@@ -30,8 +30,8 @@ import { ChatIcon } from './icons/ChatIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
 
 interface ChatSidebarProps {
-  roomId: string; // Room UUID for realtime subscriptions
-  roomSlug: string; // Room slug for API calls
+  eventId: string; // Event UUID for realtime subscriptions
+  eventSlug: string; // Event slug for API calls
   currentUser: User;
   currentUserLocation?: { lat: number; long: number } | null;
   currentUserDistance?: number;
@@ -93,8 +93,8 @@ const INPUT_STYLE = {
 };
 
 export default function ChatSidebar({
-  roomId,
-  roomSlug,
+  eventId,
+  eventSlug,
   currentUser,
   currentUserLocation,
   currentUserDistance = 0,
@@ -102,11 +102,11 @@ export default function ChatSidebar({
 }: ChatSidebarProps) {
   // Use hooks for data fetching
   const { messages: messagesData, isLoading: loading } = useMessages(
-    roomId,
-    roomSlug
+    eventId,
+    eventSlug
   );
   const { sendMessage } = useSendMessage();
-  const { count: activeUsers } = usePresence(roomId, roomSlug);
+  const { count: activeUsers } = usePresence(eventId, eventSlug);
   const { updatePresence } = useUpdatePresence();
   const { removePresence } = useRemovePresence();
 
@@ -122,7 +122,7 @@ export default function ChatSidebar({
     isSending: isRecordingSending,
     toggleRecording,
   } = useAudioRecorder({
-    roomSlug,
+    eventSlug,
     onRecordingComplete: () => {
       scrollToBottom();
     },
@@ -142,11 +142,11 @@ export default function ChatSidebar({
   // Presence management
   useEffect(() => {
     // Initial presence update
-    updatePresence({ roomId: roomSlug, status: 'online' });
+    updatePresence({ eventId: eventSlug, status: 'online' });
 
     // Update presence every 20 seconds
     presenceIntervalRef.current = setInterval(() => {
-      updatePresence({ roomId: roomSlug, status: 'online' });
+      updatePresence({ eventId: eventSlug, status: 'online' });
     }, 20000);
 
     // Cleanup on unmount
@@ -155,9 +155,9 @@ export default function ChatSidebar({
         clearInterval(presenceIntervalRef.current);
       }
       // Remove presence when leaving
-      removePresence(roomSlug);
+      removePresence(eventSlug);
     };
-  }, [roomSlug, updatePresence, removePresence]);
+  }, [eventSlug, updatePresence, removePresence]);
 
   // Helper to check if a string is a single emoji
   const isEmoji = (str: string): boolean => {
@@ -190,7 +190,7 @@ export default function ChatSidebar({
         };
       }
 
-      sendMessage({ roomId: roomSlug, messageData });
+      sendMessage({ eventId: eventSlug, messageData });
       setNewMessage('');
     } catch (err) {
       console.error('Failed to send message:', err);

@@ -16,10 +16,10 @@ import { canTrack } from '@/types/permissions';
 import type { TrackingActivity } from '@/types/activity';
 
 interface ActivityTrackerProps {
-  roomSlug: string;
+  eventSlug: string;
 }
 
-export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
+export default function ActivityTracker({ eventSlug }: ActivityTrackerProps) {
   const { permissions, loading } = useProfile();
   const { createActivity } = useCreateActivity();
 
@@ -101,7 +101,7 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
       };
 
       createActivity({
-        roomSlug,
+        eventSlug,
         activity: {
           activity_type: 'tracking',
           data: trackingData,
@@ -234,7 +234,7 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
         {isTracking && (
           <Text size="xs" c="gray.6">
             Your location, speed, and distance are being shared with others in
-            the room.
+            the event.
           </Text>
         )}
       </Stack>
