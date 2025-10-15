@@ -89,8 +89,6 @@ export function AppHeader({
     return trackingMembers.find(member => member.user_id === selectedUserId);
   }, [selectedUserId, trackingMembers]);
 
-  console.log(trackingMembers);
-
   // Show user selector if there are multiple tracking members
   const showUserSelector =
     trackingMembers.length >= 1 && onUserSelect !== undefined;

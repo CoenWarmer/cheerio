@@ -31,14 +31,9 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const { event, isLoading, error: eventError } = useEvent(eventSlug);
   const { joinEvent } = useJoinEvent();
 
-  const { activities } = useActivity(event?.id ?? '', event?.slug ?? '');
-
-  const { userNames, userLocations } = useActivity(
+  const { activities, userNames, userLocations } = useActivity(
     event?.id ?? '',
-    event?.slug ?? '',
-    {
-      limit: 200,
-    }
+    event?.slug ?? ''
   );
 
   const { emojiMarkers, currentUserDistance } = useEmojiMarkers(

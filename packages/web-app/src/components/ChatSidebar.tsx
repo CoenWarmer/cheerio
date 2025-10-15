@@ -15,11 +15,7 @@ import {
 } from '@mantine/core';
 import { ApiError } from '@/lib/api-client';
 import type { User } from '@supabase/supabase-js';
-import {
-  useMessages,
-  useSendMessage,
-  type EnrichedMessage,
-} from '@/hooks/useMessages';
+import { useMessages, useSendMessage } from '@/hooks/useMessages';
 import {
   usePresence,
   useUpdatePresence,
@@ -110,11 +106,11 @@ export default function ChatSidebar({
   const { updatePresence } = useUpdatePresence();
   const { removePresence } = useRemovePresence();
 
-  const [messages, setMessages] = useState<EnrichedMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const presenceIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const prevMessageCountRef = useRef(0);
 
   // Audio recording hook
   const {
@@ -132,12 +128,14 @@ export default function ChatSidebar({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Sync messages from hook to local state (for real-time updates)
+  // Auto-scroll when new messages arrive
   useEffect(() => {
-    setMessages(messagesData);
-    // Use setTimeout to ensure DOM has updated before scrolling
-    setTimeout(scrollToBottom, 0);
-  }, [messagesData]);
+    if (messagesData.length > prevMessageCountRef.current) {
+      // Use setTimeout to ensure DOM has updated before scrolling
+      setTimeout(scrollToBottom, 0);
+    }
+    prevMessageCountRef.current = messagesData.length;
+  }, [messagesData.length]);
 
   // Presence management
   useEffect(() => {
@@ -237,7 +235,7 @@ export default function ChatSidebar({
         </Group>
         <Group gap="xs">
           <Text size="xs" c="gray.6">
-            {messages.length} message{messages.length !== 1 ? 's' : ''}
+            {messagesData.length} message{messagesData.length !== 1 ? 's' : ''}
           </Text>
           <Text c="gray.3">•</Text>
           <Badge color="green" variant="dot" size="sm">
@@ -262,7 +260,7 @@ export default function ChatSidebar({
             <Center h="100%">
               <Text c="gray.6">Loading messages...</Text>
             </Center>
-          ) : messages.length === 0 ? (
+          ) : messagesData.length === 0 ? (
             <Center h="100%">
               <Stack align="center" gap="xs">
                 <Text fz={32}>💬</Text>
@@ -272,7 +270,7 @@ export default function ChatSidebar({
               </Stack>
             </Center>
           ) : (
-            messages.map(message => {
+            messagesData.map(message => {
               const isCurrentUser = message.user_id === currentUser.id;
               const userName = isCurrentUser
                 ? 'You'

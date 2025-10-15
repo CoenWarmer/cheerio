@@ -1,22 +1,20 @@
 'use client';
 
 import { useRef } from 'react';
-import Link from 'next/link';
 import {
-  Box,
-  Container,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Group,
-  Stack,
   Alert,
-  Paper,
   Avatar,
   Badge,
-  Loader,
+  Box,
+  Button,
   Center,
+  Container,
+  Group,
+  Loader,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
 } from '@mantine/core';
 import { AppHeader } from '@/components/AppHeader';
 import { useProfileForm } from '@/hooks/useProfileForm';

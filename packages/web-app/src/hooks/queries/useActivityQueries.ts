@@ -5,6 +5,7 @@ import { activityApi } from '@/lib/activity-client';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { ActivityFilters, CreateActivityInput } from '@/types/activity';
+import { realtimeRegistry } from '@/lib/realtime-registry';
 
 export const activityKeys = {
   all: ['activities'] as const,
@@ -38,33 +39,40 @@ export function useActivitiesRealtimeQuery(
   useEffect(() => {
     if (!eventId) return;
 
-    const channel = supabase
-      .channel(`activity-${eventId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_activity',
-          filter: `event_id=eq.${eventId}`,
-        },
-        () => {
-          // Invalidate all activity queries for this event
-          // This will trigger a refetch with the current filters
-          queryClient.invalidateQueries({
-            queryKey: activityKeys.lists(),
-            predicate: query => query.queryKey.includes(eventSlug),
-          });
-        }
-      )
-      .subscribe((status, err) => {
-        if (err) {
-          console.error('Realtime subscription error:', err);
-        }
-      });
+    const channelKey = `activity-${eventId}`;
+
+    // Get or create the channel (prevents duplicates)
+    realtimeRegistry.getOrCreateChannel(channelKey, () =>
+      supabase
+        .channel(channelKey)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_activity',
+            filter: `event_id=eq.${eventId}`,
+          },
+          () => {
+            // Invalidate all activity queries for this event
+            // This will trigger a refetch with the current filters
+            queryClient.invalidateQueries({
+              queryKey: activityKeys.lists(),
+              predicate: query => query.queryKey.includes(eventSlug),
+            });
+          }
+        )
+        .subscribe((status, err) => {
+          if (err) {
+            console.error('Realtime subscription error:', err);
+          }
+        })
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      realtimeRegistry.unsubscribe(channelKey, channel =>
+        supabase.removeChannel(channel)
+      );
     };
     // Only depend on eventId and eventSlug - these should be stable
     // eslint-disable-next-line react-hooks/exhaustive-deps
