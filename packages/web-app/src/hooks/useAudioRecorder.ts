@@ -37,8 +37,6 @@ export function useAudioRecorder({
         mimeType = 'audio/webm; codecs=opus';
       }
 
-      console.log('Using audio format:', mimeType);
-
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];

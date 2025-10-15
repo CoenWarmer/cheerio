@@ -42,12 +42,12 @@ export async function GET(
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    // Fetch all location activities for the room (chronological order)
+    // Fetch all location and tracking activities for the room (chronological order)
     const { data: activities, error: activitiesError } = await supabase
       .from('user_activity')
       .select('user_id, data, created_at')
       .eq('room_id', room.id)
-      .eq('activity_type', 'location')
+      .in('activity_type', ['location', 'tracking'])
       .order('created_at', { ascending: true });
 
     if (activitiesError) {

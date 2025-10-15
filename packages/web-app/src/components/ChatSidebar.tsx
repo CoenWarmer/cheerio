@@ -34,6 +34,7 @@ interface ChatSidebarProps {
   roomSlug: string; // Room slug for API calls
   currentUser: User;
   currentUserLocation?: { lat: number; long: number } | null;
+  currentUserDistance?: number;
   onToggleSidebar: () => void;
 }
 
@@ -96,6 +97,7 @@ export default function ChatSidebar({
   roomSlug,
   currentUser,
   currentUserLocation,
+  currentUserDistance = 0,
   onToggleSidebar,
 }: ChatSidebarProps) {
   // Use hooks for data fetching
@@ -175,14 +177,17 @@ export default function ChatSidebar({
       const content = newMessage.trim();
       const messageData: {
         content: string;
-        location?: { lat: number; long: number };
+        location?: { lat: number; long: number; distance?: number };
       } = {
         content,
       };
 
-      // If this is an emoji and the user has a location, include it
+      // If this is an emoji and the user has a location, include it with distance
       if (isEmoji(content) && currentUserLocation) {
-        messageData.location = currentUserLocation;
+        messageData.location = {
+          ...currentUserLocation,
+          distance: currentUserDistance,
+        };
       }
 
       sendMessage({ roomId: roomSlug, messageData });

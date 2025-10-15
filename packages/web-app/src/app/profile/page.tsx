@@ -13,13 +13,12 @@ import {
   Stack,
   Alert,
   Paper,
-  Anchor,
   Avatar,
-  FileButton,
   Badge,
   Loader,
   Center,
 } from '@mantine/core';
+import { AppHeader } from '@/components/AppHeader';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { getPermissionLabel } from '@/types/permissions';
 
@@ -73,27 +72,10 @@ export default function ProfilePage() {
   };
 
   return (
-    <Box mih="100vh" bg="gray.0" p="xl">
-      <Container size="sm">
+    <Box mih="100vh" bg="gray.0">
+      <AppHeader pageTitle="Edit Profile" />
+      <Container size="sm" py="xl">
         <Stack gap="xl">
-          {/* Header */}
-          <Box>
-            <Anchor
-              component={Link}
-              href="/dashboard"
-              c="gray.6"
-              size="sm"
-              mb="md"
-              display="block"
-            >
-              ← Back to Dashboard
-            </Anchor>
-            <Title order={1} mb="xs">
-              Edit Profile
-            </Title>
-            <Text c="gray.6">Manage your display name and avatar</Text>
-          </Box>
-
           {/* Success Message */}
           {success && (
             <Alert color="green" variant="light">

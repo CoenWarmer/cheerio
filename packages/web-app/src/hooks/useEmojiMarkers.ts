@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react';
 import { useMessages } from './useMessages';
+import { useUser } from './useUser';
+import { TrackingActivity, UserActivity } from '@/types/activity';
 
 export interface EmojiMarker {
   id: string;
@@ -9,6 +11,7 @@ export interface EmojiMarker {
   userName: string;
   location: { lat: number; long: number };
   timestamp: string;
+  distance?: number;
 }
 
 // Helper to check if a string is a single emoji
@@ -21,9 +24,31 @@ const isEmoji = (str: string): boolean => {
 export function useEmojiMarkers(
   roomId: string,
   roomSlug: string,
-  userNames: Map<string, string>
+  userNames: Map<string, string>,
+  activities: UserActivity[]
 ) {
+  const { user } = useUser();
   const { messages, isLoading, error } = useMessages(roomId, roomSlug);
+
+  // Get current user's distance from latest tracking activity
+  const currentUserDistance = useMemo(() => {
+    if (!user) return 0;
+
+    // Find the user's most recent tracking activity
+    const userActivities = activities
+      .filter(a => a.user_id === user.id && a.activity_type === 'tracking')
+      .sort(
+        (a, b) =>
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
+      );
+
+    if (userActivities.length === 0) return 0;
+
+    const latestActivity = userActivities[0];
+    const trackingData = latestActivity.data as TrackingActivity;
+    return trackingData?.distance || 0;
+  }, [activities, user]);
 
   const emojiMarkers = useMemo(() => {
     const markers: EmojiMarker[] = [];
@@ -39,7 +64,11 @@ export function useEmojiMarkers(
       if (!message.location) continue;
 
       // Type guard for location
-      const location = message.location as { lat: number; long: number };
+      const location = message.location as {
+        lat: number;
+        long: number;
+        distance?: number;
+      };
       if (
         typeof location.lat !== 'number' ||
         typeof location.long !== 'number'
@@ -55,8 +84,9 @@ export function useEmojiMarkers(
         id: message.id,
         emoji: message.content,
         userName,
-        location,
+        location: { lat: location.lat, long: location.long },
         timestamp: message.created_at,
+        distance: location.distance,
       });
     }
 
@@ -65,6 +95,7 @@ export function useEmojiMarkers(
 
   return {
     emojiMarkers,
+    currentUserDistance,
     isLoading,
     error,
   };

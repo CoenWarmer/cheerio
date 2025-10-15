@@ -19,6 +19,12 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
+      console.error('Presence API - Auth failed:', {
+        userError,
+        hasUser: !!user,
+        authHeader:
+          request.headers.get('authorization')?.substring(0, 20) + '...',
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

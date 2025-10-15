@@ -22,8 +22,42 @@ A native iOS application built with Swift and SwiftUI that connects to the Cheer
 See [SETUP.md](./SETUP.md) for detailed setup instructions.
 
 1. Install Supabase Swift SDK via Swift Package Manager
-2. Configure API credentials in `Config.swift`
-3. Build and run in Xcode
+2. Copy `.env.local.example` to `.env.local` at repo root
+3. Fill in your Supabase credentials in `.env.local`
+4. Run `yarn generate-config` to generate `Config.swift` from your env file
+5. Build and run in Xcode
+
+## Configuration
+
+The iOS app reads configuration from a shared `.env.local` file using a build script:
+
+```bash
+# Generate Config.swift from .env.local
+yarn generate-config
+```
+
+The script looks for `.env.local` at:
+
+1. Repo root (`/cheerio/.env.local`) - **Recommended** ✨
+2. Web app (`packages/web-app/.env.local`) - Fallback
+
+This automatically:
+
+- ✅ Reads Supabase credentials from `.env.local`
+- ✅ Detects your Mac's local IP for device builds
+- ✅ Generates `Config.swift` with simulator/device detection
+- ✅ Keeps credentials in sync between web and iOS apps
+
+**Auto-Generate on Build (Optional)**: Set up Xcode to regenerate Config.swift automatically on every build. See [QUICK-SETUP-XCODE.md](./QUICK-SETUP-XCODE.md) for 5-minute setup guide.
+
+**Detailed Documentation**:
+
+- 📘 [CONFIG-SETUP.md](./CONFIG-SETUP.md) - Quick overview
+- 📗 [ENV-VARIABLES.md](./ENV-VARIABLES.md) - Comprehensive guide
+- 📙 [XCODE-BUILD-PHASE.md](./XCODE-BUILD-PHASE.md) - Auto-generation setup
+- 📕 [QUICK-SETUP-XCODE.md](./QUICK-SETUP-XCODE.md) - Visual step-by-step guide
+
+**Manual Alternative**: You can also edit `Config.swift` directly, but changes will be overwritten when you run the script again.
 
 ## Project Structure
 

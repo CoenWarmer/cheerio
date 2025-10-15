@@ -104,3 +104,7 @@ fastlane/test_output
 
 # Code Injection
 iOSInjectionProject/
+
+# iOS Generated Config
+# Config.swift is auto-generated from .env.local - don't commit with real credentials
+packages/ios-app/CheerioApp/Config.swift

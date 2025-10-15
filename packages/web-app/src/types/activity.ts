@@ -2,7 +2,12 @@
  * Types for user activity tracking in rooms
  */
 
-export type ActivityType = 'location' | 'speed' | 'distance' | 'music';
+export type ActivityType =
+  | 'location'
+  | 'speed'
+  | 'distance'
+  | 'music'
+  | 'tracking';
 
 export interface LocationActivity {
   lat: number;
@@ -21,6 +26,19 @@ export interface DistanceActivity {
   unit: 'km' | 'miles';
 }
 
+/**
+ * Combined tracking activity that includes location, speed, and distance
+ * This reduces API calls by consolidating all tracking data into one request
+ */
+export interface TrackingActivity {
+  lat: number;
+  long: number;
+  accuracy?: number;
+  timestamp?: number;
+  speed?: number; // km/h
+  distance?: number; // total distance in km
+}
+
 export interface MusicActivity {
   title: string;
   artist: string;
@@ -33,7 +51,8 @@ export type ActivityData =
   | LocationActivity
   | SpeedActivity
   | DistanceActivity
-  | MusicActivity;
+  | MusicActivity
+  | TrackingActivity;
 
 export interface UserActivity {
   id: string;

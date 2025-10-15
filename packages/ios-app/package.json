@@ -4,7 +4,8 @@
   "private": true,
   "description": "Cheerio iOS app built with Swift/SwiftUI. This is an Xcode project and does not use npm/yarn for dependency management. Open CheerioApp.xcodeproj in Xcode to work on this project.",
   "scripts": {
-    "generate-models": "node scripts/generate-swift-models.mjs"
+    "generate-models": "node scripts/generate-swift-models.mjs",
+    "generate-config": "bash scripts/generate-config.sh"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.39.0"

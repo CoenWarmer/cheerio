@@ -394,14 +394,22 @@ export const profilesApi = {
 /**
  * Room Members API
  */
+export interface RoomMemberWithProfile {
+  user_id: string;
+  joined_at: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  permissions: 'admin' | 'tracker' | 'supporter';
+}
+
 export const roomMembersApi = {
   /**
-   * Get all members of a room
+   * Get all members of a room with their profiles
    */
   async getByRoomSlug(
     roomSlug: string
-  ): Promise<{ data: Array<{ user_id: string; joined_at: string }> }> {
-    return fetchApi<{ data: Array<{ user_id: string; joined_at: string }> }>(
+  ): Promise<{ data: RoomMemberWithProfile[] }> {
+    return fetchApi<{ data: RoomMemberWithProfile[] }>(
       `/api/rooms/${roomSlug}/members`
     );
   },

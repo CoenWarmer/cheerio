@@ -21,6 +21,8 @@ export function useActivitiesQuery(
     queryKey: activityKeys.list(roomSlug, filters),
     queryFn: () => activityApi.getActivities(roomSlug, filters),
     enabled: !!roomSlug,
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true,
   });
 }
 
@@ -47,17 +49,26 @@ export function useActivitiesRealtimeQuery(
           filter: `room_id=eq.${roomId}`,
         },
         () => {
+          // Invalidate all activity queries for this room
+          // This will trigger a refetch with the current filters
           queryClient.invalidateQueries({
-            queryKey: activityKeys.list(roomSlug, filters),
+            queryKey: activityKeys.lists(),
+            predicate: query => query.queryKey.includes(roomSlug),
           });
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Realtime subscription error:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, roomSlug, queryClient, filters]);
+    // Only depend on roomId and roomSlug - these should be stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, roomSlug]);
 
   return query;
 }

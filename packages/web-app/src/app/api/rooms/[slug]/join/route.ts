@@ -47,6 +47,9 @@ export async function POST(
 
     // If already a member, return success
     if (existingMember) {
+      console.log(
+        `Join API - User ${user.id} is already a member of room ${roomId}`
+      );
       return NextResponse.json({
         success: true,
         alreadyMember: true,
@@ -54,6 +57,9 @@ export async function POST(
     }
 
     // Add user as a member
+    console.log(
+      `Join API - Adding user ${user.id} to room ${roomId} (slug: ${slug})`
+    );
     const { data, error } = await supabase
       .from('room_members')
       .insert({
@@ -65,9 +71,11 @@ export async function POST(
       .single();
 
     if (error) {
-      console.error('Error joining room:', error);
+      console.error('Join API - Error joining room:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    console.log(`Join API - Successfully added user ${user.id} to room:`, data);
 
     return NextResponse.json({
       success: true,

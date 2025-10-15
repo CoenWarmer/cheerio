@@ -15,6 +15,7 @@ enum ActivityType: String, Codable {
     case speed
     case distance
     case music
+    case tracking
 }
 
 enum ActivityData: Codable {
@@ -22,11 +23,14 @@ enum ActivityData: Codable {
     case speed(SpeedData)
     case distance(DistanceData)
     case music(MusicData)
+    case tracking(TrackingData)
     
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         
-        if let locationData = try? container.decode(LocationData.self) {
+        if let trackingData = try? container.decode(TrackingData.self) {
+            self = .tracking(trackingData)
+        } else if let locationData = try? container.decode(LocationData.self) {
             self = .location(locationData)
         } else if let speedData = try? container.decode(SpeedData.self) {
             self = .speed(speedData)
@@ -45,6 +49,8 @@ enum ActivityData: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
+        case .tracking(let data):
+            try container.encode(data)
         case .location(let data):
             try container.encode(data)
         case .speed(let data):
@@ -76,5 +82,16 @@ struct MusicData: Codable {
     let title: String
     let artist: String?
     let service: String?
+}
+
+/// Consolidated tracking data that combines location, speed, and distance
+/// This reduces API calls by sending all tracking information in one request
+struct TrackingData: Codable {
+    let lat: Double
+    let long: Double
+    let accuracy: Double?
+    let timestamp: Double?
+    let speed: Double?
+    let distance: Double?
 }
 

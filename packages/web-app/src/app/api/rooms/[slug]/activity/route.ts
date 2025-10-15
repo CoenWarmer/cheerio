@@ -87,6 +87,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
+      console.error('Activity API - Auth failed:', userError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

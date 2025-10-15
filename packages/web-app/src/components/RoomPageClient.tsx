@@ -3,35 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Box,
-  Center,
-  Stack,
-  Title,
-  Text,
-  Anchor,
-  Group,
-  Button,
-  Burger,
-  Container,
-  Popover,
-  List,
-  ThemeIcon,
-} from '@mantine/core';
-import { IconCheck } from '@tabler/icons-react';
+import { Box, Center, Stack, Title, Text, Anchor } from '@mantine/core';
 import ChatSidebar from '@/components/ChatSidebar';
 import ActivityTracker from '@/components/ActivityTracker';
-import UserActivityFeed from '@/components/UserActivityFeed';
 import dynamic from 'next/dynamic';
 import { useRoom, useJoinRoom } from '@/hooks/useRooms';
 import { useActivity } from '@/hooks/useActivity';
 import { useEmojiMarkers } from '@/hooks/useEmojiMarkers';
 import { useUser } from '@/hooks/useUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
-import { useAudioRecorder } from '@/hooks/useAudioRecorder';
-import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
-import { MicrophoneIcon } from './icons/MicrophoneIcon';
-import { ChatIcon } from './icons/ChatIcon';
+import { AppHeader } from './AppHeader';
 
 // Dynamically import the map component to avoid SSR issues
 const RoomMap = dynamic(() => import('@/components/RoomMap'), {
@@ -50,19 +31,21 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
   const { room, isLoading, error: roomError } = useRoom(roomSlug);
   const { joinRoom } = useJoinRoom();
 
+  const { activities } = useActivity(room?.id ?? '', room?.slug ?? '');
+
   const { userNames, userLocations } = useActivity(
     room?.id ?? '',
     room?.slug ?? '',
     {
-      activity_type: 'location',
       limit: 200,
     }
   );
 
-  const { emojiMarkers } = useEmojiMarkers(
+  const { emojiMarkers, currentUserDistance } = useEmojiMarkers(
     room?.id ?? '',
     room?.slug ?? '',
-    userNames
+    userNames,
+    activities
   );
 
   const { paths: trackingPaths } = useTrackingPaths(
@@ -71,19 +54,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
   );
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [cheerPopoverOpened, setCheerPopoverOpened] = useState(false);
-
-  // Audio recording hook for cheer popover
-  const {
-    isRecording: isCheerRecording,
-    isSending: isCheerSending,
-    toggleRecording: toggleCheerRecording,
-  } = useAudioRecorder({
-    roomSlug,
-    onRecordingComplete: () => {
-      setCheerPopoverOpened(false);
-    },
-  });
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Redirect to sign-in if no user
   useEffect(() => {
@@ -194,190 +165,17 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
           background: '#f9fafb',
         }}
       >
-        {/* Header */}
-        <Box
-          component="header"
-          style={{
-            background: 'white',
-            borderBottom: '1px solid #e5e7eb',
-            flexShrink: 0,
-          }}
-        >
-          <Container size="fluid" px="lg" py="md" style={{ maxWidth: '100%' }}>
-            <Group justify="space-between" align="center">
-              {/* Left: Brand/Logo and Room Name */}
-              <Group gap="md">
-                <Anchor
-                  component={Link}
-                  href="/rooms"
-                  c="gray.7"
-                  fw={700}
-                  size="lg"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Cheerio <SpeakerphoneIcon fill="#228be6" />
-                </Anchor>
-                <Text c="gray.4" fw={300} size="lg">
-                  /
-                </Text>
-                <Title order={3} size="h4" c="gray.9">
-                  {room.name}
-                </Title>
-
-                <Popover
-                  width={500}
-                  position="bottom"
-                  withArrow
-                  shadow="xl"
-                  opened={cheerPopoverOpened}
-                  onChange={setCheerPopoverOpened}
-                >
-                  <Popover.Target>
-                    <Button
-                      variant="light"
-                      leftSection={<SpeakerphoneIcon />}
-                      radius="xl"
-                      size="md"
-                      pr={14}
-                      h={48}
-                      onClick={() => setCheerPopoverOpened(o => !o)}
-                    >
-                      Moedig je atleet aan!
-                    </Button>
-                  </Popover.Target>
-                  <Popover.Dropdown p="xl">
-                    <Stack gap="xl">
-                      <Box>
-                        <Title
-                          order={2}
-                          size="h2"
-                          fw={700}
-                          mb="md"
-                          style={{ lineHeight: 1.2 }}
-                        >
-                          Moedig je{' '}
-                          <Text
-                            component="span"
-                            fw={700}
-                            style={{
-                              backgroundColor: '#E7F5FF',
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                            }}
-                          >
-                            atleet
-                          </Text>{' '}
-                          aan! 💪
-                        </Title>
-                        <Text size="md" c="dimmed" style={{ lineHeight: 1.6 }}>
-                          Klik op opnemen en neem een boodschap op. Jouw sporter
-                          hoort het direct.
-                        </Text>
-                      </Box>
-
-                      <List
-                        spacing="md"
-                        size="sm"
-                        center
-                        icon={
-                          <ThemeIcon color="blue" size={20} radius="xl">
-                            <IconCheck size={12} />
-                          </ThemeIcon>
-                        }
-                      >
-                        <List.Item>
-                          <Text size="sm">
-                            <strong>Direct hoorbaar</strong> – je boodschap
-                            wordt meteen afgespeeld bij de atleet
-                          </Text>
-                        </List.Item>
-                        <List.Item>
-                          <Text size="sm">
-                            <strong>Eenvoudig opnemen</strong> – één klik en je
-                            bent klaar om te spreken
-                          </Text>
-                        </List.Item>
-                        <List.Item>
-                          <Text size="sm">
-                            <strong>Extra motivatie</strong> – geef die extra
-                            push op het juiste moment
-                          </Text>
-                        </List.Item>
-                      </List>
-
-                      <Group gap="md">
-                        <Button
-                          variant={isCheerRecording ? 'filled' : 'filled'}
-                          color={isCheerRecording ? 'red' : 'blue'}
-                          leftSection={<MicrophoneIcon />}
-                          radius="xl"
-                          size="md"
-                          pr={14}
-                          h={48}
-                          onClick={toggleCheerRecording}
-                          loading={isCheerSending}
-                          disabled={isCheerSending}
-                        >
-                          {isCheerRecording ? 'Stop Opname' : 'Start Opname'}
-                        </Button>
-                      </Group>
-                    </Stack>
-                  </Popover.Dropdown>
-                </Popover>
-              </Group>
-
-              {/* Right: Navigation Links */}
-              <Group gap="md" visibleFrom="sm">
-                <Button
-                  variant="light"
-                  leftSection={<ChatIcon size={20} />}
-                  radius="xl"
-                  size="s"
-                  pr={14}
-                  pl={4}
-                  h={30}
-                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                >
-                  Chat
-                </Button>
-                <Anchor
-                  component={Link}
-                  href="/rooms"
-                  c="gray.6"
-                  size="sm"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Events
-                </Anchor>
-                <Anchor
-                  component={Link}
-                  href="/dashboard"
-                  c="gray.6"
-                  size="sm"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Dashboard
-                </Anchor>
-                <Button
-                  component={Link}
-                  href="/profile"
-                  variant="default"
-                  size="sm"
-                >
-                  Profile
-                </Button>
-              </Group>
-
-              {/* Mobile burger menu */}
-              <Burger
-                opened={false}
-                hiddenFrom="sm"
-                size="sm"
-                aria-label="Toggle navigation"
-              />
-            </Group>
-          </Container>
-        </Box>
+        <AppHeader
+          pageTitle={room.name}
+          showCheerButton
+          showChatButton
+          roomSlug={room.slug}
+          roomId={room.id}
+          isChatCollapsed={isSidebarCollapsed}
+          onChatToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          selectedUserId={selectedUserId}
+          onUserSelect={setSelectedUserId}
+        />
 
         {/* Main Content */}
         <Box
@@ -407,6 +205,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                 userLocations={userLocations}
                 emojiMarkers={emojiMarkers}
                 trackingPaths={trackingPaths}
+                selectedUserId={selectedUserId}
               />
 
               <Box
@@ -426,9 +225,9 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                     {user && room && <ActivityTracker roomSlug={room.slug} />}
                   </Box>
                   <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
-                    {room && (
+                    {/* {room && (
                       <UserActivityFeed roomId={room.id} roomSlug={room.slug} />
-                    )}
+                    )} */}
                   </Box>
                 </Box>
               </Box>
@@ -470,6 +269,7 @@ export default function RoomPageClient({ roomSlug }: { roomSlug: string }) {
                     userLocations.find(loc => loc.userId === user.id)
                       ?.location || null
                   }
+                  currentUserDistance={currentUserDistance}
                   onToggleSidebar={() =>
                     setIsSidebarCollapsed(!isSidebarCollapsed)
                   }

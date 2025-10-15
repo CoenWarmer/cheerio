@@ -4,19 +4,18 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
+  Anchor,
   Box,
+  Center,
   Container,
-  Title,
-  Text,
-  Button,
-  Group,
-  Stack,
+  Loader,
   Paper,
   SimpleGrid,
-  Anchor,
-  Loader,
-  Center,
+  Stack,
+  Text,
+  Title,
 } from '@mantine/core';
+import { AppHeader } from '@/components/AppHeader';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -58,12 +57,6 @@ export default function DashboardPage() {
     };
   }, [router]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/sign-in');
-    router.refresh();
-  };
-
   if (loading) {
     return (
       <Center mih="100vh">
@@ -81,16 +74,7 @@ export default function DashboardPage() {
 
   return (
     <Box mih="100vh" bg="gray.0">
-      <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
-        <Container size="xl">
-          <Group justify="space-between" align="center">
-            <Title order={1}>Cheerio Dashboard</Title>
-            <Button color="red" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </Group>
-        </Container>
-      </Box>
+      <AppHeader pageTitle="Dashboard" />
 
       <Container size="xl" py="xl">
         <Stack gap="xl">

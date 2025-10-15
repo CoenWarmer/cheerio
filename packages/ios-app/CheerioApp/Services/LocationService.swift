@@ -66,7 +66,9 @@ class LocationService: NSObject, ObservableObject {
     }
     
     private func sendActivity(type: ActivityType, data: ActivityData) async {
-        guard let roomSlug = currentRoomSlug else { return }
+        guard let roomSlug = currentRoomSlug else {
+            return
+        }
         
         let url = URL(string: "\(Config.apiBaseURL)/api/rooms/\(roomSlug)/activity")!
         var request = URLRequest(url: url)
@@ -82,14 +84,18 @@ class LocationService: NSObject, ObservableObject {
         request.httpBody = try? JSONEncoder().encode(activity)
         
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            if let httpResponse = response as? HTTPURLResponse,
-               !(200...299).contains(httpResponse.statusCode) {
-                print("Failed to send activity: \(httpResponse.statusCode)")
+            if let httpResponse = response as? HTTPURLResponse {
+                if !(200...299).contains(httpResponse.statusCode) {
+                    print("Failed to send activity: \(httpResponse.statusCode)")
+                    if let responseString = String(data: data, encoding: .utf8) {
+                        print("Response: \(responseString)")
+                    }
+                }
             }
         } catch {
-            print("Error sending activity: \(error)")
+            print("Error sending activity: \(error.localizedDescription)")
         }
     }
 }
@@ -105,12 +111,6 @@ extension LocationService: CLLocationManagerDelegate {
             if let lastLocation = lastLocation {
                 let distance = location.distance(from: lastLocation) / 1000.0 // Convert to km
                 totalDistance += distance
-                
-                // Send distance update
-                await sendActivity(
-                    type: .distance,
-                    data: .distance(DistanceData(distance: totalDistance, unit: "km"))
-                )
             }
             
             lastLocation = location
@@ -120,19 +120,18 @@ extension LocationService: CLLocationManagerDelegate {
             let speedMPS = max(0, location.speed)
             currentSpeed = speedMPS * 3.6
             
-            // Send location update
+            // Send consolidated tracking activity (location + speed + distance)
+            // This replaces the previous 3 separate API calls, reducing network overhead
             await sendActivity(
-                type: .location,
-                data: .location(LocationData(
+                type: .tracking,
+                data: .tracking(TrackingData(
                     lat: location.coordinate.latitude,
-                    long: location.coordinate.longitude
+                    long: location.coordinate.longitude,
+                    accuracy: location.horizontalAccuracy,
+                    timestamp: location.timestamp.timeIntervalSince1970 * 1000, // Convert to milliseconds
+                    speed: currentSpeed > 1.0 ? currentSpeed : 0, // Only include speed above noise threshold
+                    distance: totalDistance
                 ))
-            )
-            
-            // Send speed update
-            await sendActivity(
-                type: .speed,
-                data: .speed(SpeedData(speed: currentSpeed, unit: "km/h"))
             )
         }
     }

@@ -40,12 +40,28 @@ class RoomService {
         // Add auth token
         if let session = try? await supabase.auth.session {
             request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
+            print("RoomService - Joining room '\(slug)' with user: \(session.user.id)")
+        } else {
+            print("RoomService - WARNING: No session found when joining room '\(slug)'")
         }
         
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("RoomService - Invalid response type")
+            throw URLError(.badServerResponse)
+        }
+        
+        print("RoomService - Join response status: \(httpResponse.statusCode)")
+        
+        if (200...299).contains(httpResponse.statusCode) {
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("RoomService - Join success response: \(responseString)")
+            }
+        } else {
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("RoomService - Join error response: \(responseString)")
+            }
             throw URLError(.badServerResponse)
         }
     }

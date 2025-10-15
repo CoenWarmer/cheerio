@@ -55,9 +55,12 @@ export function useTrackingPathsRealtimeQuery(
           filter: `room_id=eq.${roomId}`,
         },
         payload => {
-          // Only invalidate if it's a location activity
+          // Invalidate if it's a location or tracking activity
           const newActivity = payload.new as { activity_type: string };
-          if (newActivity.activity_type === 'location') {
+          if (
+            newActivity.activity_type === 'location' ||
+            newActivity.activity_type === 'tracking'
+          ) {
             queryClient.invalidateQueries({
               queryKey: trackingPathKeys.list(roomSlug),
             });

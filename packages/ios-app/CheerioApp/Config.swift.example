@@ -1,0 +1,43 @@
+//
+// Config.swift.example
+// CheerioApp
+//
+// Template configuration file
+// Run `yarn generate-config` to generate the actual Config.swift from .env.local
+//
+
+import Foundation
+
+struct Config {
+    // Supabase Configuration
+    // These values should be set in packages/web-app/.env.local
+    // Then run: yarn generate-config
+    static let supabaseURL = "YOUR_SUPABASE_URL"
+    static let supabaseAnonKey = "YOUR_SUPABASE_ANON_KEY"
+    
+    // Base URL for Next.js API routes
+    // Automatically detects simulator vs device
+    static let apiBaseURL: String = {
+        #if targetEnvironment(simulator)
+            return "http://localhost:3001"
+        #else
+            return "http://YOUR_IP:3001"  // Will be auto-detected
+        #endif
+    }()
+    
+    // Optional: Thunderforest API key for map tiles
+    static let thunderforestAPIKey: String? = nil
+    
+    // Helper property to check if running on simulator
+    static var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true
+        #else
+            return false
+        #endif
+    }
+    
+    // Build information
+    static let generatedAt = "Not generated"
+    static let localIP = "Not detected"
+}

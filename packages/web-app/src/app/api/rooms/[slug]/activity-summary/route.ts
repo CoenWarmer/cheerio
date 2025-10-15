@@ -25,6 +25,15 @@ interface MusicActivity {
   service?: 'spotify' | 'apple' | 'manual';
 }
 
+interface TrackingActivity {
+  lat: number;
+  long: number;
+  accuracy?: number;
+  timestamp?: number;
+  speed?: number;
+  distance?: number;
+}
+
 interface UserActivitySummary {
   userId: string;
   userName?: string;
@@ -147,7 +156,39 @@ export async function GET(
       const summary = summaries.get(userId)!;
 
       switch (activity.activity_type) {
+        case 'tracking': {
+          // New consolidated tracking activity (contains location, speed, and distance)
+          const trackingData = activity.data as unknown as TrackingActivity;
+          const timestamp = activity.created_at || new Date().toISOString();
+
+          if (!summary.lastLocation) {
+            summary.lastLocation = {
+              lat: trackingData.lat,
+              long: trackingData.long,
+              accuracy: trackingData.accuracy,
+              timestamp,
+            };
+          }
+
+          if (!summary.lastSpeed && trackingData.speed !== undefined) {
+            summary.lastSpeed = {
+              speed: trackingData.speed,
+              unit: 'kmh',
+              timestamp,
+            };
+          }
+
+          if (!summary.lastDistance && trackingData.distance !== undefined) {
+            summary.lastDistance = {
+              distance: trackingData.distance,
+              unit: 'km',
+              timestamp,
+            };
+          }
+          break;
+        }
         case 'location': {
+          // Legacy: Keep support for old location-only activities
           if (!summary.lastLocation) {
             const locationData = activity.data as unknown as LocationActivity;
             summary.lastLocation = {
@@ -160,6 +201,7 @@ export async function GET(
           break;
         }
         case 'speed': {
+          // Legacy: Keep support for old speed-only activities
           if (!summary.lastSpeed) {
             const speedData = activity.data as unknown as SpeedActivity;
             summary.lastSpeed = {
@@ -171,6 +213,7 @@ export async function GET(
           break;
         }
         case 'distance': {
+          // Legacy: Keep support for old distance-only activities
           if (!summary.lastDistance) {
             const distanceData = activity.data as unknown as DistanceActivity;
             summary.lastDistance = {

@@ -13,11 +13,7 @@ import {
 import { useProfile } from '@/hooks/useProfile';
 import { useCreateActivity } from '@/hooks/useActivity';
 import { canTrack } from '@/types/permissions';
-import type {
-  LocationActivity,
-  SpeedActivity,
-  DistanceActivity,
-} from '@/types/activity';
+import type { TrackingActivity } from '@/types/activity';
 
 interface ActivityTrackerProps {
   roomSlug: string;
@@ -70,23 +66,8 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
     try {
       const { latitude, longitude, accuracy } = position.coords;
 
-      // Send location activity
-      const locationData: LocationActivity = {
-        lat: latitude,
-        long: longitude,
-        accuracy: accuracy,
-        timestamp: position.timestamp,
-      };
-
-      createActivity({
-        roomSlug,
-        activity: {
-          activity_type: 'location',
-          data: locationData,
-        },
-      });
-
       // Calculate distance and speed if we have a previous position
+      let speed = 0;
       if (lastPositionRef.current) {
         const prevCoords = lastPositionRef.current.coords;
         const distance = calculateDistance(
@@ -103,41 +84,29 @@ export default function ActivityTracker({ roomSlug }: ActivityTrackerProps) {
 
           const timeDiff =
             (position.timestamp - lastPositionRef.current.timestamp) / 1000;
-          const speed = calculateSpeed(distance, timeDiff);
+          speed = calculateSpeed(distance, timeDiff);
           // Only update display if speed is above threshold (filters GPS noise)
           setCurrentSpeed(speed > 1 ? speed : 0);
-
-          // Send distance activity
-          const distanceData: DistanceActivity = {
-            distance: distanceRef.current,
-            unit: 'km',
-          };
-
-          createActivity({
-            roomSlug,
-            activity: {
-              activity_type: 'distance',
-              data: distanceData,
-            },
-          });
-
-          // Send speed activity (if speed is > 1 km/h to filter out noise)
-          if (speed > 1) {
-            const speedData: SpeedActivity = {
-              speed: speed,
-              unit: 'kmh',
-            };
-
-            createActivity({
-              roomSlug,
-              activity: {
-                activity_type: 'speed',
-                data: speedData,
-              },
-            });
-          }
         }
       }
+
+      // Send consolidated tracking activity (location + speed + distance)
+      const trackingData: TrackingActivity = {
+        lat: latitude,
+        long: longitude,
+        accuracy: accuracy,
+        timestamp: position.timestamp,
+        speed: speed > 1 ? speed : 0, // Only include speed if above noise threshold
+        distance: distanceRef.current,
+      };
+
+      createActivity({
+        roomSlug,
+        activity: {
+          activity_type: 'tracking',
+          data: trackingData,
+        },
+      });
 
       lastPositionRef.current = position;
       setStatus('Tracking...');

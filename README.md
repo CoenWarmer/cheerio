@@ -5,11 +5,13 @@ A yarn workspaces monorepo containing multiple applications.
 ## 📦 Packages
 
 ### `@cheerio/web-app`
+
 Next.js web application with TypeScript, ESLint, and Tailwind CSS.
 
 **Location:** `packages/web-app/`
 
 **Tech Stack:**
+
 - Next.js 15 with App Router
 - React 19
 - TypeScript
@@ -17,11 +19,13 @@ Next.js web application with TypeScript, ESLint, and Tailwind CSS.
 - Turbopack
 
 ### `@cheerio/ios-app`
+
 Native iOS application built with Swift and SwiftUI.
 
 **Location:** `packages/ios-app/`
 
 **Tech Stack:**
+
 - Swift 5.0
 - SwiftUI
 - iOS 17.0+
@@ -38,7 +42,28 @@ Native iOS application built with Swift and SwiftUI.
 ```bash
 # Install all dependencies
 yarn install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
 ```
+
+## 🔐 Configuration
+
+The monorepo uses a shared `.env.local` file at the root for configuration:
+
+```bash
+# .env.local (create from .env.local.example)
+NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+This configuration is shared across:
+
+- ✅ Web app (Next.js reads it automatically)
+- ✅ iOS app (via `yarn generate-config` script)
+
+See `packages/ios-app/CONFIG-SETUP.md` for iOS configuration details.
 
 ## 📱 Development
 
@@ -99,4 +124,3 @@ This monorepo uses Yarn Workspaces for managing dependencies across packages. Th
 ## 📄 License
 
 See [LICENSE](LICENSE) file for details.
-

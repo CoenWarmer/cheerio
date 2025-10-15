@@ -6,17 +6,16 @@ import {
   Container,
   Title,
   Text,
-  SimpleGrid,
-  Card,
-  Badge,
-  Group,
   Stack,
   Alert,
-  Anchor,
   Center,
   Progress,
   Paper,
+  Badge,
+  Group,
+  Card,
 } from '@mantine/core';
+import { AppHeader } from '@/components/AppHeader';
 import { useRooms } from '@/hooks/useRooms';
 
 export default function RoomsListPage() {
@@ -64,16 +63,7 @@ export default function RoomsListPage() {
   if (loading) {
     return (
       <Box mih="100vh" bg="gray.0">
-        <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
-          <Container size="xl">
-            <Group justify="space-between" align="center">
-              <Title order={1}>Rooms</Title>
-              <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
-                ← Dashboard
-              </Anchor>
-            </Group>
-          </Container>
-        </Box>
+        <AppHeader pageTitle="Events" />
         <Container size="xl" py="xl">
           <Center>
             <Text c="gray.6">Loading rooms...</Text>
@@ -85,17 +75,7 @@ export default function RoomsListPage() {
 
   return (
     <Box mih="100vh" bg="gray.0">
-      <Box bg="white" style={{ borderBottom: '1px solid #e5e7eb' }} py="md">
-        <Container size="xl">
-          <Group justify="space-between" align="center">
-            <Title order={1}>Rooms</Title>
-            <Anchor component={Link} href="/dashboard" c="gray.6" size="sm">
-              ← Dashboard
-            </Anchor>
-          </Group>
-        </Container>
-      </Box>
-
+      <AppHeader pageTitle="Events" />
       <Container size="xl" py="xl">
         {error && (
           <Alert color="red" variant="light" mb="xl">
