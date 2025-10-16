@@ -135,6 +135,7 @@ __metadata:
     "@tabler/icons-react": "npm:^3.35.0"
     "@tanstack/react-query": "npm:^5.90.3"
     "@tanstack/react-query-devtools": "npm:^5.90.2"
+    "@types/canvas-confetti": "npm:^1.9.0"
     "@types/leaflet": "npm:^1.9.21"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19"
@@ -1110,6 +1111,13 @@ __metadata:
   dependencies:
     tslib: "npm:^2.4.0"
   checksum: b255094f293794c6d2289300c5fbcafbb5532a3aed3a5ffd2f8dc1828e639b88d75f6a376dd8f94347a44813fd7a7149d8463477a9a49525c8b2dcaa38c2d1e8
+  languageName: node
+  linkType: hard
+
+"@types/canvas-confetti@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "@types/canvas-confetti@npm:1.9.0"
+  checksum: ffe2c674d466b8e13472c81ab2a97056f3433fd40a3513dbc1bb76764e4e7c3ff0a2a58d37b16ea6a245c831077c553db321b069dda6572eab59f2be61137b2e
   languageName: node
   linkType: hard
 

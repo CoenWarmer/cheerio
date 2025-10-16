@@ -4,30 +4,38 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Box, Center, Stack, Title, Text, Anchor } from '@mantine/core';
+import { useTranslations } from 'next-intl';
 import ChatSidebar from '@/components/ChatSidebar';
 import ActivityTracker from '@/components/ActivityTracker';
 import dynamic from 'next/dynamic';
 import { useEvent, useJoinEvent } from '@/hooks/useEvents';
 import { useActivity } from '@/hooks/useActivity';
 import { useEmojiMarkers } from '@/hooks/useEmojiMarkers';
-import { useUser } from '@/hooks/useUser';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { useHeader } from '@/providers/HeaderProvider';
 
+// Loading component for the map
+function MapLoading() {
+  const t = useTranslations('eventPage');
+  return (
+    <Center w="100%" h="100%" bg="gray.1">
+      <Text c="gray.6">{t('loadingMap')}</Text>
+    </Center>
+  );
+}
+
 // Dynamically import the map component to avoid SSR issues
 const EventMap = dynamic(() => import('@/components/EventMap'), {
   ssr: false,
-  loading: () => (
-    <Center w="100%" h="100%" bg="gray.1">
-      <Text c="gray.6">Loading map...</Text>
-    </Center>
-  ),
+  loading: () => <MapLoading />,
 });
 
 export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const router = useRouter();
-  const { user, isLoading: userLoading } = useUser();
+  const t = useTranslations('eventPage');
+  const { currentUser, isLoading: userLoading } = useCurrentUser();
   const { headerHeight } = useHeader();
 
   const { event, isLoading, error: eventError } = useEvent(eventSlug);
@@ -67,22 +75,22 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   });
 
   // Redirect to sign-in if no user
-  useEffect(() => {
-    if (!userLoading && !user) {
-      router.push('/sign-in');
-    }
-  }, [user, userLoading, router]);
+  // useEffect(() => {
+  //   if (!userLoading && !currentUser) {
+  //     router.push('/sign-in');
+  //   }
+  // }, [currentUser, userLoading, router]);
 
   // Automatically join the event when visiting
   useEffect(() => {
-    if (user && eventSlug) {
+    if (currentUser?.id && eventSlug) {
       try {
-        joinEvent(eventSlug);
+        joinEvent({ eventId: eventSlug, userId: currentUser.id });
       } catch (joinErr) {
         console.warn('Failed to join event automatically:', joinErr);
       }
     }
-  }, [eventSlug, user, joinEvent]);
+  }, [eventSlug, currentUser?.id, joinEvent]);
 
   return (
     <>
@@ -120,16 +128,15 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
               <Center h="100vh" bg="gray.0">
                 <Stack align="center" gap="md">
                   <Text fz={32}>⏳</Text>
-                  <Text c="gray.6">Loading event...</Text>
+                  <Text c="gray.6">{t('loadingEvent')}</Text>
                 </Stack>
               </Center>
             ) : eventError || !event ? (
               <Center h="100vh" bg="gray.0">
                 <Stack align="center" gap="xl">
-                  <Title order={1}>Event not found</Title>
+                  <Title order={1}>{t('notFound')}</Title>
                   <Text c="gray.6" ta="center" maw={500}>
-                    {eventError?.message ||
-                      'The event you are looking for does not exist'}
+                    {eventError?.message || t('notFoundMessage')}
                   </Text>
                   <Anchor
                     component={Link}
@@ -144,7 +151,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                       fontWeight: 500,
                     }}
                   >
-                    ← Back to Events
+                    {t('backToEvents')}
                   </Anchor>
                 </Stack>
               </Center>
@@ -157,6 +164,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                   emojiMarkers={emojiMarkers}
                   trackingPaths={trackingPaths}
                   selectedUserId={selectedUserId}
+                  eventSlug={event.slug}
                 />
                 <Box>
                   <Box
@@ -174,7 +182,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                       style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}
                     >
                       <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
-                        {user && event && (
+                        {currentUser && event && (
                           <ActivityTracker eventSlug={event.slug} />
                         )}
                       </Box>
@@ -211,14 +219,15 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                       overflow: 'hidden',
                     }}
                   >
-                    {user && event && (
+                    {currentUser && event && (
                       <ChatSidebar
                         eventId={event.id}
                         eventSlug={event.slug}
-                        currentUser={user}
+                        currentUser={currentUser}
                         currentUserLocation={
-                          userLocations.find(loc => loc.userId === user.id)
-                            ?.location || null
+                          userLocations.find(
+                            loc => loc.userId === currentUser.id
+                          )?.location || null
                         }
                         currentUserDistance={currentUserDistance}
                         onToggleSidebar={() => {

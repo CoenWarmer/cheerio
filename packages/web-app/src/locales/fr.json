@@ -65,7 +65,34 @@
       "goToSignIn": "Aller à la Connexion",
       "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
       "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
-      "unexpectedError": "Une erreur inattendue s'est produite"
+      "unexpectedError": "Une erreur inattendue s'est produite",
+      "setupProfile": "Configurez votre profil",
+      "setupSubtitle": "Personnalisons votre compte",
+      "displayName": "Nom d'affichage",
+      "displayNamePlaceholder": "Comment devons-nous vous appeler ?",
+      "displayNameRequired": "Le nom d'affichage est requis",
+      "avatar": "Photo de profil",
+      "avatarOptional": "Facultatif - Vous pouvez l'ajouter plus tard",
+      "uploadAvatar": "Télécharger l'avatar",
+      "continue": "Continuer",
+      "skip": "Passer pour l'instant"
+    },
+    "anonymous": {
+      "title": "Bienvenue sur Cheerioo",
+      "subtitle": "Choisissez comment commencer",
+      "continueAnonymously": "Continuer Anonymement",
+      "anonymousDescription": "Rejoignez sans créer de compte. Vous pourrez toujours vous inscrire plus tard.",
+      "createAccount": "Créer un Compte",
+      "accountDescription": "Inscrivez-vous pour sauvegarder votre profil et accéder à toutes les fonctionnalités.",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "setupTitle": "Une Dernière Chose...",
+      "setupSubtitle": "Comment devons-nous vous appeler ?",
+      "displayName": "Nom d'affichage",
+      "displayNamePlaceholder": "Votre pseudo",
+      "displayNameRequired": "Veuillez entrer un nom d'affichage",
+      "getStarted": "Commencer",
+      "creating": "Création du profil..."
     }
   },
   "home": {
@@ -112,7 +139,12 @@
     "online": "en ligne",
     "offline": "hors ligne",
     "messagesCount": "{count, plural, =0 {Aucun message} =1 {1 message} other {# messages}}",
-    "activeUsers": "{count} actifs"
+    "activeUsers": "{count} actifs",
+    "loadingMap": "Chargement de la carte...",
+    "loadingEvent": "Chargement de l'événement...",
+    "notFound": "Événement introuvable",
+    "notFoundMessage": "L'événement que vous recherchez n'existe pas",
+    "backToEvents": "← Retour aux événements"
   },
   "newEvent": {
     "title": "Créer un nouvel événement",
@@ -200,5 +232,9 @@
     "minutes": "min",
     "seconds": "sec",
     "startTime": "Heure de début"
+  },
+  "onYourMarks": {
+    "title": "À Vos Marques",
+    "subtitle": "Préparez-vous à commencer votre voyage"
   }
 }

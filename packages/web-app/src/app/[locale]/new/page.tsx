@@ -20,11 +20,11 @@ import {
 } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useCreateEvent } from '@/hooks/useEvents';
-import { ApiError } from '@/lib/api-client';
+import { ApiError } from '@/lib/api/api-client';
 import { getCurrentLocation, isValidCoordinates } from '@/utils/location';
 
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
-import { useUser } from '@/hooks/useUser';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfile } from '@/hooks/useProfile';
 
 type EventStatus = 'awaiting' | 'in_progress' | 'finished';
@@ -33,7 +33,7 @@ export default function NewEventPage() {
   const router = useRouter();
   const t = useTranslations('newEvent');
   const tNav = useTranslations('navigation');
-  const { user } = useUser();
+  const { currentUser, isAuthenticated } = useCurrentUser();
   const { createEventAsync, isCreating } = useCreateEvent();
   const { permissions } = useProfile();
 
@@ -100,7 +100,14 @@ export default function NewEventPage() {
     }
 
     try {
-      if (!user) {
+      if (!currentUser?.id) {
+        setError(t('mustBeLoggedIn'));
+        return;
+      }
+
+      // Note: Only authenticated users can create events (enforced by RLS)
+      // Anonymous users will be blocked at the database level
+      if (!isAuthenticated) {
         setError(t('mustBeLoggedIn'));
         return;
       }
@@ -113,7 +120,7 @@ export default function NewEventPage() {
         start_time: startTime ? new Date(startTime).toISOString() : null,
         status: status,
         is_private: isPrivate,
-        created_by: user.id,
+        created_by: currentUser.id,
         location: locationJson,
         locationLabel: locationLabel,
       };

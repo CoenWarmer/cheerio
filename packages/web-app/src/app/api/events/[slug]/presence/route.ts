@@ -4,6 +4,7 @@ import { createServerClient } from '@/lib/supabase-server';
 /**
  * POST /api/events/[slug]/presence
  * Updates user's presence in a event
+ * Supports both authenticated users (via auth session) and anonymous users (via user_id in body)
  */
 export async function POST(
   request: NextRequest,
@@ -12,20 +13,23 @@ export async function POST(
   try {
     const supabase = await createServerClient();
 
-    // Get the current user
+    // Try to get authenticated user
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      console.error('Presence API - Auth failed:', {
-        userError,
-        hasUser: !!user,
-        authHeader:
-          request.headers.get('authorization')?.substring(0, 20) + '...',
-      });
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Parse request body
+    const body = await request.json();
+    const { status = 'online', metadata = {}, user_id } = body;
+
+    // Use user_id from body (for anonymous) or from auth session
+    const userId = user_id || user?.id;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'No user ID provided' },
+        { status: 400 }
+      );
     }
 
     const { slug } = await params;
@@ -41,15 +45,12 @@ export async function POST(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    const body = await request.json();
-    const { status = 'online', metadata = {} } = body;
-
     // Upsert presence record (insert or update)
     const { data, error } = await supabase
       .from('presence')
       .upsert(
         {
-          user_id: user.id,
+          user_id: userId,
           event_id: event.id,
           status,
           metadata,
@@ -90,6 +91,9 @@ export async function GET(
 
     const { slug } = await params;
 
+    // Note: Anonymous users can view presence (public access via RLS)
+    // Auth check removed to support anonymous users
+
     // Get event by slug to get the event ID
     const { data: event, error: eventError } = await supabase
       .from('events')
@@ -129,6 +133,7 @@ export async function GET(
 /**
  * DELETE /api/events/[slug]/presence
  * Removes user's presence from a event
+ * Supports both authenticated users (via auth session) and anonymous users (via user_id in body)
  */
 export async function DELETE(
   request: NextRequest,
@@ -137,14 +142,23 @@ export async function DELETE(
   try {
     const supabase = await createServerClient();
 
-    // Get the current user
+    // Try to get authenticated user
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Parse request body
+    const body = await request.json().catch(() => ({}));
+    const { user_id } = body;
+
+    // Use user_id from body (for anonymous) or from auth session
+    const userId = user_id || user?.id;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'No user ID provided' },
+        { status: 400 }
+      );
     }
 
     const { slug } = await params;
@@ -164,7 +178,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('presence')
       .delete()
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('event_id', event.id);
 
     if (error) {

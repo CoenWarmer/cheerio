@@ -7,42 +7,7 @@ import type {
   CreateActivityInput,
   ActivityFilters,
 } from '@/types/activity';
-
-class ActivityApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public data?: unknown
-  ) {
-    super(message);
-    this.name = 'ActivityApiError';
-  }
-}
-
-async function fetchApi<T>(
-  endpoint: string,
-  options?: RequestInit
-): Promise<T> {
-  const response = await fetch(endpoint, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new ActivityApiError(
-      data.error || 'An error occurred',
-      response.status,
-      data
-    );
-  }
-
-  return data;
-}
+import { fetchApi } from './api-client';
 
 export const activityApi = {
   /**
@@ -80,10 +45,13 @@ export const activityApi = {
     eventSlug: string,
     activity: CreateActivityInput
   ): Promise<{ data: UserActivity }> {
-    return fetchApi<{ data: UserActivity }>(`/api/events/${eventSlug}/activity`, {
-      method: 'POST',
-      body: JSON.stringify(activity),
-    });
+    return fetchApi<{ data: UserActivity }>(
+      `/api/events/${eventSlug}/activity`,
+      {
+        method: 'POST',
+        body: JSON.stringify(activity),
+      }
+    );
   },
 
   /**

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { activityApi } from '@/lib/activity-client';
+import { activityApi } from '@/lib/api/activity-api';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { ActivityFilters, CreateActivityInput } from '@/types/activity';

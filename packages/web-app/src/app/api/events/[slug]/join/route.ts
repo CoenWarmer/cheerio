@@ -3,7 +3,7 @@ import { createServerClient } from '@/lib/supabase-server';
 
 /**
  * POST /api/events/[slug]/join
- * Adds the current user as a member of the specified event
+ * Adds a user (authenticated or anonymous) as a member of the specified event
  */
 export async function POST(
   request: NextRequest,
@@ -11,18 +11,23 @@ export async function POST(
 ) {
   try {
     const supabase = await createServerClient();
+    const { slug } = await params;
 
-    // Get the current user
+    // Try to get authenticated user
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Get user_id from request body (for anonymous users) or auth session
+    const body = await request.json().catch(() => ({}));
+    const userId = body.user_id || user?.id;
 
-    const { slug } = await params;
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID required (authenticated or anonymous)' },
+        { status: 400 }
+      );
+    }
 
     // Get event by slug to get the event ID
     const { data: event, error: eventError } = await supabase
@@ -42,13 +47,13 @@ export async function POST(
       .from('event_members')
       .select('id')
       .eq('event_id', eventId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     // If already a member, return success
     if (existingMember) {
       console.log(
-        `Join API - User ${user.id} is already a member of event ${eventId}`
+        `Join API - User ${userId} is already a member of event ${eventId}`
       );
       return NextResponse.json({
         success: true,
@@ -58,13 +63,13 @@ export async function POST(
 
     // Add user as a member
     console.log(
-      `Join API - Adding user ${user.id} to event ${eventId} (slug: ${slug})`
+      `Join API - Adding user ${userId} to event ${eventId} (slug: ${slug})`
     );
     const { data, error } = await supabase
       .from('event_members')
       .insert({
         event_id: eventId,
-        user_id: user.id,
+        user_id: userId,
         role: 'member', // Default role
       })
       .select()
@@ -75,10 +80,7 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    console.log(
-      `Join API - Successfully added user ${user.id} to event:`,
-      data
-    );
+    console.log(`Join API - Successfully added user ${userId} to event:`, data);
 
     return NextResponse.json({
       success: true,

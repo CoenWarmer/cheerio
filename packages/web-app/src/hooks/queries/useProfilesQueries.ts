@@ -1,14 +1,16 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { profilesApi } from '@/lib/api-client';
+import { profilesApi } from '@/lib/api/profiles-api';
+import { useCurrentUser } from '../useCurrentUser';
 
 export const profileKeys = {
   all: ['profiles'] as const,
   lists: () => [...profileKeys.all, 'list'] as const,
   list: (ids: string[]) =>
     [...profileKeys.lists(), ids.sort().join(',')] as const,
-  current: () => [...profileKeys.all, 'current'] as const,
+  current: (userId?: string) =>
+    [...profileKeys.all, 'current', userId] as const,
 };
 
 export function useProfilesQuery(userIds: string[]) {
@@ -20,9 +22,13 @@ export function useProfilesQuery(userIds: string[]) {
 }
 
 export function useCurrentProfileQuery() {
+  const { currentUser } = useCurrentUser();
+  const userId = currentUser?.id;
+
   return useQuery({
-    queryKey: profileKeys.current(),
-    queryFn: () => profilesApi.getCurrent(),
+    queryKey: profileKeys.current(userId),
+    queryFn: () => profilesApi.getCurrent(userId),
+    enabled: !!userId,
   });
 }
 

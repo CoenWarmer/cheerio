@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      anonymous_profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       event_members: {
         Row: {
           event_id: string

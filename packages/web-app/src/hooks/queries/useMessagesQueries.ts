@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { messagesApi } from '@/lib/api-client';
+import { messagesApi } from '@/lib/api/messages-api';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -71,6 +71,7 @@ export function useSendMessageMutation() {
           size: number;
         };
         location?: { lat: number; long: number };
+        user_id?: string;
       };
     }) => messagesApi.create(eventId, messageData),
     onSuccess: (_, { eventId }) => {

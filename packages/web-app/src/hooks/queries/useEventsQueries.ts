@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { eventsApi } from '@/lib/api-client';
+import { eventsApi } from '@/lib/api/events-api';
 
 export const eventKeys = {
   all: ['events'] as const,
@@ -40,8 +40,9 @@ export function useCreateEventMutation() {
 export function useJoinEventMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (eventId: string) => eventsApi.join(eventId),
-    onSuccess: (_, eventId) => {
+    mutationFn: ({ eventId, userId }: { eventId: string; userId?: string }) =>
+      eventsApi.join(eventId, userId),
+    onSuccess: (_, { eventId }) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
     },
   });

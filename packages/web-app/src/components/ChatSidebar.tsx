@@ -14,8 +14,8 @@ import {
   Paper,
 } from '@mantine/core';
 import { useTranslations, useLocale } from 'next-intl';
-import { ApiError } from '@/lib/api-client';
-import type { User } from '@supabase/supabase-js';
+import { ApiError } from '@/lib/api/api-client';
+import type { CurrentUser } from '@/hooks/useCurrentUser';
 import { useMessages, useSendMessage } from '@/hooks/useMessages';
 import {
   usePresence,
@@ -26,11 +26,12 @@ import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { ChatIcon } from './icons/ChatIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
 import { isEmoji } from '@/utils/emoji';
+import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
 
 interface ChatSidebarProps {
   eventId: string; // Event UUID for realtime subscriptions
   eventSlug: string; // Event slug for API calls
-  currentUser: User;
+  currentUser: CurrentUser;
   currentUserLocation?: { lat: number; long: number } | null;
   currentUserDistance?: number;
   onToggleSidebar: () => void;
@@ -144,12 +145,22 @@ export default function ChatSidebar({
 
   // Presence management
   useEffect(() => {
+    if (!currentUser?.id) return;
+
     // Initial presence update
-    updatePresence({ eventId: eventSlug, status: 'online' });
+    updatePresence({
+      eventId: eventSlug,
+      status: 'online',
+      userId: currentUser.id,
+    });
 
     // Update presence every 20 seconds
     presenceIntervalRef.current = setInterval(() => {
-      updatePresence({ eventId: eventSlug, status: 'online' });
+      updatePresence({
+        eventId: eventSlug,
+        status: 'online',
+        userId: currentUser.id,
+      });
     }, 20000);
 
     // Cleanup on unmount
@@ -158,9 +169,9 @@ export default function ChatSidebar({
         clearInterval(presenceIntervalRef.current);
       }
       // Remove presence when leaving
-      removePresence(eventSlug);
+      removePresence({ eventId: eventSlug, userId: currentUser.id });
     };
-  }, [eventSlug, updatePresence, removePresence]);
+  }, [eventSlug, currentUser?.id, updatePresence, removePresence]);
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -174,8 +185,10 @@ export default function ChatSidebar({
       const messageData: {
         content: string;
         location?: { lat: number; long: number; distance?: number };
+        user_id?: string;
       } = {
         content,
+        user_id: currentUser.id,
       };
 
       // If this is an emoji and the user has a location, include it with distance
@@ -261,7 +274,8 @@ export default function ChatSidebar({
           ) : messagesData.length === 0 ? (
             <Center h="100%">
               <Stack align="center" gap="xs">
-                <Text fz={32}>💬</Text>
+                <SpeakerphoneIcon size={128} fill="rgba(0,0,0,0.2)" />
+
                 <Text size="sm" c="gray.6" ta="center">
                   {t('noMessages')}
                 </Text>

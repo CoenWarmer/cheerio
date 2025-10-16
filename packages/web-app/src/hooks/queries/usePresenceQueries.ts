@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { presenceApi } from '@/lib/api-client';
+import { presenceApi } from '@/lib/api/presence-api';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -60,10 +60,12 @@ export function useUpdatePresenceMutation() {
     mutationFn: ({
       eventId,
       status,
+      userId,
     }: {
       eventId: string;
       status?: 'online' | 'away';
-    }) => presenceApi.update(eventId, status),
+      userId?: string;
+    }) => presenceApi.update(eventId, status, userId),
     onSuccess: (_, { eventId }) => {
       queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
     },
@@ -73,8 +75,9 @@ export function useUpdatePresenceMutation() {
 export function useRemovePresenceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (eventId: string) => presenceApi.remove(eventId),
-    onSuccess: (_, eventId) => {
+    mutationFn: ({ eventId, userId }: { eventId: string; userId?: string }) =>
+      presenceApi.remove(eventId, userId),
+    onSuccess: (_, { eventId }) => {
       queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
     },
   });

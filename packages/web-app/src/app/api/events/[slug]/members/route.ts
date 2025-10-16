@@ -13,16 +13,8 @@ export async function GET(
     const supabase = await createServerClient();
     const { slug } = await params;
 
-    // Get current user for auth check
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      console.error('Members API - Auth error:', userError);
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Note: Anonymous users can view members (public access via RLS)
+    // Auth check removed to support anonymous users
 
     // Get event by slug
     const { data: event, error: eventError } = await supabase

@@ -1,12 +1,16 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { eventMembersApi, type EventMemberWithProfile } from '@/lib/api-client';
+import {
+  eventMembersApi,
+  type EventMemberWithProfile,
+} from '@/lib/api/event-members-api';
 
 export const eventMembersKeys = {
   all: ['room-members'] as const,
   lists: () => [...eventMembersKeys.all, 'list'] as const,
-  list: (eventSlug: string) => [...eventMembersKeys.lists(), eventSlug] as const,
+  list: (eventSlug: string) =>
+    [...eventMembersKeys.lists(), eventSlug] as const,
 };
 
 export function useEventMembersQuery(eventSlug: string) {
@@ -21,4 +25,3 @@ export function useEventMembersQuery(eventSlug: string) {
 }
 
 export type { EventMemberWithProfile };
-

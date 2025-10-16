@@ -48,24 +48,51 @@
       "unexpectedError": "Ocurrió un error inesperado"
     },
     "register": {
-      "title": "Crear Cuenta",
+      "title": "Crear cuenta",
       "subtitle": "Regístrate para comenzar con Cheerioo.",
       "email": "Correo electrónico",
       "emailPlaceholder": "tu@ejemplo.com",
       "password": "Contraseña",
       "passwordPlaceholder": "••••••••",
-      "confirmPassword": "Confirmar Contraseña",
+      "confirmPassword": "Confirmar contraseña",
       "confirmPasswordPlaceholder": "••••••••",
-      "button": "Crear Cuenta",
+      "button": "Crear cuenta",
       "creating": "Creando cuenta...",
       "hasAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
-      "success": "¡Registro Exitoso!",
-      "successMessage": "Revisa tu correo electrónico para un enlace de confirmación, o si la confirmación por correo está deshabilitada, serás redirigido a eventos en breve.",
-      "goToSignIn": "Ir a Iniciar Sesión",
+      "success": "¡Registro exitoso!",
+      "successMessage": "Revisa tu correo electrónico para obtener un enlace de confirmación, o si la confirmación de correo electrónico está deshabilitada, serás redirigido a eventos en breve.",
+      "goToSignIn": "Ir a iniciar sesión",
       "passwordsDoNotMatch": "Las contraseñas no coinciden",
       "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
-      "unexpectedError": "Ocurrió un error inesperado"
+      "unexpectedError": "Ocurrió un error inesperado",
+      "setupProfile": "Configura tu perfil",
+      "setupSubtitle": "Personalicemos tu cuenta",
+      "displayName": "Nombre para mostrar",
+      "displayNamePlaceholder": "¿Cómo deberíamos llamarte?",
+      "displayNameRequired": "El nombre para mostrar es obligatorio",
+      "avatar": "Foto de perfil",
+      "avatarOptional": "Opcional - Puedes agregarlo más tarde",
+      "uploadAvatar": "Subir avatar",
+      "continue": "Continuar",
+      "skip": "Omitir por ahora"
+    },
+    "anonymous": {
+      "title": "Bienvenido a Cheerioo",
+      "subtitle": "Elige cómo quieres comenzar",
+      "continueAnonymously": "Continuar Anónimamente",
+      "anonymousDescription": "Únete sin crear una cuenta. Siempre puedes registrarte más tarde.",
+      "createAccount": "Crear una Cuenta",
+      "accountDescription": "Regístrate para guardar tu perfil y acceder a todas las funciones.",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Iniciar sesión",
+      "setupTitle": "Solo Una Cosa Más...",
+      "setupSubtitle": "¿Cómo deberíamos llamarte?",
+      "displayName": "Nombre para mostrar",
+      "displayNamePlaceholder": "Tu apodo",
+      "displayNameRequired": "Por favor ingresa un nombre para mostrar",
+      "getStarted": "Comenzar",
+      "creating": "Creando perfil..."
     }
   },
   "home": {
@@ -112,7 +139,12 @@
     "online": "en línea",
     "offline": "desconectado",
     "messagesCount": "{count, plural, =0 {Sin mensajes} =1 {1 mensaje} other {# mensajes}}",
-    "activeUsers": "{count} activos"
+    "activeUsers": "{count} activos",
+    "loadingMap": "Cargando mapa...",
+    "loadingEvent": "Cargando evento...",
+    "notFound": "Evento no encontrado",
+    "notFoundMessage": "El evento que buscas no existe",
+    "backToEvents": "← Volver a Eventos"
   },
   "newEvent": {
     "title": "Crear nuevo evento",
@@ -200,5 +232,9 @@
     "minutes": "min",
     "seconds": "seg",
     "startTime": "Hora de inicio"
+  },
+  "onYourMarks": {
+    "title": "En Sus Marcas",
+    "subtitle": "Prepárate para comenzar tu viaje"
   }
 }

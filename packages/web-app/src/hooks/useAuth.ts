@@ -43,7 +43,7 @@ export function useAuth() {
     loading: isLoading,
     signOut: async () => {
       await supabase.auth.signOut();
-      router.push('/sign-in');
+      router.push('/');
     },
   };
 }

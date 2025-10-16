@@ -9,17 +9,23 @@ import {
   Tooltip,
   Polyline,
   useMap,
+  useMapEvents,
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Event } from '@/types/types';
 import type { LocationActivity } from '@/types/activity';
 import type { TrackingPath } from '@/hooks/useTrackingPaths';
+import { Button } from '@mantine/core';
+import { ConfettiIcon } from './icons/ConfettiIcon';
+import { useSendMessage } from '@/hooks/useMessages';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import confetti from 'canvas-confetti';
 
 const flagIcon = L.divIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" width="60px" height="60px" viewBox="0 -960 960 960" fill="#228be6"><path d="M320-240h60v-200h100l40 80h200v-240H600l-40-80H320v440Zm237-180-40-80H380v-120h143l40 80h97v120H557ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>`,
+  html: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#228be6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-flag"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9z" /><path d="M5 21v-7" /></svg>`,
   className: 'custom-flag-marker',
-  iconSize: [60, 45],
+  iconSize: [60, 60],
   iconAnchor: [15, 45],
   popupAnchor: [0, -45],
 });
@@ -157,6 +163,7 @@ interface EventMapProps {
   emojiMarkers?: EmojiMarker[];
   trackingPaths?: TrackingPath[];
   selectedUserId?: string | null;
+  eventSlug?: string;
 }
 
 function MapResizer() {
@@ -219,6 +226,50 @@ function MapBoundsUpdater({
   return null;
 }
 
+function MapClickHandler({
+  confettiMode,
+  eventSlug,
+  onMessageSent,
+}: {
+  confettiMode: boolean;
+  eventSlug: string;
+  onMessageSent: (lat: number, lng: number) => void;
+}) {
+  const map = useMap();
+
+  useMapEvents({
+    click: e => {
+      if (confettiMode && eventSlug) {
+        const { lat, lng } = e.latlng;
+        
+        // Get the container point (pixel coordinates) from the lat/lng
+        const point = map.latLngToContainerPoint(e.latlng);
+        
+        // Get the map container's bounding rect to calculate position relative to viewport
+        const mapContainer = map.getContainer();
+        const rect = mapContainer.getBoundingClientRect();
+        
+        // Calculate normalized coordinates (0 to 1) for confetti
+        const x = (rect.left + point.x) / window.innerWidth;
+        const y = (rect.top + point.y) / window.innerHeight;
+        
+        // Trigger confetti explosion at the click location
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { x, y },
+          colors: ['#228be6', '#ff6b6b', '#51cf66', '#ffd43b', '#ff8787'],
+          ticks: 200,
+        });
+        
+        onMessageSent(lat, lng);
+      }
+    },
+  });
+
+  return null;
+}
+
 export default function EventMap({
   eventName,
   location,
@@ -226,16 +277,33 @@ export default function EventMap({
   emojiMarkers = [],
   trackingPaths = [],
   selectedUserId = null,
+  eventSlug,
 }: EventMapProps) {
   const [mounted, setMounted] = useState(false);
   const [userColorMap, setUserColorMap] = useState<Map<string, string>>(
     new Map()
   );
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [confettiMode, setConfettiMode] = useState(false);
+
+  const { sendMessage } = useSendMessage();
+  const { currentUser } = useCurrentUser();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleMapClick = (lat: number, lng: number) => {
+    if (!eventSlug || !currentUser?.id) return;
+
+    const messageData = {
+      content: `🎉`,
+      location: { lat, long: lng },
+      user_id: currentUser.id,
+    };
+
+    sendMessage({ eventId: eventSlug, messageData });
+  };
 
   // Update current time every 5 seconds to re-evaluate active tracking status
   useEffect(() => {
@@ -317,6 +385,31 @@ export default function EventMap({
           }
         `}
       </style>
+      <Button
+        variant="filled"
+        onClick={() => setConfettiMode(!confettiMode)}
+        style={{
+          position: 'absolute',
+          borderRadius: 100,
+          height: 60,
+          width: 60,
+          top: '40%',
+          left: 10,
+          zIndex: 500,
+          boxShadow: '2px 2px 2px rgba(0,0,0,0.2)',
+          backgroundColor: confettiMode ? '#ff6b6b' : '#228be6',
+          opacity: confettiMode ? 1 : 0.9,
+          transform: confettiMode ? 'scale(1.1)' : 'scale(1)',
+          transition: 'all 0.3s ease',
+        }}
+        title={
+          confettiMode
+            ? 'Confetti mode active - click map to celebrate!'
+            : 'Click to enable confetti mode'
+        }
+      >
+        <ConfettiIcon size={60} />
+      </Button>
       <MapContainer
         center={position}
         zoom={location ? 15 : 13}
@@ -332,6 +425,13 @@ export default function EventMap({
           selectedUserId={selectedUserId}
           userLocations={userLocations}
         />
+        {eventSlug && (
+          <MapClickHandler
+            confettiMode={confettiMode}
+            eventSlug={eventSlug}
+            onMessageSent={handleMapClick}
+          />
+        )}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url={`https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=${process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY}`}

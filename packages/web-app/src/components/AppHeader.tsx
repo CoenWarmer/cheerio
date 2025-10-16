@@ -30,6 +30,7 @@ import { useTranslations } from 'next-intl';
 import { useHeader } from '@/providers/HeaderProvider';
 import { useEvent } from '@/hooks/useEvents';
 import { Countdown } from './Countdown';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AppHeaderProps {
   /** Current page title (e.g., event name, "Dashboard", "Profile") */
@@ -60,6 +61,7 @@ export function AppHeader(props?: AppHeaderProps) {
   const { config, setHeaderHeight } = useHeader();
   const isMobile = useMediaQuery('(max-width: 48em)');
   const headerRef = useRef<HTMLDivElement>(null);
+  const { signOut } = useAuth();
 
   // Merge props with context config (props take precedence for direct usage)
   const {
@@ -203,7 +205,7 @@ export function AppHeader(props?: AppHeaderProps) {
               </Box>
             )}
 
-            <Box hiddenFrom="md">
+            <Box hiddenFrom="sm">
               <LanguageSwitcher />
             </Box>
           </Group>
@@ -352,7 +354,7 @@ export function AppHeader(props?: AppHeaderProps) {
           )}
 
           {/* Right: Navigation Links */}
-          <Group gap="md" style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <Group gap="md" style={{ flexGrow: 0, justifyContent: 'flex-end' }}>
             {showChatButton && onChatToggle ? (
               <>
                 {isChatCollapsed && (
@@ -416,6 +418,10 @@ export function AppHeader(props?: AppHeaderProps) {
                 >
                   {tNav('new')}
                 </Anchor>
+
+                <Button variant="subtle" onClick={signOut}>
+                  Logout
+                </Button>
               </>
             ) : null}
 

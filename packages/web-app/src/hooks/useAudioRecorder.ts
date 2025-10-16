@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
-import { attachmentsApi, ApiError } from '@/lib/api-client';
+import { attachmentsApi } from '@/lib/api/attachments-api';
+import { ApiError } from '@/lib/api/api-client';
 import { useSendMessage } from './useMessages';
+import { useCurrentUser } from './useCurrentUser';
 
 interface UseAudioRecorderProps {
   eventSlug: string;
@@ -17,6 +19,7 @@ export function useAudioRecorder({
   const audioChunksRef = useRef<Blob[]>([]);
 
   const { sendMessage } = useSendMessage();
+  const { currentUser } = useCurrentUser();
 
   const startRecording = useCallback(async () => {
     try {
@@ -69,6 +72,7 @@ export function useAudioRecorder({
           const messageData = {
             content: '📢 Cheerioo!',
             attachment,
+            user_id: currentUser?.id,
           };
 
           sendMessage({ eventId: eventSlug, messageData });
@@ -97,7 +101,7 @@ export function useAudioRecorder({
         'Failed to access microphone. Please grant permission and try again.'
       );
     }
-  }, [eventSlug, sendMessage, onRecordingComplete]);
+  }, [eventSlug, sendMessage, onRecordingComplete, currentUser?.id]);
 
   const stopRecording = useCallback(() => {
     if (

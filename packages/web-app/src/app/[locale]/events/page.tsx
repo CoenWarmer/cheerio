@@ -15,6 +15,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { EventCard } from '@/components/EventCard';
 import classes from './EventsList.module.css';
+import { SpeakerphoneIcon } from '@/components/icons/SpeakerphoneIcon';
 
 export default function EventsListPage() {
   const { events, isLoading: loading, error } = useEvents();
@@ -51,7 +52,9 @@ export default function EventsListPage() {
         {events.length === 0 ? (
           <Card shadow="sm" padding="xl" radius="md" withBorder>
             <Stack align="center" gap="md">
-              <Text fz={48}>🏠</Text>
+              <Text fz={48}>
+                <SpeakerphoneIcon size={128} fill="rgba(0,0,0,0.2)" />
+              </Text>
               <Title order={2}>{t('noEventsYet')}</Title>
               <Text c="gray.6">{t('createFirstEvent')}</Text>
             </Stack>

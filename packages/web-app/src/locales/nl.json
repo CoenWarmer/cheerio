@@ -48,24 +48,51 @@
       "unexpectedError": "Er is een onverwachte fout opgetreden"
     },
     "register": {
-      "title": "Account Aanmaken",
-      "subtitle": "Registreer om te beginnen met Cheerioo.",
+      "title": "Account aanmaken",
+      "subtitle": "Meld je aan om aan de slag te gaan met Cheerioo.",
       "email": "E-mail",
       "emailPlaceholder": "jij@voorbeeld.nl",
       "password": "Wachtwoord",
       "passwordPlaceholder": "••••••••",
-      "confirmPassword": "Bevestig Wachtwoord",
+      "confirmPassword": "Bevestig wachtwoord",
       "confirmPasswordPlaceholder": "••••••••",
-      "button": "Account Aanmaken",
+      "button": "Account aanmaken",
       "creating": "Account aanmaken...",
       "hasAccount": "Heb je al een account?",
       "signIn": "Inloggen",
-      "success": "Registratie Geslaagd!",
-      "successMessage": "Controleer je e-mail voor een bevestigingslink, of als e-mailbevestiging uitgeschakeld is, word je binnenkort doorgestuurd naar evenementen.",
-      "goToSignIn": "Ga naar Inloggen",
+      "success": "Registratie succesvol!",
+      "successMessage": "Controleer je e-mail voor een bevestigingslink, of als e-mailbevestiging is uitgeschakeld, word je binnenkort doorgestuurd naar evenementen.",
+      "goToSignIn": "Ga naar inloggen",
       "passwordsDoNotMatch": "Wachtwoorden komen niet overeen",
       "passwordTooShort": "Wachtwoord moet minimaal 6 tekens zijn",
-      "unexpectedError": "Er is een onverwachte fout opgetreden"
+      "unexpectedError": "Er is een onverwachte fout opgetreden",
+      "setupProfile": "Stel je profiel in",
+      "setupSubtitle": "Laten we je account personaliseren",
+      "displayName": "Weergavenaam",
+      "displayNamePlaceholder": "Hoe mogen we je noemen?",
+      "displayNameRequired": "Weergavenaam is verplicht",
+      "avatar": "Profielfoto",
+      "avatarOptional": "Optioneel - Je kunt dit later toevoegen",
+      "uploadAvatar": "Avatar uploaden",
+      "continue": "Doorgaan",
+      "skip": "Nu overslaan"
+    },
+    "anonymous": {
+      "title": "Welkom bij Cheerioo",
+      "subtitle": "Kies hoe je wilt beginnen",
+      "continueAnonymously": "Zonder account",
+      "anonymousDescription": "Lekker makkelijk, lekker snel.",
+      "createAccount": "Account Aanmaken",
+      "accountDescription": "Registreer een profiel om evenementen terug te zien.",
+      "alreadyHaveAccount": "Heb je al een account?",
+      "signIn": "Inloggen",
+      "setupTitle": "Nog één ding...",
+      "setupSubtitle": "Hoe mogen we je noemen?",
+      "displayName": "Weergavenaam",
+      "displayNamePlaceholder": "Je bijnaam",
+      "displayNameRequired": "Voer een weergavenaam in",
+      "getStarted": "Aan de Slag",
+      "creating": "Profiel aanmaken..."
     }
   },
   "home": {
@@ -112,7 +139,12 @@
     "online": "online",
     "offline": "offline",
     "messagesCount": "{count, plural, =0 {Geen berichten} =1 {1 bericht} other {# berichten}}",
-    "activeUsers": "{count} actief"
+    "activeUsers": "{count} actief",
+    "loadingMap": "Kaart laden...",
+    "loadingEvent": "Evenement laden...",
+    "notFound": "Evenement niet gevonden",
+    "notFoundMessage": "Het evenement dat je zoekt bestaat niet",
+    "backToEvents": "← Terug naar Evenementen"
   },
   "newEvent": {
     "title": "Nieuw Evenement Maken",
@@ -200,5 +232,9 @@
     "minutes": "min",
     "seconds": "sec",
     "startTime": "Starttijd is"
+  },
+  "onYourMarks": {
+    "title": "Welkom",
+    "subtitle": "Maak je klaar om je reis te beginnen"
   }
 }

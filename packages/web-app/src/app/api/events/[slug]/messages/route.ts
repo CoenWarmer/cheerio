@@ -53,16 +53,23 @@ export async function POST(
     const { slug } = await params;
     const body = await request.json();
 
-    const { content, attachment, location } = body;
+    const { content, attachment, location, user_id } = body;
 
-    // Get authenticated user
+    // Get authenticated user (if logged in)
     const {
       data: { user },
-      error: authError,
     } = await supabase.auth.getUser();
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Support both authenticated users and anonymous users
+    // Authenticated users: use session user_id
+    // Anonymous users: use provided user_id from request body
+    const userId = user_id || user?.id;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID required (authenticated or anonymous)' },
+        { status: 400 }
+      );
     }
 
     // Get event by slug to get the event ID
@@ -89,7 +96,7 @@ export async function POST(
       .insert({
         content,
         event_id: event.id,
-        user_id: user.id,
+        user_id: userId,
         attachment: attachment || null,
         location: location || null,
       })
