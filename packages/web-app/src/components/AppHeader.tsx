@@ -9,7 +9,6 @@ import {
   Text,
   Anchor,
   Button,
-  Burger,
   Popover,
   Stack,
   Badge,
@@ -17,14 +16,20 @@ import {
   Avatar,
   CloseButton,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
 import { ChatIcon } from './icons/ChatIcon';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { usePresence } from '@/hooks/usePresence';
 import { useEventMembers } from '@/hooks/useEventMembers';
 import { Logo } from './Logo';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslations } from 'next-intl';
+import { useHeader } from '@/providers/HeaderProvider';
+import { useEvent } from '@/hooks/useEvents';
+import { Countdown } from './Countdown';
 
 interface AppHeaderProps {
   /** Current page title (e.g., event name, "Dashboard", "Profile") */
@@ -33,6 +38,8 @@ interface AppHeaderProps {
   showCheerButton?: boolean;
   /** Show the chat toggle button (event page only) */
   showChatButton?: boolean;
+  /** Show the navigation links  */
+  showNavigationLinks?: boolean;
   /** Event slug for audio recording */
   eventSlug?: string;
   /** Event id for active users */
@@ -47,19 +54,31 @@ interface AppHeaderProps {
   onUserSelect?: (userId: string | null) => void;
 }
 
-export function AppHeader({
-  pageTitle,
-  showCheerButton = false,
-  showChatButton = false,
-  eventSlug,
-  eventId,
-  isChatCollapsed,
-  onChatToggle,
-  selectedUserId,
-  onUserSelect,
-}: AppHeaderProps) {
+export function AppHeader(props?: AppHeaderProps) {
+  const t = useTranslations('header');
+  const tNav = useTranslations('navigation');
+  const { config, setHeaderHeight } = useHeader();
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  // Merge props with context config (props take precedence for direct usage)
+  const {
+    pageTitle = config.pageTitle,
+    showCheerButton = config.showCheerButton ?? false,
+    showChatButton = config.showChatButton ?? false,
+    eventSlug = config.eventSlug,
+    eventId = config.eventId,
+    isChatCollapsed = config.isChatCollapsed,
+    onChatToggle = config.onChatToggle,
+    selectedUserId = config.selectedUserId,
+    onUserSelect = config.onUserSelect,
+    showNavigationLinks = config.showNavigationLinks,
+  } = props || {};
+
   const { count: activeUsers } = usePresence(eventId || '', eventSlug || '');
   const { trackingMembers } = useEventMembers(eventSlug || '');
+
+  const { event } = useEvent(eventSlug || '');
 
   const [cheerPopoverOpened, setCheerPopoverOpened] = useState(false);
 
@@ -79,9 +98,9 @@ export function AppHeader({
   const userSelectData = useMemo(() => {
     return trackingMembers.map(member => ({
       value: member.user_id,
-      label: member.display_name || 'Unknown User',
+      label: member.display_name || t('unknownUser'),
     }));
-  }, [trackingMembers]);
+  }, [trackingMembers, t]);
 
   // Find the selected user
   const selectedUser = useMemo(() => {
@@ -93,8 +112,38 @@ export function AppHeader({
   const showUserSelector =
     trackingMembers.length >= 1 && onUserSelect !== undefined;
 
+  // Measure header height and update context
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+
+    // Initial measurement
+    updateHeaderHeight();
+
+    // Update on resize
+    window.addEventListener('resize', updateHeaderHeight);
+
+    // Use ResizeObserver for more accurate tracking
+    let resizeObserver: ResizeObserver | null = null;
+    if (headerRef.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(updateHeaderHeight);
+      resizeObserver.observe(headerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [setHeaderHeight]);
+
   return (
     <Box
+      ref={headerRef}
       component="header"
       style={{
         background: 'white',
@@ -102,12 +151,34 @@ export function AppHeader({
         flexShrink: 0,
       }}
     >
-      <Container size="fluid" px="lg" py="md" style={{ maxWidth: '100%' }}>
-        <Group justify="space-between" align="center" wrap="nowrap">
+      <Container
+        size="fluid"
+        px={isMobile ? 'md' : 'lg'}
+        py={isMobile ? 'sm' : 'md'}
+      >
+        <Group
+          justify="space-between"
+          align="center"
+          wrap="nowrap"
+          gap={isMobile ? '0' : 'md'}
+          style={{
+            flexGrow: 1,
+            flexDirection: isMobile ? 'column' : 'row',
+          }}
+        >
           {/* Left: Brand/Logo and Page Title */}
-          <Group gap="md" style={{ flex: 1 }}>
-            <>
-              <Logo size="lg" />
+          <Group
+            gap="sm"
+            style={{
+              flexGrow: isMobile ? 1 : 0,
+              flexDirection: 'row',
+              width: isMobile ? '100%' : 'auto',
+              flexWrap: isMobile ? 'nowrap' : 'wrap',
+              marginBottom: isMobile ? 10 : 0,
+            }}
+          >
+            <Box style={{ display: 'flex', gap: 8 }}>
+              <Logo size="lg" mode="navbar" />
               {pageTitle && (
                 <>
                   <Text c="gray.4" fw={300} size="lg">
@@ -115,170 +186,206 @@ export function AppHeader({
                   </Text>
                 </>
               )}
-            </>
+            </Box>
 
             {pageTitle && (
-              <Title order={3} size="h4" c="gray.9">
-                {pageTitle}
-              </Title>
+              <Box
+                style={{
+                  flexGrow: isMobile ? 1 : 0,
+                  flexDirection: 'row',
+                  width: isMobile ? '100%' : 'auto',
+                  flexWrap: isMobile ? 'nowrap' : 'wrap',
+                }}
+              >
+                <Title order={3} size="h4" c="gray.9">
+                  {pageTitle}
+                </Title>
+              </Box>
             )}
+
+            <Box hiddenFrom="md">
+              <LanguageSwitcher />
+            </Box>
           </Group>
 
           {/* Center: Cheer Button & User Selector */}
           {(showCheerButton || showUserSelector) && eventSlug && (
             <Group justify="center" gap="md" style={{ flex: 1 }}>
-              {/* User Selector / Selected User Badge */}
-              {showUserSelector && (
+              {event &&
+              event.start_time &&
+              new Date(event.start_time) > new Date() ? (
+                <Countdown targetDate={new Date(event.start_time)} />
+              ) : (
                 <>
-                  {selectedUser ? (
-                    <Badge
-                      size="lg"
-                      radius="xl"
-                      variant="light"
-                      leftSection={
-                        <Avatar
-                          src={selectedUser.avatar_url}
-                          size={24}
+                  {/* User Selector / Selected User Badge */}
+                  {showUserSelector && (
+                    <>
+                      {selectedUser ? (
+                        <Badge
+                          size="lg"
                           radius="xl"
+                          variant="light"
+                          leftSection={
+                            <Avatar
+                              src={selectedUser.avatar_url}
+                              size={24}
+                              radius="xl"
+                            />
+                          }
+                          rightSection={
+                            <CloseButton
+                              size="xs"
+                              onClick={() => onUserSelect?.(null)}
+                              aria-label={t('deselectUser')}
+                            />
+                          }
+                          style={{
+                            paddingLeft: '6px',
+                            paddingRight: '4px',
+                            height: '36px',
+                          }}
+                        >
+                          {selectedUser.display_name || t('unknownUser')}
+                        </Badge>
+                      ) : (
+                        <Select
+                          placeholder={t('selectAthlete')}
+                          value={selectedUserId}
+                          onChange={onUserSelect}
+                          data={userSelectData}
+                          clearable
+                          w={180}
+                          size="sm"
                         />
-                      }
-                      rightSection={
-                        <CloseButton
-                          size="xs"
-                          onClick={() => onUserSelect?.(null)}
-                          aria-label="Deselect user"
-                        />
-                      }
-                      style={{
-                        paddingLeft: '6px',
-                        paddingRight: '4px',
-                        height: '36px',
+                      )}
+                    </>
+                  )}
+
+                  {/* Cheer Button */}
+                  {showCheerButton && (
+                    <Popover
+                      width={isMobile ? '100%' : 500}
+                      position="bottom"
+                      withArrow
+                      shadow="xl"
+                      opened={cheerPopoverOpened}
+                      onChange={setCheerPopoverOpened}
+                      transitionProps={{
+                        transition: 'scale-y',
+                        duration: 300,
+                        timingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
                       }}
                     >
-                      {selectedUser.display_name || 'Unknown User'}
-                    </Badge>
-                  ) : (
-                    <Select
-                      placeholder="Selecteer sporter"
-                      value={selectedUserId}
-                      onChange={onUserSelect}
-                      data={userSelectData}
-                      clearable
-                      w={200}
-                      size="sm"
-                    />
-                  )}
-                </>
-              )}
-
-              {/* Cheer Button */}
-              {showCheerButton && (
-                <Popover
-                  width={500}
-                  position="bottom"
-                  withArrow
-                  shadow="xl"
-                  opened={cheerPopoverOpened}
-                  onChange={setCheerPopoverOpened}
-                  transitionProps={{
-                    transition: 'scale-y',
-                    duration: 300,
-                    timingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                >
-                  <Popover.Target>
-                    <Button
-                      variant="light"
-                      leftSection={<SpeakerphoneIcon />}
-                      radius="xl"
-                      size="md"
-                      pr={14}
-                      h={48}
-                      onClick={() => setCheerPopoverOpened(o => !o)}
-                    >
-                      Moedig je atleet aan!
-                    </Button>
-                  </Popover.Target>
-                  <Popover.Dropdown p="xl">
-                    <Stack gap="xl">
-                      <Box>
-                        <Title
-                          order={2}
-                          size="h2"
-                          fw={700}
-                          mb="md"
-                          style={{ lineHeight: 1.2 }}
-                        >
-                          Moedig je{' '}
-                          <Text
-                            component="span"
-                            fw={700}
-                            style={{
-                              backgroundColor: '#E7F5FF',
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                            }}
-                          >
-                            atleet
-                          </Text>{' '}
-                          aan! 💪
-                        </Title>
-                        <Text size="md" c="dimmed" style={{ lineHeight: 1.6 }}>
-                          Klik op opnemen en neem een boodschap op. Jouw sporter
-                          hoort het direct tijdens de race.
-                        </Text>
-                      </Box>
-
-                      <Group gap="md">
+                      <Popover.Target>
                         <Button
-                          variant={isCheerRecording ? 'filled' : 'filled'}
-                          color={isCheerRecording ? 'red' : 'blue'}
-                          leftSection={<MicrophoneIcon />}
+                          variant="light"
+                          leftSection={<SpeakerphoneIcon />}
                           radius="xl"
-                          size="md"
+                          size={isMobile ? 'sm' : 'md'}
                           pr={14}
                           h={48}
-                          onClick={toggleCheerRecording}
-                          loading={isCheerSending}
-                          disabled={isCheerSending}
+                          onClick={() => setCheerPopoverOpened(o => !o)}
                         >
-                          {isCheerRecording ? 'Stop Opname' : 'Start Opname'}
+                          {t('cheerButton')}
                         </Button>
-                      </Group>
-                    </Stack>
-                  </Popover.Dropdown>
-                </Popover>
+                      </Popover.Target>
+                      <Popover.Dropdown p="xl">
+                        <Stack gap="xl">
+                          <Box>
+                            <Title
+                              order={2}
+                              size="h2"
+                              fw={700}
+                              mb="md"
+                              style={{ lineHeight: 1.2 }}
+                            >
+                              {t.rich('cheerTitle', {
+                                athlete: chunks => (
+                                  <Text
+                                    component="span"
+                                    fw={700}
+                                    style={{
+                                      backgroundColor: '#E7F5FF',
+                                      padding: '4px 8px',
+                                      borderRadius: '4px',
+                                    }}
+                                  >
+                                    {chunks}
+                                  </Text>
+                                ),
+                              })}
+                            </Title>
+                            <Text
+                              size="md"
+                              c="dimmed"
+                              style={{ lineHeight: 1.6 }}
+                            >
+                              {t('cheerDescription')}
+                            </Text>
+                          </Box>
+
+                          <Group gap="md">
+                            <Button
+                              variant={isCheerRecording ? 'filled' : 'filled'}
+                              color={isCheerRecording ? 'red' : 'blue'}
+                              leftSection={<MicrophoneIcon />}
+                              radius="xl"
+                              size="md"
+                              pr={14}
+                              h={48}
+                              onClick={toggleCheerRecording}
+                              loading={isCheerSending}
+                              disabled={isCheerSending}
+                            >
+                              {isCheerRecording
+                                ? t('stopRecording')
+                                : t('startRecording')}
+                            </Button>
+                          </Group>
+                        </Stack>
+                      </Popover.Dropdown>
+                    </Popover>
+                  )}
+                </>
               )}
             </Group>
           )}
 
           {/* Right: Navigation Links */}
-          <Group
-            gap="md"
-            visibleFrom="sm"
-            style={{ flex: 1, justifyContent: 'flex-end' }}
-          >
+          <Group gap="md" style={{ flex: 1, justifyContent: 'flex-end' }}>
             {showChatButton && onChatToggle ? (
-              <div>
+              <>
                 {isChatCollapsed && (
-                  <Badge color="green" variant="dot" size="sm" mr="xs">
-                    {activeUsers} active
-                  </Badge>
+                  <Button
+                    variant={isChatCollapsed ? 'filled' : 'light'}
+                    leftSection={
+                      <>
+                        {isChatCollapsed && (
+                          <Badge color="green" variant="dot" size="sm" mr="xs">
+                            {t('active', { count: activeUsers })}
+                          </Badge>
+                        )}
+                        <ChatIcon size={20} />
+                      </>
+                    }
+                    radius="xl"
+                    size="sm"
+                    pr={14}
+                    pl={4}
+                    h={30}
+                    onClick={onChatToggle}
+                    style={{
+                      position: isMobile ? 'absolute' : 'initial',
+                      top: (headerRef.current?.offsetHeight || 0) + 10,
+                      right: 10,
+                      zIndex: 1,
+                    }}
+                  >
+                    {tNav('chat')}
+                  </Button>
                 )}
-                <Button
-                  variant={isChatCollapsed ? 'filled' : 'light'}
-                  leftSection={<ChatIcon size={20} />}
-                  radius="xl"
-                  size="sm"
-                  pr={14}
-                  pl={4}
-                  h={30}
-                  onClick={onChatToggle}
-                >
-                  Chat
-                </Button>
-              </div>
-            ) : (
+              </>
+            ) : showNavigationLinks ? (
               <>
                 <Anchor
                   component={Link}
@@ -287,27 +394,35 @@ export function AppHeader({
                   size="sm"
                   style={{ textDecoration: 'none' }}
                 >
-                  Events
+                  {tNav('events')}
+                </Anchor>
+
+                <Anchor
+                  component={Link}
+                  href="/profile"
+                  c="gray.6"
+                  size="sm"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {tNav('profile')}
+                </Anchor>
+
+                <Anchor
+                  component={Link}
+                  href="/new"
+                  c="gray.6"
+                  size="sm"
+                  style={{ textDecoration: 'none' }}
+                >
+                  {tNav('new')}
                 </Anchor>
               </>
-            )}
-            <Button
-              component={Link}
-              href="/profile"
-              variant="default"
-              size="sm"
-            >
-              Profile
-            </Button>
-          </Group>
+            ) : null}
 
-          {/* Mobile burger menu */}
-          <Burger
-            opened={false}
-            hiddenFrom="sm"
-            size="sm"
-            aria-label="Toggle navigation"
-          />
+            <Box visibleFrom="sm">
+              <LanguageSwitcher />
+            </Box>
+          </Group>
         </Group>
       </Container>
     </Box>

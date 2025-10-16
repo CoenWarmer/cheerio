@@ -16,10 +16,12 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
+import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabase';
 
 export default function SignInPage() {
   const router = useRouter();
+  const t = useTranslations('auth.signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -43,7 +45,7 @@ export default function SignInPage() {
         router.refresh();
       }
     } catch {
-      setError('An unexpected error occurred');
+      setError(t('unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -55,29 +57,29 @@ export default function SignInPage() {
         <Paper shadow="sm" p="xl" radius="md" withBorder>
           <Stack gap="md">
             <Title order={1} ta="center">
-              Sign In
+              {t('title')}
             </Title>
             <Text c="gray.6" ta="center" size="sm">
-              Welcome back! Please sign in to your account.
+              {t('welcome')}
             </Text>
 
             <form onSubmit={handleSignIn}>
               <Stack gap="md">
                 <TextInput
-                  label="Email"
+                  label={t('email')}
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
 
                 <PasswordInput
-                  label="Password"
+                  label={t('password')}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                 />
 
                 {error && (
@@ -87,15 +89,15 @@ export default function SignInPage() {
                 )}
 
                 <Button type="submit" loading={loading} fullWidth>
-                  {loading ? 'Signing in...' : 'Sign In'}
+                  {loading ? t('signingIn') : t('button')}
                 </Button>
               </Stack>
             </form>
 
             <Text ta="center" size="sm" c="gray.6">
-              Don&apos;t have an account?{' '}
+              {t('noAccount')}{' '}
               <Anchor component={Link} href="/register" fw={500}>
-                Sign up
+                {t('signUp')}
               </Anchor>
             </Text>
           </Stack>

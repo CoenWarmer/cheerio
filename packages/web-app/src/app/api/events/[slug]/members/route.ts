@@ -89,15 +89,6 @@ export async function GET(
       };
     });
 
-    console.log(
-      'Members API - Returning enriched members:',
-      enrichedMembers.map(m => ({
-        id: m.user_id.substring(0, 8),
-        name: m.display_name,
-        perm: m.permissions,
-      }))
-    );
-
     return NextResponse.json({ data: enrichedMembers });
   } catch (error) {
     console.error('Error in event members API:', error);

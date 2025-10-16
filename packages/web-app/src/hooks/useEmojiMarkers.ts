@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useMessages } from './useMessages';
 import { useUser } from './useUser';
 import { TrackingActivity, UserActivity } from '@/types/activity';
+import { isEmoji } from '@/utils/emoji';
 
 export interface EmojiMarker {
   id: string;
@@ -13,13 +14,6 @@ export interface EmojiMarker {
   timestamp: string;
   distance?: number;
 }
-
-// Helper to check if a string is a single emoji
-const isEmoji = (str: string): boolean => {
-  const emojiRegex =
-    /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Extended_Pictographic})$/u;
-  return emojiRegex.test(str.trim());
-};
 
 export function useEmojiMarkers(
   eventId: string,

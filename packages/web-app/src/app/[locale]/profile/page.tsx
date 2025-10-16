@@ -16,12 +16,20 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { AppHeader } from '@/components/AppHeader';
+import { useTranslations } from 'next-intl';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { getPermissionLabel } from '@/types/permissions';
+import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 
 export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('profile');
+  const tNav = useTranslations('navigation');
+
+  useHeaderConfig({
+    pageTitle: tNav('profile'),
+    showNavigationLinks: true,
+  });
 
   const {
     user,
@@ -57,7 +65,7 @@ export default function ProfilePage() {
       <Center mih="100vh" bg="gray.0">
         <Stack align="center" gap="md">
           <Loader size="lg" />
-          <Text c="gray.6">Loading profile...</Text>
+          <Text c="gray.6">{t('loadingProfile')}</Text>
         </Stack>
       </Center>
     );
@@ -71,13 +79,12 @@ export default function ProfilePage() {
 
   return (
     <Box mih="100vh" bg="gray.0">
-      <AppHeader pageTitle="Edit Profile" />
       <Container size="sm" py="xl">
         <Stack gap="xl">
           {/* Success Message */}
           {success && (
             <Alert color="green" variant="light">
-              ✓ Profile updated successfully!
+              ✓ {t('success')}
             </Alert>
           )}
 
@@ -95,7 +102,7 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <Box>
                   <Text size="sm" fw={500} mb="sm">
-                    Avatar
+                    {t('avatar')}
                   </Text>
                   <Group align="center">
                     <Avatar
@@ -125,7 +132,7 @@ export default function ProfilePage() {
                           onClick={() => fileInputRef.current?.click()}
                           loading={uploading}
                         >
-                          {uploading ? 'Uploading...' : 'Upload'}
+                          {uploading ? t('uploading') : t('upload')}
                         </Button>
                         {avatarUrl && (
                           <Button
@@ -134,12 +141,12 @@ export default function ProfilePage() {
                             color="red"
                             onClick={handleRemoveAvatar}
                           >
-                            Remove
+                            {t('remove')}
                           </Button>
                         )}
                       </Group>
                       <Text size="xs" c="gray.6">
-                        JPEG, PNG or WebP. Max 5MB.
+                        {t('avatarDescription')}
                       </Text>
                     </Stack>
                   </Group>
@@ -147,16 +154,16 @@ export default function ProfilePage() {
 
                 {/* Display Name */}
                 <TextInput
-                  label="Display Name"
-                  placeholder="Enter your display name"
+                  label={t('displayName')}
+                  placeholder={t('displayNamePlaceholder')}
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
-                  description="This is how other users will see you in events and chats."
+                  description={t('displayNameDescription')}
                 />
 
                 {/* Email (read-only) */}
                 <TextInput
-                  label="Email"
+                  label={t('email')}
                   value={user?.email || ''}
                   disabled
                   styles={{
@@ -167,7 +174,7 @@ export default function ProfilePage() {
                 {/* Permission (read-only) */}
                 <Box>
                   <Text size="sm" fw={500} mb="xs">
-                    Permission Level
+                    {t('permissionLevel')}
                   </Text>
                   <Paper p="xs" withBorder bg="gray.0">
                     <Group gap="sm">
@@ -184,14 +191,11 @@ export default function ProfilePage() {
                       </Text>
                     </Group>
                   </Paper>
-                  <Text size="xs" c="gray.6" mt="xs">
-                    Contact an administrator to change your permission level.
-                  </Text>
                 </Box>
 
                 {/* Submit Button */}
                 <Button type="submit" loading={saving} fullWidth>
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? t('saving') : t('saveChanges')}
                 </Button>
               </Stack>
             </form>

@@ -16,10 +16,12 @@ import {
   Anchor,
   Center,
 } from '@mantine/core';
+import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations('auth.register');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -34,14 +36,14 @@ export default function RegisterPage() {
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     // Validate password length
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -66,7 +68,7 @@ export default function RegisterPage() {
         }
       }
     } catch {
-      setError('An unexpected error occurred');
+      setError(t('unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -80,15 +82,13 @@ export default function RegisterPage() {
             <Stack align="center" gap="md">
               <Text fz={48}>✅</Text>
               <Title order={2} ta="center">
-                Registration Successful!
+                {t('success')}
               </Title>
               <Text c="gray.6" ta="center">
-                Check your email for a confirmation link, or if email
-                confirmation is disabled, you&apos;ll be redirected to events
-                shortly.
+                {t('successMessage')}
               </Text>
               <Button component={Link} href="/sign-in" fullWidth>
-                Go to Sign In
+                {t('goToSignIn')}
               </Button>
             </Stack>
           </Paper>
@@ -103,37 +103,37 @@ export default function RegisterPage() {
         <Paper shadow="sm" p="xl" radius="md" withBorder>
           <Stack gap="md">
             <Title order={1} ta="center">
-              Create Account
+              {t('title')}
             </Title>
             <Text c="gray.6" ta="center" size="sm">
-              Sign up to get started with Cheerioo.
+              {t('subtitle')}
             </Text>
 
             <form onSubmit={handleRegister}>
               <Stack gap="md">
                 <TextInput
-                  label="Email"
+                  label={t('email')}
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
 
                 <PasswordInput
-                  label="Password"
+                  label={t('password')}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                 />
 
                 <PasswordInput
-                  label="Confirm Password"
+                  label={t('confirmPassword')}
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('confirmPasswordPlaceholder')}
                 />
 
                 {error && (
@@ -143,15 +143,15 @@ export default function RegisterPage() {
                 )}
 
                 <Button type="submit" loading={loading} fullWidth>
-                  {loading ? 'Creating account...' : 'Create Account'}
+                  {loading ? t('creating') : t('button')}
                 </Button>
               </Stack>
             </form>
 
             <Text ta="center" size="sm" c="gray.6">
-              Already have an account?{' '}
+              {t('hasAccount')}{' '}
               <Anchor component={Link} href="/sign-in" fw={500}>
-                Sign in
+                {t('signIn')}
               </Anchor>
             </Text>
           </Stack>

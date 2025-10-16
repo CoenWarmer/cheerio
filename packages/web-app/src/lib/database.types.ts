@@ -55,6 +55,7 @@ export type Database = {
           id: string
           is_private: boolean
           location: Json | null
+          location_label: string | null
           name: string
           slug: string
           start_time: string | null
@@ -68,6 +69,7 @@ export type Database = {
           id?: string
           is_private?: boolean
           location?: Json | null
+          location_label?: string | null
           name: string
           slug: string
           start_time?: string | null
@@ -81,6 +83,7 @@ export type Database = {
           id?: string
           is_private?: boolean
           location?: Json | null
+          location_label?: string | null
           name?: string
           slug?: string
           start_time?: string | null

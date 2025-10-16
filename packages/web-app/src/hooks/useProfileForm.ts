@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { profilesApi } from '@/lib/api-client';
+import { useProfile } from '@/hooks/useProfile';
+import {
+  useUpdateProfile,
+  useUploadAvatar,
+  useDeleteAvatar,
+} from '@/hooks/useProfiles';
 import type { User } from '@supabase/supabase-js';
 import type { UserPermission } from '@/types/permissions';
 
@@ -15,6 +19,7 @@ interface UseProfileFormResult {
   loading: boolean;
   saving: boolean;
   uploading: boolean;
+  deleting: boolean;
   error: string | null;
   success: boolean;
   previewUrl: string | null;
@@ -29,59 +34,48 @@ interface UseProfileFormResult {
 export function useProfileForm(): UseProfileFormResult {
   const router = useRouter();
 
-  const [user, setUser] = useState<User | null>(null);
+  // Use existing hooks
+  const { user, profile, loading: profileLoading } = useProfile();
+  const { updateProfileAsync, isUpdating } = useUpdateProfile();
+  const { uploadAvatarAsync, isUploading } = useUploadAvatar();
+  const { deleteAvatarAsync, isDeleting } = useDeleteAvatar();
+
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [permissions, setPermissions] = useState<UserPermission>('supporter');
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    async function fetchData() {
-      try {
-        // Get current user
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+    if (!profileLoading && !user) {
+      router.push('/sign-in');
+    }
+  }, [user, profileLoading, router]);
 
-        if (!user) {
-          router.push('/sign-in');
-          return;
-        }
+  // Sync profile data to local state
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.display_name || '');
+      setAvatarUrl(profile.avatar_url);
+      setPermissions(profile.permissions || 'supporter');
 
-        setUser(user);
-
-        // Fetch profile
-        const profileResult = await profilesApi.getCurrent();
-        const profile = profileResult.data;
-
-        setDisplayName(profile.display_name || '');
-        setAvatarUrl(profile.avatar_url);
-        setPermissions(profile.permissions || 'supporter');
-
-        // Extract path from URL if it exists
-        if (profile.avatar_url) {
+      // Extract path from URL if it exists
+      if (profile.avatar_url) {
+        try {
           const url = new URL(profile.avatar_url);
           const pathMatch = url.pathname.match(/avatars\/(.+)/);
           if (pathMatch) {
             setAvatarPath(`avatars/${pathMatch[1]}`);
           }
+        } catch (err) {
+          console.error('Error parsing avatar URL:', err);
         }
-      } catch (err) {
-        console.error('Error fetching profile:', err);
-        setError('Failed to load profile');
-      } finally {
-        setLoading(false);
       }
     }
-
-    fetchData();
-  }, [router]);
+  }, [profile]);
 
   const handleFileSelect = async (file: File) => {
     // Validate file type
@@ -106,11 +100,10 @@ export function useProfileForm(): UseProfileFormResult {
     reader.readAsDataURL(file);
 
     // Upload
-    setUploading(true);
     setError(null);
 
     try {
-      const result = await profilesApi.uploadAvatar(file);
+      const result = await uploadAvatarAsync(file);
       setAvatarUrl(result.avatar_url);
       setAvatarPath(result.path);
       setSuccess(true);
@@ -119,8 +112,6 @@ export function useProfileForm(): UseProfileFormResult {
       console.error('Error uploading avatar:', err);
       setError(err instanceof Error ? err.message : 'Failed to upload avatar');
       setPreviewUrl(null);
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -130,7 +121,7 @@ export function useProfileForm(): UseProfileFormResult {
     if (!confirm('Are you sure you want to remove your avatar?')) return;
 
     try {
-      await profilesApi.deleteAvatar(avatarPath);
+      await deleteAvatarAsync(avatarPath);
       setAvatarUrl(null);
       setAvatarPath(null);
       setPreviewUrl(null);
@@ -143,11 +134,10 @@ export function useProfileForm(): UseProfileFormResult {
   };
 
   const handleSubmit = async () => {
-    setSaving(true);
     setError(null);
 
     try {
-      await profilesApi.update({
+      await updateProfileAsync({
         display_name: displayName || undefined,
         avatar_url: avatarUrl ?? undefined,
       });
@@ -157,8 +147,6 @@ export function useProfileForm(): UseProfileFormResult {
     } catch (err) {
       console.error('Error updating profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to update profile');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -169,9 +157,10 @@ export function useProfileForm(): UseProfileFormResult {
     avatarUrl,
     avatarPath,
     permissions,
-    loading,
-    saving,
-    uploading,
+    loading: profileLoading,
+    saving: isUpdating,
+    uploading: isUploading,
+    deleting: isDeleting,
     error,
     success,
     previewUrl,

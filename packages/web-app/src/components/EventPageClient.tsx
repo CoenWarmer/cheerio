@@ -12,7 +12,8 @@ import { useActivity } from '@/hooks/useActivity';
 import { useEmojiMarkers } from '@/hooks/useEmojiMarkers';
 import { useUser } from '@/hooks/useUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
-import { AppHeader } from './AppHeader';
+import { useHeaderConfig } from '@/hooks/useHeaderConfig';
+import { useHeader } from '@/providers/HeaderProvider';
 
 // Dynamically import the map component to avoid SSR issues
 const EventMap = dynamic(() => import('@/components/EventMap'), {
@@ -27,6 +28,7 @@ const EventMap = dynamic(() => import('@/components/EventMap'), {
 export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const router = useRouter();
   const { user, isLoading: userLoading } = useUser();
+  const { headerHeight } = useHeader();
 
   const { event, isLoading, error: eventError } = useEvent(eventSlug);
   const { joinEvent } = useJoinEvent();
@@ -48,8 +50,21 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
     event?.slug ?? ''
   );
 
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  // Configure the header from this page
+  useHeaderConfig({
+    pageTitle: event?.name || '',
+    showCheerButton: true,
+    showChatButton: true,
+    eventSlug: event?.slug || '',
+    eventId: event?.id || '',
+    isChatCollapsed: isSidebarCollapsed,
+    onChatToggle: () => setIsSidebarCollapsed(!isSidebarCollapsed),
+    selectedUserId,
+    onUserSelect: setSelectedUserId,
+  });
 
   // Redirect to sign-in if no user
   useEffect(() => {
@@ -69,210 +84,153 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
     }
   }, [eventSlug, user, joinEvent]);
 
-  if (isLoading) {
-    return (
-      <Center h="100vh" bg="gray.0">
-        <Stack align="center" gap="md">
-          <Text fz={32}>⏳</Text>
-          <Text c="gray.6">Loading event...</Text>
-        </Stack>
-      </Center>
-    );
-  }
-
-  if (eventError || !event) {
-    return (
-      <Center h="100vh" bg="gray.0">
-        <Stack align="center" gap="xl">
-          <Title order={1}>Event not found</Title>
-          <Text c="gray.6" ta="center" maw={500}>
-            {eventError?.message ||
-              'The event you are looking for does not exist'}
-          </Text>
-          <Anchor
-            component={Link}
-            href="/events"
-            px="xl"
-            py="md"
-            bg="blue.6"
-            c="white"
-            style={{
-              borderRadius: '0.5rem',
-              textDecoration: 'none',
-              fontWeight: 500,
-            }}
-          >
-            ← Back to Events
-          </Anchor>
-        </Stack>
-      </Center>
-    );
-  }
-
   return (
     <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .chat-sidebar.collapsed {
-          right: -400px !important;
-        }
-        
-        .map-overlay-bottom.sidebar-collapsed {
-          right: 20px !important;
-        }
-        
-        @media (max-width: 768px) {
-          .chat-sidebar {
-            top: auto !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 50vh !important;
-            border-left: none !important;
-            border-top: 1px solid #e5e7eb !important;
-          }
-          
-          .chat-sidebar.collapsed {
-            right: 0 !important;
-            bottom: -50vh !important;
-          }
-          
-          .map-overlay-bottom {
-            right: 20px !important;
-            bottom: calc(50vh + 20px) !important;
-          }
-          
-          .map-overlay-bottom.sidebar-collapsed {
-            bottom: 20px !important;
-          }
-        }
-      `,
-        }}
-      />
       <Box
         style={{
-          height: '100vh',
-          overflow: 'hidden',
           display: 'flex',
+          height: `calc(100vh - ${headerHeight}px)`,
+          overflow: 'hidden',
           flexDirection: 'column',
           background: '#f9fafb',
+          position: 'relative',
         }}
       >
-        <AppHeader
-          pageTitle={event.name}
-          showCheerButton
-          showChatButton
-          eventSlug={event.slug}
-          eventId={event.id}
-          isChatCollapsed={isSidebarCollapsed}
-          onChatToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          selectedUserId={selectedUserId}
-          onUserSelect={setSelectedUserId}
-        />
-
         {/* Main Content */}
         <Box
           style={{
-            flex: 1,
+            display: 'flex',
             position: 'relative',
             overflow: 'hidden',
+            height: '100%',
+            width: '100%',
           }}
         >
           <Box
             component="main"
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
+              width: '100%',
+              height: '100%',
               display: 'flex',
               flexDirection: 'column',
               zIndex: 0,
             }}
           >
-            <Box style={{ flex: 1, position: 'relative' }}>
-              <EventMap
-                eventName={event.name}
-                location={event.location}
-                userLocations={userLocations}
-                emojiMarkers={emojiMarkers}
-                trackingPaths={trackingPaths}
-                selectedUserId={selectedUserId}
-              />
-
-              <Box
-                className={`map-overlay-bottom ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}
-                style={{
-                  position: 'absolute',
-                  bottom: '20px',
-                  left: '20px',
-                  right: '420px',
-                  pointerEvents: 'none',
-                  zIndex: 500,
-                  transition: 'right 0.3s ease, bottom 0.3s ease',
-                }}
-              >
-                <Box style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                  <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
-                    {user && event && (
-                      <ActivityTracker eventSlug={event.slug} />
-                    )}
-                  </Box>
-                  <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
-                    {/* {event && (
+            {isLoading ? (
+              <Center h="100vh" bg="gray.0">
+                <Stack align="center" gap="md">
+                  <Text fz={32}>⏳</Text>
+                  <Text c="gray.6">Loading event...</Text>
+                </Stack>
+              </Center>
+            ) : eventError || !event ? (
+              <Center h="100vh" bg="gray.0">
+                <Stack align="center" gap="xl">
+                  <Title order={1}>Event not found</Title>
+                  <Text c="gray.6" ta="center" maw={500}>
+                    {eventError?.message ||
+                      'The event you are looking for does not exist'}
+                  </Text>
+                  <Anchor
+                    component={Link}
+                    href="/events"
+                    px="xl"
+                    py="md"
+                    bg="blue.6"
+                    c="white"
+                    style={{
+                      borderRadius: '0.5rem',
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                    }}
+                  >
+                    ← Back to Events
+                  </Anchor>
+                </Stack>
+              </Center>
+            ) : (
+              <>
+                <EventMap
+                  eventName={event.name}
+                  location={event.location}
+                  userLocations={userLocations}
+                  emojiMarkers={emojiMarkers}
+                  trackingPaths={trackingPaths}
+                  selectedUserId={selectedUserId}
+                />
+                <Box>
+                  <Box
+                    style={{
+                      position: 'absolute',
+                      bottom: '20px',
+                      left: '20px',
+                      right: isSidebarCollapsed ? '20px' : '420px',
+                      pointerEvents: 'none',
+                      zIndex: 500,
+                      transition: 'right 0.3s ease, bottom 0.3s ease',
+                    }}
+                  >
+                    <Box
+                      style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}
+                    >
+                      <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
+                        {user && event && (
+                          <ActivityTracker eventSlug={event.slug} />
+                        )}
+                      </Box>
+                      <Box style={{ flex: '1 1 300px', pointerEvents: 'auto' }}>
+                        {/* {event && (
                       <UserActivityFeed eventId={event.id} eventSlug={event.slug} />
                     )} */}
+                      </Box>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
-            </Box>
-          </Box>
 
-          {/* Chat Sidebar Container */}
-          <Box
-            className={`chat-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              bottom: 0,
-              width: '400px',
-              zIndex: 1000,
-              transition: 'right 0.3s ease, bottom 0.3s ease',
-            }}
-          >
-            {/* Chat Sidebar */}
-            <Box
-              component="aside"
-              style={{
-                width: '100%',
-                height: '100%',
-                borderLeft: '1px solid #e5e7eb',
-                display: 'flex',
-                flexDirection: 'column',
-                background: 'rgba(255, 255, 255, 0.8)',
-                overflow: 'hidden',
-              }}
-            >
-              {user && event && (
-                <ChatSidebar
-                  eventId={event.id}
-                  eventSlug={event.slug}
-                  currentUser={user}
-                  currentUserLocation={
-                    userLocations.find(loc => loc.userId === user.id)
-                      ?.location || null
-                  }
-                  currentUserDistance={currentUserDistance}
-                  onToggleSidebar={() =>
-                    setIsSidebarCollapsed(!isSidebarCollapsed)
-                  }
-                />
-              )}
-            </Box>
+                {/* Chat Sidebar Container */}
+                <aside
+                  style={{
+                    position: 'fixed',
+                    top: `${headerHeight}px`,
+                    right: isSidebarCollapsed ? '-400px' : '0px',
+                    bottom: 0,
+                    width: '400px',
+                    zIndex: 1000,
+                    transition: 'right 0.3s ease',
+                    borderLeft: '1px solid #e5e7eb',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                  }}
+                >
+                  {/* Chat Sidebar */}
+                  <Box
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {user && event && (
+                      <ChatSidebar
+                        eventId={event.id}
+                        eventSlug={event.slug}
+                        currentUser={user}
+                        currentUserLocation={
+                          userLocations.find(loc => loc.userId === user.id)
+                            ?.location || null
+                        }
+                        currentUserDistance={currentUserDistance}
+                        onToggleSidebar={() => {
+                          console.log('hello?');
+                          setIsSidebarCollapsed(!isSidebarCollapsed);
+                        }}
+                      />
+                    )}
+                  </Box>
+                </aside>
+              </>
+            )}
           </Box>
         </Box>
       </Box>

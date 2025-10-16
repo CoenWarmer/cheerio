@@ -13,6 +13,7 @@ import {
   Center,
   Paper,
 } from '@mantine/core';
+import { useTranslations, useLocale } from 'next-intl';
 import { ApiError } from '@/lib/api-client';
 import type { User } from '@supabase/supabase-js';
 import { useMessages, useSendMessage } from '@/hooks/useMessages';
@@ -24,6 +25,7 @@ import {
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { ChatIcon } from './icons/ChatIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
+import { isEmoji } from '@/utils/emoji';
 
 interface ChatSidebarProps {
   eventId: string; // Event UUID for realtime subscriptions
@@ -96,6 +98,9 @@ export default function ChatSidebar({
   currentUserDistance = 0,
   onToggleSidebar,
 }: ChatSidebarProps) {
+  const t = useTranslations('chat');
+  const locale = useLocale();
+
   // Use hooks for data fetching
   const { messages: messagesData, isLoading: loading } = useMessages(
     eventId,
@@ -157,13 +162,6 @@ export default function ChatSidebar({
     };
   }, [eventSlug, updatePresence, removePresence]);
 
-  // Helper to check if a string is a single emoji
-  const isEmoji = (str: string): boolean => {
-    const emojiRegex =
-      /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Extended_Pictographic})$/u;
-    return emojiRegex.test(str.trim());
-  };
-
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
 
@@ -193,9 +191,9 @@ export default function ChatSidebar({
     } catch (err) {
       console.error('Failed to send message:', err);
       if (err instanceof ApiError) {
-        alert(`Failed to send message: ${err.message}`);
+        alert(t('sendMessageErrorDetail', { error: err.message }));
       } else {
-        alert('Failed to send message');
+        alert(t('sendMessageError'));
       }
     } finally {
       setSending(false);
@@ -209,12 +207,12 @@ export default function ChatSidebar({
     const hours = Math.floor(diff / (1000 * 60 * 60));
 
     if (hours < 24) {
-      return date.toLocaleTimeString('en-US', {
+      return date.toLocaleTimeString(locale, {
         hour: 'numeric',
         minute: '2-digit',
       });
     } else {
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',
@@ -229,24 +227,24 @@ export default function ChatSidebar({
       <Group p="md" justify="space-between" bg="white" style={HEADER_STYLE}>
         <Group gap="10px">
           <Text size="lg" fw={700}>
-            Chat
+            {t('title')}
           </Text>
           <ChatIcon fill="#228be6" />
         </Group>
         <Group gap="xs">
           <Text size="xs" c="gray.6">
-            {messagesData.length} message{messagesData.length !== 1 ? 's' : ''}
+            {t('messageCount', { count: messagesData.length })}
           </Text>
           <Text c="gray.3">•</Text>
           <Badge color="green" variant="dot" size="sm">
-            {activeUsers} active
+            {t('activeUsers', { count: activeUsers })}
           </Badge>
           <ActionIcon
             variant="subtle"
             color="gray"
             size="sm"
             onClick={onToggleSidebar}
-            aria-label="Close chat"
+            aria-label={t('closeChat')}
           >
             ✕
           </ActionIcon>
@@ -258,14 +256,14 @@ export default function ChatSidebar({
         <Stack gap="md">
           {loading ? (
             <Center h="100%">
-              <Text c="gray.6">Loading messages...</Text>
+              <Text c="gray.6">{t('loadingMessages')}</Text>
             </Center>
           ) : messagesData.length === 0 ? (
             <Center h="100%">
               <Stack align="center" gap="xs">
                 <Text fz={32}>💬</Text>
                 <Text size="sm" c="gray.6" ta="center">
-                  No messages yet. Start the conversation!
+                  {t('noMessages')}
                 </Text>
               </Stack>
             </Center>
@@ -273,8 +271,8 @@ export default function ChatSidebar({
             messagesData.map(message => {
               const isCurrentUser = message.user_id === currentUser.id;
               const userName = isCurrentUser
-                ? 'You'
-                : message.userName || 'Unknown User';
+                ? t('you')
+                : message.userName || t('unknownUser');
 
               return (
                 <Stack
@@ -323,7 +321,7 @@ export default function ChatSidebar({
                     pr={isCurrentUser ? 'xs' : 0}
                   >
                     {formatTime(message.created_at)}
-                    {message.edited_at && ' (edited)'}
+                    {message.edited_at && ` (${t('edited')})`}
                   </Text>
                 </Stack>
               );
@@ -341,7 +339,7 @@ export default function ChatSidebar({
               flex={1}
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
+              placeholder={t('typeMessage')}
               disabled={sending || isRecording || isRecordingSending}
               radius="xl"
               size="sm"
@@ -358,7 +356,7 @@ export default function ChatSidebar({
               {isRecording ? (
                 <>
                   <Box style={PULSE_DOT_STYLE} />
-                  Stop
+                  {t('stop')}
                 </>
               ) : (
                 <>
@@ -378,21 +376,10 @@ export default function ChatSidebar({
               radius="xl"
               size="sm"
             >
-              {sending ? 'Sending...' : 'Send'}
+              {sending ? t('sending') : t('send')}
             </Button>
           </Group>
         </form>
-        <style jsx>{`
-          @keyframes pulse {
-            0%,
-            100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.5;
-            }
-          }
-        `}</style>
       </Box>
     </Box>
   );
