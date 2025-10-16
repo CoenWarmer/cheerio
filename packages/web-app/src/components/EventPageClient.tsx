@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Box, Center, Stack, Title, Text, Anchor } from '@mantine/core';
 import { useTranslations } from 'next-intl';
@@ -33,9 +32,8 @@ const EventMap = dynamic(() => import('@/components/EventMap'), {
 });
 
 export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
-  const router = useRouter();
   const t = useTranslations('eventPage');
-  const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   const { headerHeight } = useHeader();
 
   const { event, isLoading, error: eventError } = useEvent(eventSlug);

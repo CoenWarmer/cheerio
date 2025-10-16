@@ -241,18 +241,18 @@ function MapClickHandler({
     click: e => {
       if (confettiMode && eventSlug) {
         const { lat, lng } = e.latlng;
-        
+
         // Get the container point (pixel coordinates) from the lat/lng
         const point = map.latLngToContainerPoint(e.latlng);
-        
+
         // Get the map container's bounding rect to calculate position relative to viewport
         const mapContainer = map.getContainer();
         const rect = mapContainer.getBoundingClientRect();
-        
+
         // Calculate normalized coordinates (0 to 1) for confetti
         const x = (rect.left + point.x) / window.innerWidth;
         const y = (rect.top + point.y) / window.innerHeight;
-        
+
         // Trigger confetti explosion at the click location
         confetti({
           particleCount: 100,
@@ -261,7 +261,7 @@ function MapClickHandler({
           colors: ['#228be6', '#ff6b6b', '#51cf66', '#ffd43b', '#ff8787'],
           ticks: 200,
         });
-        
+
         onMessageSent(lat, lng);
       }
     },

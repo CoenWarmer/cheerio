@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Title, Text, Stack } from '@mantine/core';
+import { Container, Stack } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import HomeClient from '@/components/HomeClient';
