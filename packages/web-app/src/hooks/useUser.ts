@@ -1,35 +1,44 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
+export const userKeys = {
+  all: ['user'] as const,
+  current: () => [...userKeys.all, 'current'] as const,
+};
+
+async function fetchCurrentUser(): Promise<User | null> {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+
+  return user;
+}
+
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: userKeys.current(),
+    queryFn: fetchCurrentUser,
+    staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: 1, // Only retry once on failure
+  });
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError) throw authError;
-        setUser(user);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error('Failed to fetch user')
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  return { user, isLoading, error };
+  return {
+    user: user ?? null,
+    isLoading,
+    error: error ? new Error(error.message) : null,
+  };
 }

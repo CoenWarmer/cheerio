@@ -170,7 +170,8 @@ export default function ChatSidebar({
       // Remove presence when leaving
       removePresence({ eventId: eventSlug, userId: currentUser.id });
     };
-  }, [eventSlug, currentUser?.id, updatePresence, removePresence]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventSlug, currentUser?.id]);
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();

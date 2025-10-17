@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { useUser } from './useUser';
+import { useUser, userKeys } from './useUser';
 import { anonymousUserStorage } from '@/lib/anonymous-user';
 import type { User } from '@supabase/supabase-js';
 
@@ -11,6 +12,7 @@ export function useAuth() {
   const { user: initialUser, isLoading } = useUser();
   const [user, setUser] = useState<User | null>(initialUser);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Sync initial user from useUser hook
   useEffect(() => {
@@ -26,6 +28,9 @@ export function useAuth() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
 
+      // Invalidate user cache on auth state changes
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
+
       if (event === 'SIGNED_IN') {
         router.refresh();
       }
@@ -37,7 +42,7 @@ export function useAuth() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, queryClient]);
 
   return {
     user,
@@ -48,6 +53,9 @@ export function useAuth() {
 
       // Clear anonymous user data from localStorage
       anonymousUserStorage.clear();
+
+      // Invalidate user cache
+      queryClient.invalidateQueries({ queryKey: userKeys.current() });
 
       router.push('/');
     },

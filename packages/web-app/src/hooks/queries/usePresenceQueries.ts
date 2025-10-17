@@ -56,7 +56,6 @@ export function usePresenceRealtimeQuery(eventId: string, eventSlug: string) {
 }
 
 export function useUpdatePresenceMutation() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       eventId,
@@ -67,19 +66,14 @@ export function useUpdatePresenceMutation() {
       status?: 'online' | 'away';
       userId?: string;
     }) => presenceApi.update(eventId, status, userId),
-    onSuccess: (_, { eventId }) => {
-      queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
-    },
+    // No need to invalidate - realtime subscription handles updates automatically
   });
 }
 
 export function useRemovePresenceMutation() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ eventId, userId }: { eventId: string; userId?: string }) =>
       presenceApi.remove(eventId, userId),
-    onSuccess: (_, { eventId }) => {
-      queryClient.invalidateQueries({ queryKey: presenceKeys.list(eventId) });
-    },
+    // No need to invalidate - realtime subscription handles updates automatically
   });
 }

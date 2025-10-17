@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { messagesApi } from '@/lib/api/messages-api';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import type { Message } from '@/types/types';
 
 export const messageKeys = {
   all: ['messages'] as const,
@@ -74,7 +75,53 @@ export function useSendMessageMutation() {
         user_id?: string;
       };
     }) => messagesApi.create(eventId, messageData),
-    onSuccess: (_, { eventId }) => {
+    // Optimistic update: add message immediately before API call
+    onMutate: async ({ eventId, messageData }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: messageKeys.list(eventId) });
+
+      // Snapshot the previous value for rollback
+      const previousMessages = queryClient.getQueryData(
+        messageKeys.list(eventId)
+      );
+
+      // Optimistically update the cache
+      queryClient.setQueryData(
+        messageKeys.list(eventId),
+        (old: { data: Message[] } | undefined) => {
+          const optimisticMessage: Message = {
+            id: `temp-${Date.now()}`, // Temporary ID
+            content: messageData.content,
+            attachment: messageData.attachment || null,
+            location: messageData.location || null,
+            user_id: messageData.user_id || '',
+            event_id: eventId,
+            created_at: new Date().toISOString(),
+            deleted: false,
+            edited_at: null,
+          };
+
+          return {
+            data: [...(old?.data || []), optimisticMessage],
+          };
+        }
+      );
+
+      // Return context with previous value for rollback
+      return { previousMessages };
+    },
+    // If mutation fails, rollback to previous messages
+    onError: (err, { eventId }, context) => {
+      if (context?.previousMessages) {
+        queryClient.setQueryData(
+          messageKeys.list(eventId),
+          context.previousMessages
+        );
+      }
+      console.error('Failed to send message:', err);
+    },
+    // Always refetch after error or success (realtime will update with real data)
+    onSettled: (_, __, { eventId }) => {
       queryClient.invalidateQueries({ queryKey: messageKeys.list(eventId) });
     },
   });
