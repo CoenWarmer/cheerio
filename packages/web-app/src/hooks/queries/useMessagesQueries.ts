@@ -73,6 +73,7 @@ export function useSendMessageMutation() {
         };
         location?: { lat: number; long: number };
         user_id?: string;
+        user_name?: string;
       };
     }) => messagesApi.create(eventId, messageData),
     // Optimistic update: add message immediately before API call
@@ -89,12 +90,13 @@ export function useSendMessageMutation() {
       queryClient.setQueryData(
         messageKeys.list(eventId),
         (old: { data: Message[] } | undefined) => {
-          const optimisticMessage: Message = {
+          const optimisticMessage: Message & { user_name?: string } = {
             id: `temp-${Date.now()}`, // Temporary ID
             content: messageData.content,
             attachment: messageData.attachment || null,
             location: messageData.location || null,
             user_id: messageData.user_id || '',
+            user_name: messageData.user_name,
             event_id: eventId,
             created_at: new Date().toISOString(),
             deleted: false,

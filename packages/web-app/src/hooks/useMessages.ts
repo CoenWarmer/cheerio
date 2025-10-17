@@ -5,7 +5,6 @@ import {
   useMessagesRealtimeQuery,
   useSendMessageMutation,
 } from './queries/useMessagesQueries';
-import { useProfiles } from './useProfiles';
 import type { Message } from '@/types/types';
 
 export type MessageAttachment = {
@@ -19,33 +18,26 @@ export type MessageAttachment = {
 
 export type EnrichedMessage = Omit<Message, 'attachment'> & {
   userName?: string;
+  user_name?: string | null;
   attachment?: MessageAttachment | null;
 };
 
 export function useMessages(eventId: string, eventSlug: string) {
-  const { data, isLoading, error } = useMessagesRealtimeQuery(eventId, eventSlug);
+  const { data, isLoading, error } = useMessagesRealtimeQuery(
+    eventId,
+    eventSlug
+  );
 
-  const messages = useMemo(() => data?.data ?? [], [data]);
-
-  // Get unique user IDs from messages
-  const uniqueUserIds = useMemo(() => {
-    return Array.from(
-      new Set(messages.map(msg => msg.user_id).filter(Boolean))
-    );
-  }, [messages]);
-
-  // Fetch profiles for all users in messages
-  const { profiles } = useProfiles(uniqueUserIds);
-
-  // Enrich messages with user names
+  // Messages are already enriched with user_name from the API
   const enrichedMessages = useMemo<EnrichedMessage[]>(() => {
+    const messages = data?.data ?? [];
     return messages.map(msg => ({
       ...msg,
       userName:
-        profiles.find(p => p.id === msg.user_id)?.display_name ?? undefined,
+        (msg as Message & { user_name?: string }).user_name ?? undefined,
       attachment: msg.attachment as MessageAttachment | null,
     }));
-  }, [messages, profiles]);
+  }, [data]);
 
   return {
     messages: enrichedMessages,

@@ -21,7 +21,8 @@ export async function GET(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    const { data, error } = await supabase
+    // Fetch messages
+    const { data: messages, error } = await supabase
       .from('messages')
       .select('*')
       .eq('event_id', event.id)
@@ -33,7 +34,37 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json({ data });
+    if (!messages || messages.length === 0) {
+      return NextResponse.json({ data: [] });
+    }
+
+    // Get unique user IDs
+    const userIds = Array.from(new Set(messages.map(m => m.user_id)));
+
+    // Fetch profiles for all users (both authenticated and anonymous)
+    // Note: User IDs can reference either 'profiles' or 'anonymous_profiles'
+    const [authenticatedProfiles, anonymousProfiles] = await Promise.all([
+      supabase.from('profiles').select('id, display_name').in('id', userIds),
+      supabase
+        .from('anonymous_profiles')
+        .select('id, display_name')
+        .in('id', userIds),
+    ]);
+
+    // Combine profiles from both tables
+    const profileMap = new Map<string, string | null>();
+    authenticatedProfiles.data?.forEach(p =>
+      profileMap.set(p.id, p.display_name)
+    );
+    anonymousProfiles.data?.forEach(p => profileMap.set(p.id, p.display_name));
+
+    // Enrich messages with user names
+    const enrichedMessages = messages.map(msg => ({
+      ...msg,
+      user_name: profileMap.get(msg.user_id) || null,
+    }));
+
+    return NextResponse.json({ data: enrichedMessages });
   } catch (err) {
     console.error('API error:', err);
     return NextResponse.json(

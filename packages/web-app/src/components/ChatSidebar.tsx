@@ -186,9 +186,11 @@ export default function ChatSidebar({
         content: string;
         location?: { lat: number; long: number; distance?: number };
         user_id?: string;
+        user_name?: string;
       } = {
         content,
         user_id: currentUser.id,
+        user_name: currentUser.displayName || undefined,
       };
 
       // If this is an emoji and the user has a location, include it with distance
