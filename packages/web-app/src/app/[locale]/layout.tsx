@@ -12,6 +12,7 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { AppHeader } from '@/components/AppHeader';
 import { HeaderProvider } from '@/providers/HeaderProvider';
+import { Content } from './Content';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -64,7 +65,7 @@ export default async function RootLayout({
             <QueryProvider>
               <HeaderProvider>
                 <AppHeader />
-                {children}
+                <Content>{children}</Content>
               </HeaderProvider>
             </QueryProvider>
           </MantineProvider>
