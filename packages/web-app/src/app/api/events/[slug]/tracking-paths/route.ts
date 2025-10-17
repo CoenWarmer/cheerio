@@ -91,20 +91,24 @@ export async function GET(
       const locationData = activity.data as { lat: number; long: number };
       const timestamp = new Date(activity.created_at || new Date());
 
-      // Check if we should start a new path
-      const shouldStartNewPath =
-        !currentPath ||
-        currentPath.userId !== userId ||
-        (lastTimestamp &&
-          timestamp.getTime() - lastTimestamp.getTime() > MAX_GAP_MS);
+      // Check if we should start a new path (new user or time gap)
+      const isNewUser = currentPath && currentPath.userId !== userId;
+      const hasTimeGap =
+        lastTimestamp &&
+        currentPath &&
+        timestamp.getTime() - lastTimestamp.getTime() > MAX_GAP_MS;
 
-      if (shouldStartNewPath) {
+      if (isNewUser || hasTimeGap) {
         // Save the previous path if it has at least 2 points
-        if (currentPath && currentPath.coordinates.length >= 2) {
-          paths.push(currentPath);
+        // We know currentPath is not null here because of the conditions above
+        if (currentPath!.coordinates.length >= 2) {
+          paths.push(currentPath!);
         }
+        currentPath = null; // Reset for new path
+      }
 
-        // Start a new path
+      // Start a new path if needed
+      if (!currentPath) {
         const userIndex = uniqueUserIds.indexOf(userId);
         currentPath = {
           userId,
@@ -116,7 +120,7 @@ export async function GET(
       }
 
       // Add coordinate to current path
-      currentPath!.coordinates.push({
+      currentPath.coordinates.push({
         lat: locationData.lat,
         lng: locationData.long,
         timestamp: activity.created_at || new Date().toISOString(),
@@ -125,9 +129,12 @@ export async function GET(
       lastTimestamp = timestamp;
     });
 
-    // Don't forget to add the last path
-    if (currentPath && currentPath.coordinates.length >= 2) {
-      paths.push(currentPath);
+    // Add the last path if it has at least 2 points
+    if (currentPath) {
+      const path: TrackingPath = currentPath;
+      if (path.coordinates.length >= 2) {
+        paths.push(path);
+      }
     }
 
     return NextResponse.json({ data: paths });
