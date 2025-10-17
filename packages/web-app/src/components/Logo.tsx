@@ -3,7 +3,6 @@
 import { Anchor, Text } from '@mantine/core';
 import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
 import Link from 'next/link';
-import { useMediaQuery } from '@mantine/hooks';
 
 export function Logo({
   mode,
@@ -14,8 +13,6 @@ export function Logo({
   size?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs' | 'l' | 'xl' | 'xxl';
   showText?: boolean;
 }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
-  console.log(showText);
   let sizeNumber = 28;
   switch (size) {
     case 'xxs':

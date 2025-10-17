@@ -23,7 +23,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import confetti from 'canvas-confetti';
 
 const flagIcon = L.divIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#228be6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-flag"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9z" /><path d="M5 21v-7" /></svg>`,
+  html: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#228be6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-flag flag-animated"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9z" /><path d="M5 21v-7" /></svg>`,
   className: 'custom-flag-marker',
   iconSize: [60, 60],
   iconAnchor: [15, 45],
@@ -382,6 +382,34 @@ export default function EventMap({
           /* Keep pointer cursor for clickable elements */
           .leaflet-interactive {
             cursor: pointer;
+          }
+          
+          /* Flag bunny hop animation */
+          @keyframes bunny-hop {
+            0%, 100% {
+              transform: translateY(0) scale(1);
+            }
+            10% {
+              transform: translateY(-15px) scale(1.05);
+            }
+            20% {
+              transform: translateY(0) scale(0.95, 1.05);
+            }
+            30% {
+              transform: translateY(-8px) scale(1.02);
+            }
+            40% {
+              transform: translateY(0) scale(0.98, 1.02);
+            }
+            50%, 100% {
+              transform: translateY(0) scale(1);
+            }
+          }
+          
+          .flag-animated {
+            animation: bunny-hop 2s ease-out infinite;
+            transform-origin: center bottom;
+            display: block;
           }
         `}
       </style>

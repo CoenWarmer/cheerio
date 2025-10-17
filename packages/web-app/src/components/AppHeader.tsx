@@ -157,7 +157,7 @@ export function AppHeader(props?: AppHeaderProps) {
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 1000,
+        zIndex: 100,
         background: 'white',
         borderBottom: '1px solid #e5e7eb',
         flexShrink: 0,

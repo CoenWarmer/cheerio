@@ -208,7 +208,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                     zIndex: 1000,
                     transition: 'right 0.3s ease',
                     borderLeft: '1px solid #e5e7eb',
-                    background: 'rgba(255, 255, 255, 0.8)',
+                    background: 'rgba(255, 255, 255, 0.9)',
                   }}
                 >
                   {/* Chat Sidebar */}

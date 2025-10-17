@@ -26,7 +26,6 @@ import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { ChatIcon } from './icons/ChatIcon';
 import { MicrophoneIcon } from './icons/MicrophoneIcon';
 import { isEmoji } from '@/utils/emoji';
-import { SpeakerphoneIcon } from './icons/SpeakerphoneIcon';
 
 interface ChatSidebarProps {
   eventId: string; // Event UUID for realtime subscriptions
@@ -238,11 +237,11 @@ export default function ChatSidebar({
     <Box h="100%" style={CONTAINER_STYLE}>
       {/* Chat Header */}
       <Group p="md" justify="space-between" bg="white" style={HEADER_STYLE}>
-        <Group gap="10px">
+        <Group gap="5px">
+          <ChatIcon fill="#228be6" />
           <Text size="lg" fw={700}>
             {t('title')}
           </Text>
-          <ChatIcon fill="#228be6" />
         </Group>
         <Group gap="xs">
           <Text size="xs" c="gray.6">
@@ -274,8 +273,6 @@ export default function ChatSidebar({
           ) : messagesData.length === 0 ? (
             <Center h="100%">
               <Stack align="center" gap="xs">
-                <SpeakerphoneIcon size={128} fill="rgba(0,0,0,0.2)" />
-
                 <Text size="sm" c="gray.6" ta="center">
                   {t('noMessages')}
                 </Text>
