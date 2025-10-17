@@ -31,6 +31,7 @@ import { useHeader } from '@/providers/HeaderProvider';
 import { useEvent } from '@/hooks/useEvents';
 import { Countdown } from './Countdown';
 import { useAuth } from '@/hooks/useAuth';
+import styles from './appHeader.module.css';
 
 interface AppHeaderProps {
   /** Current page title (e.g., event name, "Dashboard", "Profile") */
@@ -150,7 +151,13 @@ export function AppHeader(props?: AppHeaderProps) {
     <Box
       ref={headerRef}
       component="header"
+      className={styles.header}
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
         background: 'white',
         borderBottom: '1px solid #e5e7eb',
         flexShrink: 0,

@@ -1,0 +1,15 @@
+.header {
+  animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+  opacity: 0;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

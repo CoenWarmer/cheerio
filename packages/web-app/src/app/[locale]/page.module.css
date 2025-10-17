@@ -15,9 +15,20 @@
   gap: 64px;
   font-family: var(--font-geist-sans);
   background-image: url('/hero.png');
-  background-size: cover;
-  background-position: center;
+  background-size: contain;
+  background-position: bottom left;
   background-repeat: no-repeat;
+
+  @media (max-width: 700px) {
+    background-position: bottom left;
+    background-origin: padding-box;
+    background-size: contain;
+    background-repeat: no-repeat;
+    /* background-size: cover; */
+    background-size: 140% auto;
+    background-position-y: 330px;
+    background-position-x: -200px;
+  }
 }
 
 .title {
@@ -54,6 +65,11 @@
   max-width: 100%;
   background: rgba(255, 255, 255, 0.8);
   padding: 32px;
+  margin-bottom: 100px;
+  animation: fadeInDown 1s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
 .main ol {
@@ -185,5 +201,16 @@ a.secondary {
 @media (prefers-color-scheme: dark) {
   .logo {
     filter: invert();
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
