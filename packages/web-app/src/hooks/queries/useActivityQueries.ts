@@ -22,8 +22,8 @@ export function useActivitiesQuery(
     queryKey: activityKeys.list(eventSlug, filters),
     queryFn: () => activityApi.getActivities(eventSlug, filters),
     enabled: !!eventSlug,
-    refetchInterval: 5000, // Poll every 5 seconds
-    refetchIntervalInBackground: true,
+    // No polling needed - realtime subscriptions handle updates
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 }
 

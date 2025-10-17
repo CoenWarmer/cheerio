@@ -16,7 +16,8 @@ export function usePresenceQuery(eventSlug: string) {
     queryKey: presenceKeys.list(eventSlug),
     queryFn: () => presenceApi.getActive(eventSlug),
     enabled: !!eventSlug,
-    refetchInterval: 30000, // Refetch every 30s as fallback
+    // No polling needed - realtime subscriptions handle all updates
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 }
 
