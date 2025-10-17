@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -18,7 +18,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useCreateEvent } from '@/hooks/useEvents';
 import { ApiError } from '@/lib/api/api-client';
 import { getCurrentLocation, isValidCoordinates } from '@/utils/location';
@@ -34,7 +34,12 @@ export default function NewEventPage() {
   const router = useRouter();
   const t = useTranslations('newEvent');
   const tNav = useTranslations('navigation');
-  const { currentUser, isAuthenticated } = useCurrentUser();
+  const locale = useLocale();
+  const {
+    currentUser,
+    isAuthenticated,
+    isLoading: userLoading,
+  } = useCurrentUser();
   const { createEventAsync, isCreating } = useCreateEvent();
   const { permissions } = useProfile();
 
@@ -56,6 +61,26 @@ export default function NewEventPage() {
     showNavigationLinks: true,
     showLogoText: !isMobile,
   });
+
+  // Redirect to on-your-marks if not logged in (either authenticated or anonymous)
+  useEffect(() => {
+    if (!userLoading && !currentUser) {
+      router.push(`/${locale}/on-your-marks`);
+    }
+  }, [currentUser, userLoading, router, locale]);
+
+  // Show loading while checking authentication
+  if (userLoading || !currentUser) {
+    return (
+      <Box mih="100vh" bg="gray.0">
+        <Container size="md" py="xl">
+          <Text c="gray.6" ta="center">
+            Loading...
+          </Text>
+        </Container>
+      </Box>
+    );
+  }
 
   const handleGetCurrentLocation = async () => {
     setLoadingLocation(true);

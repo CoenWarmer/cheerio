@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Box, Center, Stack, Title, Text, Anchor } from '@mantine/core';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ChatSidebar from '@/components/ChatSidebar';
 import ActivityTracker from '@/components/ActivityTracker';
 import dynamic from 'next/dynamic';
@@ -33,8 +34,10 @@ const EventMap = dynamic(() => import('@/components/EventMap'), {
 });
 
 export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
+  const router = useRouter();
   const t = useTranslations('eventPage');
-  const { currentUser } = useCurrentUser();
+  const locale = useLocale();
+  const { currentUser, isLoading: userLoading } = useCurrentUser();
   const { headerHeight } = useHeader();
 
   const { event, isLoading, error: eventError } = useEvent(eventSlug);
@@ -76,12 +79,12 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
     onUserSelect: setSelectedUserId,
   });
 
-  // Redirect to sign-in if no user
-  // useEffect(() => {
-  //   if (!userLoading && !currentUser) {
-  //     router.push('/sign-in');
-  //   }
-  // }, [currentUser, userLoading, router]);
+  // Redirect to on-your-marks if not logged in (either authenticated or anonymous)
+  useEffect(() => {
+    if (!userLoading && !currentUser) {
+      router.push(`/${locale}/on-your-marks`);
+    }
+  }, [currentUser, userLoading, router, locale]);
 
   // Automatically join the event when visiting
   useEffect(() => {
@@ -93,6 +96,23 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
       }
     }
   }, [eventSlug, currentUser?.id, joinEvent]);
+
+  // Show loading while checking authentication
+  if (userLoading || !currentUser) {
+    return (
+      <Box
+        style={{
+          display: 'flex',
+          height: `calc(100vh - ${headerHeight}px)`,
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f9fafb',
+        }}
+      >
+        <Text c="gray.6">Loading...</Text>
+      </Box>
+    );
+  }
 
   return (
     <>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -16,16 +16,28 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { supabase } from '@/lib/supabase';
 
 export default function SignInPage() {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('auth.signIn');
+  const { user } = useAuth();
+  const { currentUser } = useCurrentUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user || currentUser) {
+      router.push(`/${locale}/events`);
+    }
+  }, [user, currentUser, router, locale]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +53,7 @@ export default function SignInPage() {
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        router.push('/events');
+        router.push(`/${locale}/events`);
         router.refresh();
       }
     } catch {
@@ -96,7 +108,7 @@ export default function SignInPage() {
 
             <Text ta="center" size="sm" c="gray.6">
               {t('noAccount')}{' '}
-              <Anchor component={Link} href="/register" fw={500}>
+              <Anchor component={Link} href={`/${locale}/register`} fw={500}>
                 {t('signUp')}
               </Anchor>
             </Text>

@@ -10,20 +10,33 @@ import {
   Center,
   Card,
 } from '@mantine/core';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useEvents } from '@/hooks/useEvents';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { EventCard } from '@/components/EventCard';
-import classes from './EventsList.module.css';
 import { SpeakerphoneIcon } from '@/components/icons/SpeakerphoneIcon';
 import { useMediaQuery } from '@mantine/hooks';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import classes from './EventsList.module.css';
 
 export default function EventsListPage() {
   const { events, isLoading: loading, error } = useEvents();
   const t = useTranslations('events');
   const tNav = useTranslations('navigation');
+  const locale = useLocale();
+  const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const router = useRouter();
 
   const isMobile = useMediaQuery('(max-width: 48em)');
+
+  // Redirect to on-your-marks if not logged in (either authenticated or anonymous)
+  useEffect(() => {
+    if (!userLoading && !currentUser) {
+      router.push(`/${locale}/on-your-marks`);
+    }
+  }, [currentUser, userLoading, router, locale]);
 
   // Configure the header for this page
   useHeaderConfig({
@@ -31,6 +44,19 @@ export default function EventsListPage() {
     showNavigationLinks: true,
     showLogoText: !isMobile,
   });
+
+  // Show loading while checking authentication
+  if (userLoading || !currentUser) {
+    return (
+      <Box mih="100vh" bg="gray.0">
+        <Container size="xl" py="xl">
+          <Center>
+            <Text c="gray.6">Loading...</Text>
+          </Center>
+        </Container>
+      </Box>
+    );
+  }
 
   if (loading) {
     return (
