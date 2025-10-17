@@ -22,6 +22,16 @@ export function useAudioRecorder({
   const { currentUser } = useCurrentUser();
 
   const startRecording = useCallback(async () => {
+    // Ensure we have a user ID before starting
+    if (!currentUser?.id) {
+      console.error('Cannot record: No user ID available');
+      alert('Please wait for your profile to load before recording.');
+      return;
+    }
+
+    // Capture user ID at the start to use in the onstop callback
+    const userId = currentUser.id;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -65,14 +75,15 @@ export function useAudioRecorder({
           const { attachment } = await attachmentsApi.upload(
             audioBlob,
             eventSlug,
-            'audio'
+            'audio',
+            userId
           );
 
           // Send message with attachment URL
           const messageData = {
             content: '📢 Cheerioo!',
             attachment,
-            user_id: currentUser?.id,
+            user_id: userId,
           };
 
           sendMessage({ eventId: eventSlug, messageData });
@@ -101,7 +112,7 @@ export function useAudioRecorder({
         'Failed to access microphone. Please grant permission and try again.'
       );
     }
-  }, [eventSlug, sendMessage, onRecordingComplete, currentUser?.id]);
+  }, [eventSlug, sendMessage, onRecordingComplete, currentUser]);
 
   const stopRecording = useCallback(() => {
     if (

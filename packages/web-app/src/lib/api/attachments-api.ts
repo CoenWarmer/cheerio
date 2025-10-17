@@ -10,7 +10,8 @@ export const attachmentsApi = {
   async upload(
     file: Blob,
     eventId: string,
-    type: 'audio' | 'image' | 'video'
+    type: 'audio' | 'image' | 'video',
+    userId?: string
   ): Promise<{
     success: boolean;
     attachment: {
@@ -25,6 +26,10 @@ export const attachmentsApi = {
     formData.append('file', file, `recording.webm`);
     formData.append('eventId', eventId);
     formData.append('type', type);
+
+    if (userId) {
+      formData.append('user_id', userId);
+    }
 
     const response = await fetch('/api/attachments/upload', {
       method: 'POST',

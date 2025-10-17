@@ -9,21 +9,27 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerClient();
 
-    // Get the current user
+    // Get authenticated user (if logged in)
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const eventId = formData.get('eventId') as string;
     const type = formData.get('type') as string; // e.g., 'audio', 'image', 'video'
+    const user_id = formData.get('user_id') as string; // For anonymous users
+
+    // Support both authenticated users and anonymous users
+    const userId = user_id || user?.id;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID required (authenticated or anonymous)' },
+        { status: 400 }
+      );
+    }
 
     if (!file || !eventId || !type) {
       return NextResponse.json(
@@ -63,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now();
     const extension = file.name.split('.').pop() || 'webm';
-    const filename = `${type}-${user.id}-${timestamp}.${extension}`;
+    const filename = `${type}-${userId}-${timestamp}.${extension}`;
     const filePath = `${type}-messages/${eventId}/${filename}`;
 
     // Convert File to ArrayBuffer then to Buffer
