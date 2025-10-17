@@ -9,6 +9,7 @@ export interface TrackingPath {
   userName?: string;
   coordinates: Array<{ lat: number; lng: number; timestamp: string }>;
   color: string;
+  sessionId: string; // Unique ID for each tracking session
 }
 
 export const trackingPathKeys = {

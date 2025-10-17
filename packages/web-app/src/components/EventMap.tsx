@@ -704,7 +704,7 @@ export default function EventMap({
 
           return (
             <Polyline
-              key={path.userId}
+              key={path.sessionId}
               positions={positions}
               color={path.color}
               weight={3}

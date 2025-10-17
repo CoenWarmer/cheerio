@@ -44,12 +44,21 @@ if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]
     exit 1
 fi
 
+# Validate required variables
+if [ -z "$CHEERIOO_API_URL" ]; then
+    echo -e "${RED}❌ Error: Missing CHEERIOO_API_URL environment variable${NC}"
+    echo -e "${YELLOW}Set CHEERIOO_API_URL in .env.local${NC}"
+    exit 1
+fi
+
 # Detect current machine's IP address for device builds
 LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "localhost")
 
 # Optional variables with defaults
 API_PORT="${API_PORT:-3001}"
 THUNDERFOREST_API_KEY="${NEXT_PUBLIC_THUNDERFOREST_API_KEY:-}"
+
+CHEERIOO_API_URL="${CHEERIOO_API_URL:-}"
 
 # Generate Config.swift
 cat > "$OUTPUT_FILE" << EOF
@@ -79,9 +88,8 @@ struct Config {
             // Simulator can use localhost
             return "http://localhost:$API_PORT"
         #else
-            // Device needs your Mac's IP address on the local network
-            // Auto-detected IP: $LOCAL_IP
-            return "http://$LOCAL_IP:$API_PORT"
+            // Device uses the API URL from the environment variable
+            return "$CHEERIOO_API_URL"
         #endif
     }()
     

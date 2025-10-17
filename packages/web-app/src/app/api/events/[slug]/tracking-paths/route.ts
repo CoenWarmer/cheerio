@@ -17,11 +17,13 @@ interface TrackingPath {
   userName?: string;
   coordinates: Array<{ lat: number; lng: number; timestamp: string }>;
   color: string;
+  sessionId: string; // Unique ID for each tracking session
 }
 
 /**
  * GET /api/events/[slug]/tracking-paths
  * Fetch tracking paths (polylines) for all users in a event
+ * Separates paths by tracking sessions (breaks polylines when there's a time gap > 2 minutes)
  */
 export async function GET(
   request: NextRequest,
@@ -48,6 +50,7 @@ export async function GET(
       .select('user_id, data, created_at')
       .eq('event_id', event.id)
       .in('activity_type', ['location', 'tracking'])
+      .order('user_id', { ascending: true })
       .order('created_at', { ascending: true });
 
     if (activitiesError) {
@@ -75,31 +78,57 @@ export async function GET(
       profiles?.map(p => [p.id, p.display_name]) || []
     );
 
-    // Group coordinates by user
-    const pathsByUser = new Map<string, TrackingPath>();
+    // Group coordinates by user and tracking session
+    // Break into separate paths when there's a time gap > 2 minutes
+    const MAX_GAP_MS = 2 * 60 * 1000; // 2 minutes
+    const paths: TrackingPath[] = [];
+
+    let currentPath: TrackingPath | null = null;
+    let lastTimestamp: Date | null = null;
 
     activities.forEach(activity => {
       const userId = activity.user_id;
       const locationData = activity.data as { lat: number; long: number };
+      const timestamp = new Date(activity.created_at || new Date());
 
-      if (!pathsByUser.has(userId)) {
+      // Check if we should start a new path
+      const shouldStartNewPath =
+        !currentPath ||
+        currentPath.userId !== userId ||
+        (lastTimestamp &&
+          timestamp.getTime() - lastTimestamp.getTime() > MAX_GAP_MS);
+
+      if (shouldStartNewPath) {
+        // Save the previous path if it has at least 2 points
+        if (currentPath && currentPath.coordinates.length >= 2) {
+          paths.push(currentPath);
+        }
+
+        // Start a new path
         const userIndex = uniqueUserIds.indexOf(userId);
-        pathsByUser.set(userId, {
+        currentPath = {
           userId,
           userName: profileMap.get(userId) || undefined,
           coordinates: [],
           color: TRACKING_COLORS[userIndex % TRACKING_COLORS.length],
-        });
+          sessionId: `${userId}-${timestamp.getTime()}`,
+        };
       }
 
-      pathsByUser.get(userId)!.coordinates.push({
+      // Add coordinate to current path
+      currentPath!.coordinates.push({
         lat: locationData.lat,
         lng: locationData.long,
         timestamp: activity.created_at || new Date().toISOString(),
       });
+
+      lastTimestamp = timestamp;
     });
 
-    const paths = Array.from(pathsByUser.values());
+    // Don't forget to add the last path
+    if (currentPath && currentPath.coordinates.length >= 2) {
+      paths.push(currentPath);
+    }
 
     return NextResponse.json({ data: paths });
   } catch (error) {

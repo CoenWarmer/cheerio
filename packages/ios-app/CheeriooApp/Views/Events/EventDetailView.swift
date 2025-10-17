@@ -168,7 +168,7 @@ struct EventDetailView: View {
                 }
             }
         }
-        .navigationTitle(room.title)
+        .navigationTitle(event.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await joinEventAndSubscribe()
@@ -213,7 +213,7 @@ struct EventDetailView: View {
     
     private func updatePresence() async {
         do {
-            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(room.slug)/presence")!
+            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(event.slug)/presence")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -233,7 +233,7 @@ struct EventDetailView: View {
     
     private func fetchActiveUsers() async {
         do {
-            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(room.slug)/presence")!
+            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(event.slug)/presence")!
             var request = URLRequest(url: url)
             
             if let session = try? await appState.supabase.auth.session {
@@ -261,7 +261,7 @@ struct EventDetailView: View {
     
     private func removePresence() async {
         do {
-            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(room.slug)/presence")!
+            let url = URL(string: "\(Config.apiBaseURL)/api/events/\(event.slug)/presence")!
             var request = URLRequest(url: url)
             request.httpMethod = "DELETE"
             
@@ -341,7 +341,7 @@ struct EventDetailView: View {
                 let uploadResult = try await audioService.uploadAudio(fileURL: fileURL, eventSlug: event.slug)
                 
                 // Send message with audio attachment (matching web app format)
-                let url = URL(string: "\(Config.apiBaseURL)/api/events/\(room.slug)/messages")!
+                let url = URL(string: "\(Config.apiBaseURL)/api/events/\(event.slug)/messages")!
                 var request = URLRequest(url: url)
                 request.httpMethod = "POST"
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -353,6 +353,7 @@ struct EventDetailView: View {
                 let body: [String: Any] = [
                     "content": "🎤 Voice message",
                     "attachment": uploadResult
+                    
                 ]
                 request.httpBody = try JSONSerialization.data(withJSONObject: body)
                 
