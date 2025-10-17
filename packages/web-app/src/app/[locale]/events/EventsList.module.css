@@ -52,8 +52,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--mantine-spacing-sm);
-  margin-bottom: var(--mantine-spacing-xs);
+  /* gap: var(--mantine-spacing-sm); */
+  /* margin-bottom: var(--mantine-spacing-xs); */
 }
 
 .title {

@@ -78,12 +78,12 @@
       "skip": "Passer pour l'instant"
     },
     "anonymous": {
-      "title": "Bienvenue sur Cheerioo",
-      "subtitle": "Choisissez comment commencer",
-      "continueAnonymously": "Continuer Anonymement",
-      "anonymousDescription": "Rejoignez sans créer de compte. Vous pourrez toujours vous inscrire plus tard.",
+      "title": "Bienvenue sur Cheerioo !",
+      "subtitle": "Choisissez comment vous souhaitez commencer.",
+      "continueAnonymously": "Sans compte",
+      "anonymousDescription": "Vous voulez simplement encourager sans créer de compte tout de suite.",
       "createAccount": "Créer un Compte",
-      "accountDescription": "Inscrivez-vous pour sauvegarder votre profil et accéder à toutes les fonctionnalités.",
+      "accountDescription": "Vous créez un compte. Vous pouvez encourager et créer vos propres événements.",
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
       "signIn": "Se connecter",
       "setupTitle": "Une Dernière Chose...",
@@ -97,6 +97,8 @@
   },
   "home": {
     "title": "Bienvenue sur Cheerioo",
+    "description": "Suivez et encouragez vos proches.",
+    "getStartedButton": "Cliquez ici pour commencer !",
     "subtitle": "Soutenez vos amis",
     "getStarted": "Commencer",
     "signIn": "Se connecter",

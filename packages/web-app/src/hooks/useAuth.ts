@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useUser } from './useUser';
+import { anonymousUserStorage } from '@/lib/anonymous-user';
 import type { User } from '@supabase/supabase-js';
 
 export function useAuth() {
@@ -42,7 +43,12 @@ export function useAuth() {
     user,
     loading: isLoading,
     signOut: async () => {
+      // Sign out authenticated user (if any)
       await supabase.auth.signOut();
+
+      // Clear anonymous user data from localStorage
+      anonymousUserStorage.clear();
+
       router.push('/');
     },
   };

@@ -10,16 +10,13 @@ interface UseHeaderConfigOptions {
   eventSlug?: string;
   eventId?: string;
   isChatCollapsed?: boolean;
+  showLogoText?: boolean;
   selectedUserId?: string | null;
   showNavigationLinks?: boolean;
   onChatToggle?: () => void;
   onUserSelect?: (userId: string | null) => void;
 }
 
-/**
- * Hook to configure the AppHeader from within a page component.
- * Updates the header configuration when the component mounts or when dependencies change.
- */
 export function useHeaderConfig(config: UseHeaderConfigOptions) {
   const { setConfig } = useHeader();
 
@@ -39,6 +36,7 @@ export function useHeaderConfig(config: UseHeaderConfigOptions) {
       pageTitle: config.pageTitle,
       showCheerButton: config.showCheerButton ?? false,
       showChatButton: config.showChatButton ?? false,
+      showLogoText: config.showLogoText,
       eventSlug: config.eventSlug,
       eventId: config.eventId,
       isChatCollapsed: config.isChatCollapsed,
@@ -61,6 +59,7 @@ export function useHeaderConfig(config: UseHeaderConfigOptions) {
     config.isChatCollapsed,
     config.selectedUserId,
     config.showNavigationLinks,
+    config.showLogoText,
     setConfig,
   ]);
 }

@@ -14,6 +14,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { useHeader } from '@/providers/HeaderProvider';
+import { useMediaQuery } from '@mantine/hooks';
 
 // Loading component for the map
 function MapLoading() {
@@ -59,6 +60,8 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
+  const isMobile = useMediaQuery('(max-width: 48em)');
+
   // Configure the header from this page
   useHeaderConfig({
     pageTitle: event?.name || '',
@@ -69,6 +72,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
     isChatCollapsed: isSidebarCollapsed,
     onChatToggle: () => setIsSidebarCollapsed(!isSidebarCollapsed),
     selectedUserId,
+    showLogoText: !isMobile,
     onUserSelect: setSelectedUserId,
   });
 

@@ -16,16 +16,20 @@ import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { EventCard } from '@/components/EventCard';
 import classes from './EventsList.module.css';
 import { SpeakerphoneIcon } from '@/components/icons/SpeakerphoneIcon';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function EventsListPage() {
   const { events, isLoading: loading, error } = useEvents();
   const t = useTranslations('events');
   const tNav = useTranslations('navigation');
 
+  const isMobile = useMediaQuery('(max-width: 48em)');
+
   // Configure the header for this page
   useHeaderConfig({
     pageTitle: tNav('events'),
     showNavigationLinks: true,
+    showLogoText: !isMobile,
   });
 
   if (loading) {

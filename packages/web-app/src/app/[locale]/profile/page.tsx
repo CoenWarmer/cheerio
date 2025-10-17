@@ -20,15 +20,18 @@ import { useTranslations } from 'next-intl';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { getPermissionLabel } from '@/types/permissions';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations('profile');
   const tNav = useTranslations('navigation');
+  const isMobile = useMediaQuery('(max-width: 48em)');
 
   useHeaderConfig({
     pageTitle: tNav('profile'),
     showNavigationLinks: true,
+    showLogoText: !isMobile,
   });
 
   const {

@@ -34,7 +34,8 @@ export function LanguageSwitcher() {
         { value: 'fr', label: '🇫🇷' },
         { value: 'ru', label: '🇷🇺' },
       ]}
-      w={60}
+      w={70}
+      px={4}
       size="sm"
     />
   );

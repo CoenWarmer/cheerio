@@ -78,12 +78,12 @@
       "skip": "Nu overslaan"
     },
     "anonymous": {
-      "title": "Welkom bij Cheerioo",
-      "subtitle": "Kies hoe je wilt beginnen",
+      "title": "Welkom bij Cheerioo!",
+      "subtitle": "Kies hoe je wilt beginnen.",
       "continueAnonymously": "Zonder account",
-      "anonymousDescription": "Lekker makkelijk, lekker snel.",
-      "createAccount": "Account Aanmaken",
-      "accountDescription": "Registreer een profiel om evenementen terug te zien.",
+      "anonymousDescription": "Je wilt gewoon aanmoedigen zonder meteen een account aan te maken.",
+      "createAccount": "Account aanmaken",
+      "accountDescription": "Je maakt een account aan. Je kunt aanmoedigen en je eigen evenementen aanmaken.",
       "alreadyHaveAccount": "Heb je al een account?",
       "signIn": "Inloggen",
       "setupTitle": "Nog één ding...",
@@ -91,12 +91,14 @@
       "displayName": "Weergavenaam",
       "displayNamePlaceholder": "Je bijnaam",
       "displayNameRequired": "Voer een weergavenaam in",
-      "getStarted": "Aan de Slag",
+      "getStarted": "We gaan!",
       "creating": "Profiel aanmaken..."
     }
   },
   "home": {
     "title": "Welkom bij Cheerioo",
+    "description": "Track en moedig jouw mensen aan.",
+    "getStartedButton": "Klik hier om te beginnen!",
     "subtitle": "Steun je vrienden",
     "getStarted": "Aan de slag",
     "signIn": "Inloggen",

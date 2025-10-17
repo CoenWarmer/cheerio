@@ -78,12 +78,12 @@
       "skip": "Omitir por ahora"
     },
     "anonymous": {
-      "title": "Bienvenido a Cheerioo",
-      "subtitle": "Elige cómo quieres comenzar",
-      "continueAnonymously": "Continuar Anónimamente",
-      "anonymousDescription": "Únete sin crear una cuenta. Siempre puedes registrarte más tarde.",
+      "title": "¡Bienvenido a Cheerioo!",
+      "subtitle": "Elige cómo quieres comenzar.",
+      "continueAnonymously": "Sin cuenta",
+      "anonymousDescription": "Solo quieres animar sin crear una cuenta de inmediato.",
       "createAccount": "Crear una Cuenta",
-      "accountDescription": "Regístrate para guardar tu perfil y acceder a todas las funciones.",
+      "accountDescription": "Creas una cuenta. Puedes animar y crear tus propios eventos.",
       "alreadyHaveAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
       "setupTitle": "Solo Una Cosa Más...",
@@ -97,6 +97,8 @@
   },
   "home": {
     "title": "Bienvenido a Cheerioo",
+    "description": "Rastrea y anima a tu gente.",
+    "getStartedButton": "¡Haz clic aquí para comenzar!",
     "subtitle": "Apoya a tus amigos",
     "getStarted": "Comenzar",
     "signIn": "Iniciar sesión",

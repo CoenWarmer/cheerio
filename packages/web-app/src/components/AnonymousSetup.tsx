@@ -58,7 +58,7 @@ export default function AnonymousSetup() {
     return (
       <Center p="md">
         <Container size="xs" w="100%">
-          <Paper shadow="sm" p="xl" radius="md" withBorder>
+          <Paper shadow="sm" p="lg" radius="md" withBorder>
             <Stack gap="md">
               <Title order={1} ta="center">
                 {t('setupTitle')}
@@ -98,7 +98,7 @@ export default function AnonymousSetup() {
   }
 
   return (
-    <Center p="md">
+    <Center py="md">
       <Container size="md" w="100%">
         <Stack gap="xl">
           <Stack gap="sm" align="center">
@@ -110,14 +110,19 @@ export default function AnonymousSetup() {
             </Text>
           </Stack>
 
-          <Group gap="md" align="stretch" grow>
+          <Group
+            gap="md"
+            align="stretch"
+            grow
+            style={{ flexDirection: 'column' }}
+          >
             {/* Anonymous Option */}
             <Card
               shadow="sm"
               padding="lg"
               radius="md"
               withBorder
-              style={{ cursor: 'pointer', flex: 1 }}
+              style={{ cursor: 'pointer', flexGrow: 1, maxWidth: '100%' }}
               onClick={() => setStep('setup')}
             >
               <Stack gap="sm">
@@ -145,7 +150,7 @@ export default function AnonymousSetup() {
               withBorder
               component={Link}
               href="/register"
-              style={{ textDecoration: 'none', cursor: 'pointer', flex: 1 }}
+              style={{ cursor: 'pointer', flexGrow: 1, maxWidth: '100%' }}
             >
               <Stack gap="sm">
                 <Group justify="space-between" align="flex-start">

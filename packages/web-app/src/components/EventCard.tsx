@@ -2,21 +2,12 @@
 
 import Link from 'next/link';
 import { Paper, Badge, Group } from '@mantine/core';
-import { IconMapPin, IconRun, IconUsers } from '@tabler/icons-react';
+import { IconCheck, IconMapPin, IconRun, IconUsers } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { usePresence } from '@/hooks/usePresence';
 import { Countdown } from '@/components/Countdown';
 import classes from '@/app/[locale]/events/EventsList.module.css';
-
-interface Event {
-  id: string;
-  slug: string;
-  name: string;
-  description: string | null;
-  is_private: boolean;
-  location_label: string | null;
-  start_time: string | null;
-}
+import { Event } from '@/types/types';
 
 interface EventCardProps {
   event: Event;
@@ -89,6 +80,13 @@ export function EventCard({ event }: EventCardProps) {
           <div className={classes.countdownWrapper}>
             <Countdown targetDate={new Date(event.start_time)} />
           </div>
+        )}
+
+        {event.status === 'finished' && (
+          <Badge color="green" variant="filled" size="md">
+            <IconCheck size={12} />
+            <span>{t('status.finished')}</span>
+          </Badge>
         )}
       </Group>
     </Paper>

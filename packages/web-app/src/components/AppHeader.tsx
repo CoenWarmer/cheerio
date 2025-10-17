@@ -47,6 +47,8 @@ interface AppHeaderProps {
   eventId?: string;
   /** Chat sidebar collapsed state */
   isChatCollapsed?: boolean;
+  /** Show the logo text (navbar only) */
+  showLogoText?: boolean;
   /** Callback for chat toggle */
   onChatToggle?: () => void;
   /** Selected user ID for tracking (optional) */
@@ -75,6 +77,7 @@ export function AppHeader(props?: AppHeaderProps) {
     selectedUserId = config.selectedUserId,
     onUserSelect = config.onUserSelect,
     showNavigationLinks = config.showNavigationLinks,
+    showLogoText = config.showLogoText,
   } = props || {};
 
   const { count: activeUsers } = usePresence(eventId || '', eventSlug || '');
@@ -176,11 +179,13 @@ export function AppHeader(props?: AppHeaderProps) {
               flexDirection: 'row',
               width: isMobile ? '100%' : 'auto',
               flexWrap: isMobile ? 'nowrap' : 'wrap',
-              marginBottom: isMobile ? 10 : 0,
+              justifyContent: 'space-between',
+              marginBottom:
+                (isMobile && showNavigationLinks) || showCheerButton ? 16 : 0,
             }}
           >
             <Box style={{ display: 'flex', gap: 8 }}>
-              <Logo size="lg" mode="navbar" />
+              <Logo size="lg" mode="navbar" showText={showLogoText} />
               {pageTitle && (
                 <>
                   <Text c="gray.4" fw={300} size="lg">

@@ -26,6 +26,7 @@ import { getCurrentLocation, isValidCoordinates } from '@/utils/location';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useProfile } from '@/hooks/useProfile';
+import { useMediaQuery } from '@mantine/hooks';
 
 type EventStatus = 'awaiting' | 'in_progress' | 'finished';
 
@@ -48,10 +49,12 @@ export default function NewEventPage() {
   const [longitude, setLongitude] = useState('');
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [error, setError] = useState('');
+  const isMobile = useMediaQuery('(max-width: 48em)');
 
   useHeaderConfig({
     pageTitle: tNav('new'),
     showNavigationLinks: true,
+    showLogoText: !isMobile,
   });
 
   const handleGetCurrentLocation = async () => {

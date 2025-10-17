@@ -1,8 +1,7 @@
 import Link from 'next/link';
-import { Box, Button, Group, Text } from '@mantine/core';
+import { Box, Button, Text } from '@mantine/core';
 import styles from './page.module.css';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import Image from 'next/image';
 
 export default async function Home({
   params,
@@ -22,7 +21,7 @@ export default async function Home({
         {/* <Logo size="xl" mode="big" /> */}
         <h1 className={styles.title}>{t('title')}</h1>
         <Text size="20px" c="grey" mb={28}>
-          Track en moedig jouw mensen aan.
+          {t('description')}
         </Text>
         <Button
           component={Link}
@@ -36,17 +35,8 @@ export default async function Home({
             maxWidth: 'min-content',
           }}
         >
-          Klik hier om te beginnen
+          {t('getStartedButton')}
         </Button>
-
-        <Group className={styles.ctas} gap="md" justify="center">
-          <Image
-            alt="cheerioo landing"
-            src="/hero.png"
-            width={512}
-            height={512}
-          />
-        </Group>
       </Box>
       <Box component="footer" className={styles.footer}></Box>
     </Box>

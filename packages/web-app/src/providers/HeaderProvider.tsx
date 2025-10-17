@@ -16,6 +16,7 @@ interface HeaderConfig {
   eventSlug?: string;
   eventId?: string;
   isChatCollapsed?: boolean;
+  showLogoText?: boolean;
   selectedUserId?: string | null;
   onChatToggle?: () => void;
   onUserSelect?: (userId: string | null) => void;
