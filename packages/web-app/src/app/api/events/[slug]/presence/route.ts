@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
+import { validateUserId } from '@/lib/validate-user-id';
 
 /**
  * POST /api/events/[slug]/presence
@@ -13,22 +14,20 @@ export async function POST(
   try {
     const supabase = await createServerClient();
 
-    // Try to get authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     // Parse request body
     const body = await request.json();
     const { status = 'online', metadata = {}, user_id } = body;
 
-    // Use user_id from body (for anonymous) or from auth session
-    const userId = user_id || user?.id;
+    // Validate user ID (prevents impersonation)
+    const { userId, error: userIdError } = await validateUserId(
+      supabase,
+      user_id
+    );
 
-    if (!userId) {
+    if (!userId || userIdError) {
       return NextResponse.json(
-        { error: 'No user ID provided' },
-        { status: 400 }
+        { error: userIdError || 'User ID required' },
+        { status: 403 }
       );
     }
 
@@ -142,22 +141,20 @@ export async function DELETE(
   try {
     const supabase = await createServerClient();
 
-    // Try to get authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     // Parse request body
     const body = await request.json().catch(() => ({}));
     const { user_id } = body;
 
-    // Use user_id from body (for anonymous) or from auth session
-    const userId = user_id || user?.id;
+    // Validate user ID (prevents impersonation)
+    const { userId, error: userIdError } = await validateUserId(
+      supabase,
+      user_id
+    );
 
-    if (!userId) {
+    if (!userId || userIdError) {
       return NextResponse.json(
-        { error: 'No user ID provided' },
-        { status: 400 }
+        { error: userIdError || 'User ID required' },
+        { status: 403 }
       );
     }
 

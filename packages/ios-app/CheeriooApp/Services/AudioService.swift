@@ -22,10 +22,12 @@ class AudioService: NSObject, ObservableObject {
     private func configureAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, mode: .default, options: [.mixWithOthers, .defaultToSpeaker])
+            // Configure for mixing with other audio - this is the global default
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
+            print("🔊 Global audio session configured for mixing")
         } catch {
-            print("Failed to configure audio session: \(error)")
+            print("❌ Failed to configure global audio session: \(error)")
         }
     }
     
@@ -117,16 +119,16 @@ class AudioService: NSObject, ObservableObject {
         
         print("Playing audio from: \(urlString)")
         
-        // Check if it's a WebM file
+        // Check if it's a WebM file (fallback to VLC)
         let isWebM = urlString.contains(".webm")
         
         if isWebM {
-            // Use VLCKit for WebM playback
-            print("Using VLCKit for WebM playback")
+            // Use VLCKit for WebM playback (legacy support)
+            print("⚠️ Using VLCKit for WebM playback (legacy)")
             playWithVLC(url: url)
         } else {
-            // Use AVAudioPlayer for M4A/MP3/WAV
-            print("Using AVAudioPlayer for native format")
+            // Use AVAudioPlayer for M4A/MP3/WAV (better audio mixing support)
+            print("✅ Using AVAudioPlayer for native format (M4A/MP3/WAV)")
             await playWithAVFoundation(url: url)
         }
     }
@@ -136,25 +138,34 @@ class AudioService: NSObject, ObservableObject {
         audioPlayer?.stop()
         vlcPlayer?.stop()
         
+        // Configure audio session with explicit mixing
+        do {
+            let session = AVAudioSession.sharedInstance()
+            // Try playback category with mixWithOthers option
+            // This should allow VLC to play alongside other audio
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true, options: [])
+            print("✅ Audio session configured: .playback + .mixWithOthers")
+        } catch {
+            print("❌ Failed to configure audio session: \(error)")
+        }
+        
+        // Give the audio session a moment to take effect
+        Thread.sleep(forTimeInterval: 0.1)
+        
         // Create VLC media and player
         let media = VLCMedia(url: url)
         vlcPlayer = VLCMediaPlayer()
         vlcPlayer?.media = media
         vlcPlayer?.delegate = self
         
-        // Configure audio session
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: .mixWithOthers)
-            try session.setActive(true)
-        } catch {
-            print("Failed to configure audio session: \(error)")
-        }
+        // Configure VLC audio if possible
+        print("🎬 Starting VLC playback...")
         
         // Play
         vlcPlayer?.play()
         isPlaying = true
-        print("VLC playback started")
+        print("▶️ VLC playback started")
     }
     
     private func playWithAVFoundation(url: URL) async {
@@ -176,10 +187,12 @@ class AudioService: NSObject, ObservableObject {
             let tempURL = getDocumentsDirectory().appendingPathComponent("temp-\(UUID().uuidString).\(fileExtension)")
             try data.write(to: tempURL)
             
-            // Configure audio session
+            // Configure audio session to play alongside other audio
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: .mixWithOthers)
-            try session.setActive(true)
+            // Use playback category with mixWithOthers to play alongside other audio
+            try session.setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers])
+            try session.setActive(true, options: [])
+            print("🎵 Audio session configured: .playback + .mixWithOthers + .spokenAudio")
             
             // Stop any existing playback
             audioPlayer?.stop()
@@ -205,6 +218,7 @@ extension AudioService: AVAudioPlayerDelegate {
     nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         Task { @MainActor in
             isPlaying = false
+            // No need to deactivate since we're mixing with other audio
         }
     }
 }
@@ -218,6 +232,7 @@ extension AudioService: VLCMediaPlayerDelegate {
             case .ended, .stopped, .error:
                 isPlaying = false
                 print("VLC playback ended")
+                // No need to deactivate since we're mixing with other audio
             case .playing:
                 print("VLC is playing")
             default:

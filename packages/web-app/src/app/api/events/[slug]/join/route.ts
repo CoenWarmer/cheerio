@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
+import { validateUserId } from '@/lib/validate-user-id';
 
 /**
  * POST /api/events/[slug]/join
@@ -13,19 +14,19 @@ export async function POST(
     const supabase = await createServerClient();
     const { slug } = await params;
 
-    // Try to get authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    // Get user_id from request body (for anonymous users) or auth session
+    // Get user_id from request body (for anonymous users)
     const body = await request.json().catch(() => ({}));
-    const userId = body.user_id || user?.id;
 
-    if (!userId) {
+    // Validate user ID (prevents impersonation)
+    const { userId, error: userIdError } = await validateUserId(
+      supabase,
+      body.user_id
+    );
+
+    if (!userId || userIdError) {
       return NextResponse.json(
-        { error: 'User ID required (authenticated or anonymous)' },
-        { status: 400 }
+        { error: userIdError || 'User ID required' },
+        { status: 403 }
       );
     }
 

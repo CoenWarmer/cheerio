@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
+import { validateUserId } from '@/lib/validate-user-id';
 
 /**
  * POST /api/attachments/upload
@@ -9,11 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerClient();
 
-    // Get authenticated user (if logged in)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
@@ -21,13 +17,16 @@ export async function POST(request: NextRequest) {
     const type = formData.get('type') as string; // e.g., 'audio', 'image', 'video'
     const user_id = formData.get('user_id') as string; // For anonymous users
 
-    // Support both authenticated users and anonymous users
-    const userId = user_id || user?.id;
+    // Validate user ID (prevents impersonation)
+    const { userId, error: userIdError } = await validateUserId(
+      supabase,
+      user_id
+    );
 
-    if (!userId) {
+    if (!userId || userIdError) {
       return NextResponse.json(
-        { error: 'User ID required (authenticated or anonymous)' },
-        { status: 400 }
+        { error: userIdError || 'User ID required' },
+        { status: 403 }
       );
     }
 
@@ -38,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
+    // Validate file type (check base type, ignore codecs)
     const allowedTypes = [
       'audio/webm',
       'audio/mpeg',
@@ -50,9 +49,15 @@ export async function POST(request: NextRequest) {
       'audio/x-m4a',
       'audio/aac',
     ];
-    if (type === 'audio' && !allowedTypes.includes(file.type)) {
+
+    // Extract base MIME type (before semicolon for codecs)
+    const baseMimeType = file.type.split(';')[0].trim();
+
+    if (type === 'audio' && !allowedTypes.includes(baseMimeType)) {
       return NextResponse.json(
-        { error: `Invalid file type. Allowed: ${allowedTypes.join(', ')}` },
+        {
+          error: `Invalid file type: ${baseMimeType}. Allowed: ${allowedTypes.join(', ')}`,
+        },
         { status: 400 }
       );
     }
@@ -66,21 +71,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const extension = file.name.split('.').pop() || 'webm';
-    const filename = `${type}-${userId}-${timestamp}.${extension}`;
-    const filePath = `${type}-messages/${eventId}/${filename}`;
-
     // Convert File to ArrayBuffer then to Buffer
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer: Buffer = Buffer.from(arrayBuffer);
+    const finalMimeType = file.type;
+
+    // Determine file extension based on MIME type (not filename)
+    // This handles cases where Chrome sends audio/mp4 with filename "recording.webm"
+    let finalExtension: string;
+    if (file.type.includes('audio/mp4') || file.type.includes('audio/m4a')) {
+      finalExtension = 'm4a';
+    } else if (
+      file.type.includes('audio/mpeg') ||
+      file.type.includes('audio/mp3')
+    ) {
+      finalExtension = 'mp3';
+    } else if (file.type.includes('audio/wav')) {
+      finalExtension = 'wav';
+    } else if (file.type.includes('audio/ogg')) {
+      finalExtension = 'ogg';
+    } else if (file.type.includes('audio/webm')) {
+      finalExtension = 'webm';
+    } else {
+      // Fallback to filename extension
+      finalExtension = file.name.split('.').pop() || 'audio';
+    }
+
+    console.log(
+      `📁 File: ${file.name} | Type: ${file.type} | Size: ${file.size} bytes`
+    );
+    console.log(`✅ Detected extension: .${finalExtension}`);
+
+    // Note: Audio conversion is now handled in the browser via ffmpeg.wasm
+    // before upload, so we just upload the already-converted M4A file
+
+    // Generate unique filename with correct extension
+    const timestamp = Date.now();
+    const filename = `${type}-${userId}-${timestamp}.${finalExtension}`;
+    const filePath = `${type}-messages/${eventId}/${filename}`;
 
     // Upload to Supabase Storage
+    // Use base MIME type without codecs (Supabase doesn't accept codecs in contentType)
+    const uploadMimeType = finalMimeType.split(';')[0].trim();
+
     const { error: uploadError } = await supabase.storage
       .from('room-attachments')
       .upload(filePath, buffer, {
-        contentType: file.type,
+        contentType: uploadMimeType,
         cacheControl: '3600',
       });
 
@@ -103,8 +140,8 @@ export async function POST(request: NextRequest) {
         type,
         url: publicUrl,
         filename,
-        mimeType: file.type,
-        size: file.size,
+        mimeType: uploadMimeType, // Use base MIME type (without codecs)
+        size: buffer.length, // Use converted file size
       },
     });
   } catch (error) {

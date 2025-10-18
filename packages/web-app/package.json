@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@mantine/core": "8.3.5",
     "@mantine/hooks": "8.3.5",
     "@supabase/ssr": "^0.7.0",

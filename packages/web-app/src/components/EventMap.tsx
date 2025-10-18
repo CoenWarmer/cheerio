@@ -16,10 +16,9 @@ import 'leaflet/dist/leaflet.css';
 import { Event } from '@/types/types';
 import type { LocationActivity } from '@/types/activity';
 import type { TrackingPath } from '@/hooks/useTrackingPaths';
-import { Button } from '@mantine/core';
-import { ConfettiIcon } from './icons/ConfettiIcon';
 import { useSendMessage } from '@/hooks/useMessages';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { EmojiModeButtons } from './EmojiModeButtons';
 import confetti from 'canvas-confetti';
 
 const flagIcon = L.divIcon({
@@ -227,11 +226,11 @@ function MapBoundsUpdater({
 }
 
 function MapClickHandler({
-  confettiMode,
+  emojiMode,
   eventSlug,
   onMessageSent,
 }: {
-  confettiMode: boolean;
+  emojiMode: 'confetti' | 'heart' | null;
   eventSlug: string;
   onMessageSent: (lat: number, lng: number) => void;
 }) {
@@ -239,7 +238,7 @@ function MapClickHandler({
 
   useMapEvents({
     click: e => {
-      if (confettiMode && eventSlug) {
+      if (emojiMode && eventSlug) {
         const { lat, lng } = e.latlng;
 
         // Get the container point (pixel coordinates) from the lat/lng
@@ -253,14 +252,31 @@ function MapClickHandler({
         const x = (rect.left + point.x) / window.innerWidth;
         const y = (rect.top + point.y) / window.innerHeight;
 
-        // Trigger confetti explosion at the click location
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { x, y },
-          colors: ['#228be6', '#ff6b6b', '#51cf66', '#ffd43b', '#ff8787'],
-          ticks: 200,
-        });
+        // Trigger visual effect based on emoji mode
+        if (emojiMode === 'confetti') {
+          // Regular confetti explosion
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x, y },
+            colors: ['#228be6', '#ff6b6b', '#51cf66', '#ffd43b', '#ff8787'],
+            ticks: 200,
+          });
+        } else if (emojiMode === 'heart') {
+          // Heart emoji confetti
+          const scalar = 2;
+          const heart = confetti.shapeFromText({ text: '❤️', scalar });
+
+          confetti({
+            particleCount: 30,
+            spread: 60,
+            startVelocity: 30,
+            origin: { x, y },
+            shapes: [heart],
+            scalar,
+            ticks: 150,
+          });
+        }
 
         onMessageSent(lat, lng);
       }
@@ -284,7 +300,7 @@ export default function EventMap({
     new Map()
   );
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const [confettiMode, setConfettiMode] = useState(false);
+  const [emojiMode, setEmojiMode] = useState<'confetti' | 'heart' | null>(null);
 
   const { sendMessage } = useSendMessage();
   const { currentUser } = useCurrentUser();
@@ -294,10 +310,12 @@ export default function EventMap({
   }, []);
 
   const handleMapClick = (lat: number, lng: number) => {
-    if (!eventSlug || !currentUser?.id) return;
+    if (!eventSlug || !currentUser?.id || !emojiMode) return;
+
+    const emoji = emojiMode === 'confetti' ? '🎉' : '❤️';
 
     const messageData = {
-      content: `🎉`,
+      content: emoji,
       location: { lat, long: lng },
       user_id: currentUser.id,
     };
@@ -413,31 +431,10 @@ export default function EventMap({
           }
         `}
       </style>
-      <Button
-        variant="filled"
-        onClick={() => setConfettiMode(!confettiMode)}
-        style={{
-          position: 'absolute',
-          borderRadius: 100,
-          height: 60,
-          width: 60,
-          top: '40%',
-          left: 10,
-          zIndex: 500,
-          boxShadow: '2px 2px 2px rgba(0,0,0,0.2)',
-          backgroundColor: confettiMode ? '#ff6b6b' : '#228be6',
-          opacity: confettiMode ? 1 : 0.9,
-          transform: confettiMode ? 'scale(1.1)' : 'scale(1)',
-          transition: 'all 0.3s ease',
-        }}
-        title={
-          confettiMode
-            ? 'Confetti mode active - click map to celebrate!'
-            : 'Click to enable confetti mode'
-        }
-      >
-        <ConfettiIcon size={60} />
-      </Button>
+      <EmojiModeButtons
+        emojiMode={emojiMode}
+        onEmojiModeChange={setEmojiMode}
+      />
       <MapContainer
         center={position}
         zoom={location ? 15 : 13}
@@ -455,7 +452,7 @@ export default function EventMap({
         />
         {eventSlug && (
           <MapClickHandler
-            confettiMode={confettiMode}
+            emojiMode={emojiMode}
             eventSlug={eventSlug}
             onMessageSent={handleMapClick}
           />

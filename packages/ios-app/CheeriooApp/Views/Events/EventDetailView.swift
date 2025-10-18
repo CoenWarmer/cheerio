@@ -174,9 +174,8 @@ struct EventDetailView: View {
             await joinEventAndSubscribe()
         }
         .onDisappear {
-            if locationService.isTracking {
-                locationService.stopTracking()
-            }
+            // Don't stop tracking - let it continue in background
+            // Users should explicitly stop tracking with the "Stop Tracking" button
             Task {
                 await chatService.unsubscribe()
                 await removePresence()

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
+import { validateUserId } from '@/lib/validate-user-id';
 
 // GET /api/events/[slug]/messages - Get messages for a event
 export async function GET(
@@ -86,20 +87,16 @@ export async function POST(
 
     const { content, attachment, location, user_id } = body;
 
-    // Get authenticated user (if logged in)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // Validate user ID (prevents impersonation)
+    const { userId, error: userIdError } = await validateUserId(
+      supabase,
+      user_id
+    );
 
-    // Support both authenticated users and anonymous users
-    // Authenticated users: use session user_id
-    // Anonymous users: use provided user_id from request body
-    const userId = user_id || user?.id;
-
-    if (!userId) {
+    if (!userId || userIdError) {
       return NextResponse.json(
-        { error: 'User ID required (authenticated or anonymous)' },
-        { status: 400 }
+        { error: userIdError || 'User ID required' },
+        { status: 403 }
       );
     }
 
