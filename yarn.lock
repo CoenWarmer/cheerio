@@ -148,6 +148,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:15.5.5"
     leaflet: "npm:^1.9.4"
+    leaflet-curve: "npm:^1.0.0"
     next: "npm:15.5.5"
     next-intl: "npm:^4.3.12"
     react: "npm:19.1.0"
@@ -3351,6 +3352,13 @@ __metadata:
   dependencies:
     language-subtag-registry: "npm:^0.3.20"
   checksum: 9ab911213c4bd8bd583c850201c17794e52cb0660d1ab6e32558aadc8324abebf6844e46f92b80a5d600d0fbba7eface2c207bfaf270a1c7fd539e4c3a880bff
+  languageName: node
+  linkType: hard
+
+"leaflet-curve@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "leaflet-curve@npm:1.0.0"
+  checksum: 1c69598cb6c92226d1dc132fc72b14f7cd7e977fb30be0651f1a5d21558c1d1204b3a5dc229392b572ef08be613aa285af58ceec44275814c77f012079c71f3b
   languageName: node
   linkType: hard
 

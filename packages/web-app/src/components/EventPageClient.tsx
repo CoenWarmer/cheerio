@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { useEvent, useJoinEvent } from '@/hooks/useEvents';
 import { useActivity } from '@/hooks/useActivity';
 import { useEmojiMarkers } from '@/hooks/useEmojiMarkers';
+import { useImageMarkers } from '@/hooks/useImageMarkers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useTrackingPaths } from '@/hooks/useTrackingPaths';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
@@ -43,7 +44,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const { event, isLoading, error: eventError } = useEvent(eventSlug);
   const { joinEvent } = useJoinEvent();
 
-  const { activities, userNames, userLocations } = useActivity(
+  const { activities, userLocations } = useActivity(
     event?.id ?? '',
     event?.slug ?? ''
   );
@@ -51,9 +52,10 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
   const { emojiMarkers, currentUserDistance } = useEmojiMarkers(
     event?.id ?? '',
     event?.slug ?? '',
-    userNames,
     activities
   );
+
+  const { imageMarkers } = useImageMarkers(event?.id ?? '', event?.slug ?? '');
 
   const { paths: trackingPaths } = useTrackingPaths(
     event?.id ?? '',
@@ -184,6 +186,7 @@ export default function EventPageClient({ eventSlug }: { eventSlug: string }) {
                   location={event.location}
                   userLocations={userLocations}
                   emojiMarkers={emojiMarkers}
+                  imageMarkers={imageMarkers}
                   trackingPaths={trackingPaths}
                   selectedUserId={selectedUserId}
                   eventSlug={event.slug}

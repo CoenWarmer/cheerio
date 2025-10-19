@@ -7,18 +7,19 @@ import {
   Marker,
   Popup,
   Tooltip,
-  Polyline,
   useMap,
   useMapEvents,
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-curve';
 import { Event } from '@/types/types';
 import type { LocationActivity } from '@/types/activity';
 import type { TrackingPath } from '@/hooks/useTrackingPaths';
 import { useSendMessage } from '@/hooks/useMessages';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { EmojiModeButtons } from './EmojiModeButtons';
+import { ImageMarker } from '@/hooks/useImageMarkers';
 import confetti from 'canvas-confetti';
 
 const flagIcon = L.divIcon({
@@ -160,9 +161,148 @@ interface EventMapProps {
   location?: Event['location'];
   userLocations?: UserLocationMarker[];
   emojiMarkers?: EmojiMarker[];
+  imageMarkers?: ImageMarker[];
   trackingPaths?: TrackingPath[];
   selectedUserId?: string | null;
   eventSlug?: string;
+}
+
+// Custom component for curved tracking paths using leaflet-curve
+function CurvedPath({
+  positions,
+  color,
+  weight = 4,
+  userName,
+}: {
+  positions: [number, number][];
+  color: string;
+  weight?: number;
+  userName?: string;
+}) {
+  const map = useMap();
+  const curveRef = useRef<L.Polyline | null>(null);
+
+  useEffect(() => {
+    if (positions.length < 2) return;
+
+    // Remove existing curve if any
+    if (curveRef.current) {
+      map.removeLayer(curveRef.current);
+    }
+
+    // Create curved path data
+    // Only apply curves at turns, keep straight sections straight
+    const curveData: Array<string | [number, number]> = [];
+
+    // Start with the first point
+    curveData.push('M', positions[0]);
+
+    for (let i = 0; i < positions.length - 1; i++) {
+      const start = positions[i];
+      const end = positions[i + 1];
+
+      // Calculate distance between points
+      const dx = end[1] - start[1];
+      const dy = end[0] - start[0];
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Skip if points are too close (avoid division by zero)
+      if (dist < 0.00001) {
+        continue;
+      }
+
+      // Detect if this is a turn by looking at the angle change
+      let isTurn = false;
+      let turnSharpness = 0;
+
+      if (i > 0 && i < positions.length - 1) {
+        const prev = positions[i - 1];
+        const curr = start;
+        const next = end;
+
+        // Calculate vectors
+        const v1x = curr[1] - prev[1];
+        const v1y = curr[0] - prev[0];
+        const v2x = next[1] - curr[1];
+        const v2y = next[0] - curr[0];
+
+        // Calculate angle between vectors using dot product
+        const dot = v1x * v2x + v1y * v2y;
+        const mag1 = Math.sqrt(v1x * v1x + v1y * v1y);
+        const mag2 = Math.sqrt(v2x * v2x + v2y * v2y);
+
+        if (mag1 > 0.00001 && mag2 > 0.00001) {
+          const cosAngle = dot / (mag1 * mag2);
+          const angle = Math.acos(Math.max(-1, Math.min(1, cosAngle)));
+
+          // If angle is significant (> 10 degrees), it's a turn
+          const angleInDegrees = (angle * 180) / Math.PI;
+          if (angleInDegrees > 10) {
+            isTurn = true;
+            // Normalize sharpness: 10° = 0, 180° = 1
+            turnSharpness = Math.min((angleInDegrees - 10) / 170, 1);
+          }
+        }
+      }
+
+      if (isTurn) {
+        // Apply curve at turns, strength based on sharpness
+        const midLat = (start[0] + end[0]) / 2;
+        const midLng = (start[1] + end[1]) / 2;
+
+        // Offset based on turn sharpness (sharper turns = more curve)
+        const baseOffset = dist * 0.1;
+        const offsetFactor = Math.min(baseOffset * turnSharpness, 0.0005);
+
+        const controlLat = midLat + (-dx / dist) * offsetFactor;
+        const controlLng = midLng + (dy / dist) * offsetFactor;
+
+        // Create quadratic Bézier curve
+        curveData.push('Q', [controlLat, controlLng], end);
+      } else {
+        // Straight line for straight sections
+        curveData.push('L', end);
+      }
+    }
+
+    // Create the curve with leaflet-curve
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const curve = (L as any).curve(curveData, {
+      color,
+      weight,
+      opacity: 1,
+      lineCap: 'round',
+      lineJoin: 'round',
+      smoothFactor: 1,
+    });
+
+    // Add tooltip
+    if (userName) {
+      curve.bindTooltip(
+        `<div style="padding: 8px 12px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1); border: 2px solid ${color}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <div style="font-size: 14px; font-weight: 600; color: #212529; margin-bottom: 4px;">${userName}</div>
+          <div style="font-size: 12px; color: #868e96; line-height: 1.55;">${positions.length} points tracked</div>
+        </div>`,
+        {
+          sticky: true,
+          direction: 'top',
+          opacity: 1,
+          className: 'mantine-tooltip',
+        }
+      );
+    }
+
+    curve.addTo(map);
+    curveRef.current = curve;
+
+    return () => {
+      if (curveRef.current) {
+        map.removeLayer(curveRef.current);
+      }
+    };
+  }, [positions, color, weight, userName, map]);
+
+  return null;
 }
 
 function MapResizer() {
@@ -291,6 +431,7 @@ export default function EventMap({
   location,
   userLocations = [],
   emojiMarkers = [],
+  imageMarkers = [],
   trackingPaths = [],
   selectedUserId = null,
   eventSlug,
@@ -690,27 +831,57 @@ export default function EventMap({
           }
         )}
 
-        {/* Tracking path polylines */}
-        {trackingPaths.map(path => {
-          if (path.coordinates.length < 2) return null;
+        {/* Image markers */}
+        {imageMarkers.map(({ id, imageUrl, userName, location, timestamp }) => {
+          const imagePosition: [number, number] = [location.lat, location.long];
 
-          const positions: [number, number][] = path.coordinates.map(coord => [
-            coord.lat,
-            coord.lng,
-          ]);
+          // Create custom image marker icon with thumbnail
+          const imageIcon = L.divIcon({
+            html: `
+              <div style="
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                border: 3px solid #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                overflow: hidden;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              ">
+                <img 
+                  src="${imageUrl}" 
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                  "
+                  alt="Photo marker"
+                />
+              </div>
+            `,
+            className: 'custom-image-marker',
+            iconSize: [60, 60],
+            iconAnchor: [30, 30],
+            popupAnchor: [0, -30],
+          });
+
+          const timeSince = currentTime - new Date(timestamp).getTime();
+          const minutesAgo = Math.floor(timeSince / 1000 / 60);
+          const timeText =
+            minutesAgo < 1
+              ? 'just now'
+              : minutesAgo < 60
+                ? `${minutesAgo}m ago`
+                : `${Math.floor(minutesAgo / 60)}h ago`;
 
           return (
-            <Polyline
-              key={path.sessionId}
-              positions={positions}
-              color={path.color}
-              weight={3}
-              opacity={0.7}
-            >
+            <Marker key={id} position={imagePosition} icon={imageIcon}>
               <Tooltip
                 direction="top"
+                offset={[0, -40]}
                 opacity={1}
-                sticky
                 className="mantine-tooltip"
               >
                 <div
@@ -720,7 +891,7 @@ export default function EventMap({
                     borderRadius: '8px',
                     boxShadow:
                       '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
-                    border: `2px solid ${path.color}`,
+                    border: '2px solid #3b82f6',
                     fontFamily:
                       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                   }}
@@ -733,7 +904,7 @@ export default function EventMap({
                       marginBottom: '4px',
                     }}
                   >
-                    {path.userName || `User ${path.userId.substring(0, 8)}`}
+                    📷 {userName}
                   </div>
                   <div
                     style={{
@@ -742,11 +913,53 @@ export default function EventMap({
                       lineHeight: '1.55',
                     }}
                   >
-                    {path.coordinates.length} points tracked
+                    {timeText}
                   </div>
                 </div>
               </Tooltip>
-            </Polyline>
+              <Popup maxWidth={300}>
+                <div>
+                  <img
+                    src={imageUrl}
+                    alt="Photo"
+                    style={{
+                      width: '100%',
+                      maxHeight: '200px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      marginBottom: '8px',
+                    }}
+                  />
+                  <strong>{userName}</strong>
+                  <br />
+                  📍 {location.lat.toFixed(6)}, {location.long.toFixed(6)}
+                  <br />
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                    {timeText}
+                  </span>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
+        {/* Tracking path curved polylines */}
+        {trackingPaths.map(path => {
+          if (path.coordinates.length < 2) return null;
+
+          const positions: [number, number][] = path.coordinates.map(coord => [
+            coord.lat,
+            coord.lng,
+          ]);
+
+          return (
+            <CurvedPath
+              key={path.sessionId}
+              positions={positions}
+              color={path.color}
+              weight={4}
+              userName={path.userName || `User ${path.userId.substring(0, 8)}`}
+            />
           );
         })}
       </MapContainer>

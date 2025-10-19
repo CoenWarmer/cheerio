@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type (check base type, ignore codecs)
-    const allowedTypes = [
+    const allowedAudioTypes = [
       'audio/webm',
       'audio/mpeg',
       'audio/mp3',
@@ -50,13 +50,30 @@ export async function POST(request: NextRequest) {
       'audio/aac',
     ];
 
+    const allowedImageTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+    ];
+
     // Extract base MIME type (before semicolon for codecs)
     const baseMimeType = file.type.split(';')[0].trim();
 
-    if (type === 'audio' && !allowedTypes.includes(baseMimeType)) {
+    if (type === 'audio' && !allowedAudioTypes.includes(baseMimeType)) {
       return NextResponse.json(
         {
-          error: `Invalid file type: ${baseMimeType}. Allowed: ${allowedTypes.join(', ')}`,
+          error: `Invalid audio type: ${baseMimeType}. Allowed: ${allowedAudioTypes.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (type === 'image' && !allowedImageTypes.includes(baseMimeType)) {
+      return NextResponse.json(
+        {
+          error: `Invalid image type: ${baseMimeType}. Allowed: ${allowedImageTypes.join(', ')}`,
         },
         { status: 400 }
       );
@@ -92,9 +109,20 @@ export async function POST(request: NextRequest) {
       finalExtension = 'ogg';
     } else if (file.type.includes('audio/webm')) {
       finalExtension = 'webm';
+    } else if (
+      file.type.includes('image/jpeg') ||
+      file.type.includes('image/jpg')
+    ) {
+      finalExtension = 'jpg';
+    } else if (file.type.includes('image/png')) {
+      finalExtension = 'png';
+    } else if (file.type.includes('image/gif')) {
+      finalExtension = 'gif';
+    } else if (file.type.includes('image/webp')) {
+      finalExtension = 'webp';
     } else {
       // Fallback to filename extension
-      finalExtension = file.name.split('.').pop() || 'audio';
+      finalExtension = file.name.split('.').pop() || type;
     }
 
     console.log(

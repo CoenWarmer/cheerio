@@ -18,7 +18,6 @@ export interface EmojiMarker {
 export function useEmojiMarkers(
   eventId: string,
   eventSlug: string,
-  userNames: Map<string, string>,
   activities: UserActivity[]
 ) {
   const { user } = useUser();
@@ -70,14 +69,10 @@ export function useEmojiMarkers(
         continue;
       }
 
-      const userId = message.user_id;
-      const userName =
-        userNames.get(userId) || `User ${userId.substring(0, 8)}`;
-
       markers.push({
         id: message.id,
         emoji: message.content,
-        userName,
+        userName: message.userName || '',
         location: { lat: location.lat, long: location.long },
         timestamp: message.created_at,
         distance: location.distance,
@@ -85,7 +80,7 @@ export function useEmojiMarkers(
     }
 
     return markers;
-  }, [messages, userNames]);
+  }, [messages]);
 
   return {
     emojiMarkers,

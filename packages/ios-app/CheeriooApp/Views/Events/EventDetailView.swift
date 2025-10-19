@@ -1,5 +1,6 @@
 import SwiftUI
 import Supabase
+import PhotosUI
 
 struct EventDetailView: View {
     @EnvironmentObject var appState: AppState
@@ -13,6 +14,9 @@ struct EventDetailView: View {
     @State private var showingRecordButton = false
     @State private var hasJoinedEvent = false
     @State private var activeUsersCount = 0
+    @State private var showCamera = false
+    @State private var capturedImage: UIImage?
+    @State private var isUploadingImage = false
     
     init(event: Event) {
         self.event = event
@@ -31,7 +35,36 @@ struct EventDetailView: View {
         VStack(spacing: 0) {
             // Top Section (scrollable when needed)
             ScrollView {
-                VStack(spacing: 16) {                    
+                VStack(spacing: 16) {
+                    // Network Status & Pending Activities
+                    if !locationService.isOnline || locationService.pendingActivitiesCount > 0 {
+                        HStack(spacing: 8) {
+                            if !locationService.isOnline {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "wifi.slash")
+                                        .foregroundColor(.orange)
+                                    Text("Offline")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                            
+                            if locationService.pendingActivitiesCount > 0 {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "arrow.clockwise.circle.fill")
+                                        .foregroundColor(.blue)
+                                    Text("\(locationService.pendingActivitiesCount) pending")
+                                        .font(.caption)
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                    
                     // Tracking Stats (when tracking)
                     if locationService.isTracking {
                         TrackingStatsView(
@@ -58,7 +91,7 @@ struct EventDetailView: View {
                     VStack(spacing: 8) {
                         HStack(spacing: 8) {
                             EmojiButton(emoji: "😎") { handleEmojiTap("😎") }
-                            EmojiButton(emoji: "🙁") { handleEmojiTap("🙁") }
+                            EmojiButton(emoji: "📷") { showCamera = true }
                             EmojiButton(emoji: "😫") { handleEmojiTap("😫") }
                         }
                         HStack(spacing: 8) {
@@ -180,6 +213,9 @@ struct EventDetailView: View {
                 await chatService.unsubscribe()
                 await removePresence()
             }
+        }
+        .sheet(isPresented: $showCamera) {
+            ImagePicker(image: $capturedImage, onImageCaptured: handleImageCaptured)
         }
     }
     
@@ -399,6 +435,136 @@ struct EventDetailView: View {
             }
         }
     }
+    
+    private func handleImageCaptured(_ image: UIImage) {
+        isUploadingImage = true
+        
+        Task {
+            do {
+                // Compress image to JPEG
+                guard let imageData = image.jpegData(compressionQuality: 0.7) else {
+                    print("Failed to convert image to JPEG")
+                    isUploadingImage = false
+                    return
+                }
+                
+                // Upload image
+                let attachment = try await uploadImage(imageData: imageData)
+                
+                // Get current location if tracking
+                var location: [String: Double]?
+                if locationService.isTracking,
+                   let currentLocation = locationService.currentLocation {
+                    location = [
+                        "lat": currentLocation.coordinate.latitude,
+                        "long": currentLocation.coordinate.longitude
+                    ]
+                }
+                
+                // Send message with image attachment
+                let url = URL(string: "\(Config.apiBaseURL)/api/events/\(event.slug)/messages")!
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                
+                if let session = try? await appState.supabase.auth.session {
+                    request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
+                }
+                
+                let body: [String: Any] = [
+                    "content": "📷 Photo",
+                    "attachment": attachment,
+                    "location": location as Any
+                ]
+                request.httpBody = try JSONSerialization.data(withJSONObject: body)
+                
+                let (_, _) = try await URLSession.shared.data(for: request)
+                
+                isUploadingImage = false
+                capturedImage = nil
+            } catch {
+                print("Failed to send photo: \(error)")
+                isUploadingImage = false
+            }
+        }
+    }
+    
+    private func uploadImage(imageData: Data) async throws -> [String: Any] {
+        let url = URL(string: "\(Config.apiBaseURL)/api/attachments/upload")!
+        
+        // Create multipart form data
+        let boundary = UUID().uuidString
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        if let session = try? await appState.supabase.auth.session {
+            request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
+        }
+        
+        var body = Data()
+        
+        // Add file
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"photo.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        // Add eventId
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"eventId\"\r\n\r\n".data(using: .utf8)!)
+        body.append(event.id.data(using: .utf8)!)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        // Add type
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"type\"\r\n\r\n".data(using: .utf8)!)
+        body.append("image".data(using: .utf8)!)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        // Add user_id if available
+        if let userId = appState.currentUser?.id.uuidString {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"user_id\"\r\n\r\n".data(using: .utf8)!)
+            body.append(userId.data(using: .utf8)!)
+            body.append("\r\n".data(using: .utf8)!)
+        }
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        request.httpBody = body
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let result = try JSONDecoder().decode(UploadResponse.self, from: data)
+        return [
+            "type": result.attachment.type,
+            "url": result.attachment.url,
+            "filename": result.attachment.filename,
+            "mimeType": result.attachment.mimeType,
+            "size": result.attachment.size
+        ]
+    }
+}
+
+// MARK: - Upload Response
+struct UploadResponse: Codable {
+    let success: Bool
+    let attachment: AttachmentInfo
+}
+
+struct AttachmentInfo: Codable {
+    let type: String
+    let url: String
+    let filename: String
+    let mimeType: String
+    let size: Int
 }
 
 // MARK: - Emoji Button Component
